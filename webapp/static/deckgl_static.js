@@ -4,9 +4,11 @@
  *
  *   Traffic — a PathLayer of streets coloured/sized by average
  *     vehicles/hour for the selected window (All Day / Peak AM /
- *     Peak PM), from _static/traffic_<daytype>.json:
+ *     Peak PM / Off-peak early / Off-peak late), from
+ *     _static/traffic_<daytype>.json:
  *       { meta:{vmax_vph, center, ...}, skeleton:[...],
- *         edges:[{id, name, coords, vals:{all_day,peak_am,peak_pm}}] }
+ *         edges:[{id, name, coords, vals:{all_day,peak_am,peak_pm,
+ *                 off_peak_early,off_peak_late}}] }
  *
  *   Crash — a ScatterplotLayer of NJDOT crash points coloured by KABCO
  *     severity and filtered by year, from _static/crashes.json:
@@ -187,7 +189,13 @@
     }
 
     function trafficTipHtml(e) {
-      const w = { all_day: "All day", peak_am: "Peak AM", peak_pm: "Peak PM" };
+      const w = {
+        all_day: "All day",
+        peak_am: "Peak AM",
+        peak_pm: "Peak PM",
+        off_peak_early: "Off-peak early",
+        off_peak_late: "Off-peak late",
+      };
       return (
         '<div class="deck-tip-name">' +
         (e.name || e.id) +

@@ -122,16 +122,24 @@ window.LeoniaTabs = window.LeoniaTabs || {
         staticCatalog.peak_windows &&
         staticCatalog.peak_windows[dayType]) ||
       null;
+    // Base labels for the off-peak windows differ by day type: weekday's
+    // early off-peak is the midday lull, while Sunday's is the quiet morning
+    // before the midday plateau. The hour range is appended from the catalog.
+    const earlyBase =
+      dayType === "sunday" ? "Off-peak morning" : "Off-peak midday";
+    const lateBase = "Off-peak evening";
+    const withWin = (base, win) =>
+      pw && win ? `${base} (${fmtWindow(win)})` : base;
     for (const opt of els.daypart.options) {
       if (opt.value === "all_day") opt.textContent = "All day";
       else if (opt.value === "peak_am") {
-        opt.textContent = pw
-          ? `Peak AM (${fmtWindow(pw.peak_am)})`
-          : "Peak AM";
+        opt.textContent = withWin("Peak AM", pw && pw.peak_am);
       } else if (opt.value === "peak_pm") {
-        opt.textContent = pw
-          ? `Peak PM (${fmtWindow(pw.peak_pm)})`
-          : "Peak PM";
+        opt.textContent = withWin("Peak PM", pw && pw.peak_pm);
+      } else if (opt.value === "off_peak_early") {
+        opt.textContent = withWin(earlyBase, pw && pw.off_peak_early);
+      } else if (opt.value === "off_peak_late") {
+        opt.textContent = withWin(lateBase, pw && pw.off_peak_late);
       }
     }
   }
@@ -165,11 +173,13 @@ window.LeoniaTabs = window.LeoniaTabs || {
   }
 
   function partLabel(part) {
-    return part === "peak_am"
-      ? "Peak AM"
-      : part === "peak_pm"
-        ? "Peak PM"
-        : "all day";
+    const labels = {
+      peak_am: "Peak AM",
+      peak_pm: "Peak PM",
+      off_peak_early: "off-peak early",
+      off_peak_late: "off-peak late",
+    };
+    return labels[part] || "all day";
   }
 
   async function apply() {

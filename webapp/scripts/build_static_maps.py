@@ -5,10 +5,10 @@ summarise average conditions for the day, driven by a unified control
 bar. This module emits the precomputed artefacts that tab consumes:
 
 * ``_static/traffic_weekday.json`` / ``_static/traffic_sunday.json`` —
-  per-edge average vehicles/hour for three windows (All Day, Peak AM,
-  Peak PM), derived from the StreetLight hourly overlays
-  (``_overlays/streetlight_<demand>.json``) joined to SUMO edge
-  geometry.
+  per-edge average vehicles/hour for five windows (All Day, Peak AM,
+  Peak PM, Off-peak early, Off-peak late), derived from the StreetLight
+  hourly overlays (``_overlays/streetlight_<demand>.json``) joined to
+  SUMO edge geometry.
 * ``_static/crashes.json`` — borough-filtered NJDOT crash points with
   per-point year/severity, plus the list of years available for the
   Year filter, over a grey street skeleton.
@@ -81,14 +81,32 @@ STATIC_DIR = PRECACHE_DIR / "_static"
 # can represent today.
 DAY_TYPES: tuple[str, ...] = ("weekday", "sunday")
 
-# Data-derived peak windows as ``[start_hour, end_hour)`` (24h clock).
-# Weekday is bimodal; Sunday is a flat midday plateau split into a
-# late-morning ("AM") and afternoon ("PM") side. Catalog-driven so the
-# front-end labels these as Peak AM / Peak PM without hard-coding hours.
+# Day-part windows as ``[start_hour, end_hour)`` (24h clock). Weekday is
+# bimodal (AM + PM commute peaks) with a midday lull and a quiet evening;
+# Sunday is a flat midday plateau bracketed by a quiet morning and evening.
+# Catalog-driven so the front-end labels each option with its hours without
+# hard-coding them. Each window key here becomes a selectable day part and an
+# averaged value on every edge (plus the implicit "all_day").
 PEAK_WINDOWS: dict[str, dict[str, list[int]]] = {
-    "weekday": {"peak_am": [7, 10], "peak_pm": [15, 18]},
-    "sunday": {"peak_am": [10, 13], "peak_pm": [13, 16]},
+    "weekday": {
+        "peak_am": [7, 10],
+        "peak_pm": [15, 18],
+        "off_peak_early": [10, 15],  # midday lull between the commute peaks
+        "off_peak_late": [19, 23],   # evening, after the PM peak fades
+    },
+    "sunday": {
+        "peak_am": [10, 13],
+        "peak_pm": [13, 16],
+        "off_peak_early": [6, 10],   # early morning before the midday plateau
+        "off_peak_late": [16, 21],   # late afternoon into evening
+    },
 }
+
+# Windows whose values drive the colour ramp's vmax. Restricting this to the
+# busier windows keeps the scale stable so the lower-volume off-peak windows
+# correctly read as lighter/greener instead of depressing vmax (which would
+# tint every window redder).
+VMAX_WINDOWS: tuple[str, ...] = ("peak_am", "peak_pm")
 
 MAX_SKELETON = 4000
 ZOOM = 14
@@ -413,8 +431,6 @@ def build_traffic_static(
     overlay = json.loads(overlay_path.read_text())
     by_edge = overlay.get("by_edge", {})
     windows = PEAK_WINDOWS[demand]
-    am_lo, am_hi = windows["peak_am"]
-    pm_lo, pm_hi = windows["peak_pm"]
 
     edges_out: list[dict] = []
     all_values: list[float] = []
@@ -435,14 +451,17 @@ def build_traffic_static(
         if not hourly:
             continue
         all_day = float(sum(hourly) / len(hourly))
-        peak_am = _window_mean(hourly, am_lo, am_hi)
-        peak_pm = _window_mean(hourly, pm_lo, pm_hi)
+        vals = {"all_day": int(round(all_day))}
+        for wkey, (lo, hi) in windows.items():
+            vals[wkey] = int(round(_window_mean(hourly, lo, hi)))
         covered.add(eid)
         # Scale colours off Leonia's own streets so the much higher-volume
         # GWB approach saturates at max-red instead of washing out the
         # in-town gradient. Falls back to all edges when no subset given.
+        # Only the busy windows feed vmax (see VMAX_WINDOWS).
         if vmax_ids is None or str(eid) in vmax_ids:
-            all_values.extend([all_day, peak_am, peak_pm])
+            all_values.append(all_day)
+            all_values.extend(float(vals[w]) for w in VMAX_WINDOWS if w in vals)
         coords = (
             coords_by_edge.get(str(eid)) if coords_by_edge is not None else None
         ) or _round_coords(list(geom.coords))
@@ -450,11 +469,7 @@ def build_traffic_static(
             "id": str(eid),
             "name": rec.get("street") or str(eid),
             "coords": coords,
-            "vals": {
-                "all_day": int(round(all_day)),
-                "peak_am": int(round(peak_am)),
-                "peak_pm": int(round(peak_pm)),
-            },
+            "vals": vals,
         })
 
     positive = [v for v in all_values if v > 0]
@@ -470,28 +485,19 @@ def build_traffic_static(
         and name_of is not None and edge_junctions is not None
     ):
         colored = {
-            e["id"]: {
-                "all_day": e["vals"]["all_day"],
-                "peak_am": e["vals"]["peak_am"],
-                "peak_pm": e["vals"]["peak_pm"],
-                "name": e["name"],
-            }
+            e["id"]: {"vals": e["vals"], "name": e["name"]}
             for e in edges_out
         }
         filled = fill_unnamed_gaps(
             colored, coords_by_edge, name_of, edge_junctions, in_borough,
         )
-        for eid, vals in filled.items():
+        for eid, payload in filled.items():
             covered.add(eid)
             edges_out.append({
                 "id": str(eid),
-                "name": vals.get("name") or str(eid),
+                "name": payload.get("name") or str(eid),
                 "coords": coords_by_edge[eid],
-                "vals": {
-                    "all_day": int(vals["all_day"]),
-                    "peak_am": int(vals["peak_am"]),
-                    "peak_pm": int(vals["peak_pm"]),
-                },
+                "vals": dict(payload["vals"]),
             })
         if filled:
             logger.info("%s: filled %d unnamed gap segments.", demand, len(filled))
@@ -679,6 +685,32 @@ def static_catalog_block(precache_dir: Path = PRECACHE_DIR) -> dict:
     }
 
 
+def refresh_catalog_static_block(precache_dir: Path = PRECACHE_DIR) -> bool:
+    """Patch the ``static`` block of an existing ``catalog.json`` in place.
+
+    ``build_precache.py`` owns full catalog generation, but rebuilding only
+    the static maps (overlays + ``_static/``) leaves the catalog's ``static``
+    block — including ``peak_windows`` the front-end labels day parts from —
+    stale. This refreshes just that block (everything else is preserved) so a
+    standalone ``build_static_maps`` run keeps the catalog consistent. Returns
+    ``True`` if the catalog was updated.
+    """
+    catalog_path = precache_dir / "catalog.json"
+    if not catalog_path.is_file():
+        logger.info("No catalog.json at %s; skipping static-block refresh.",
+                    catalog_path)
+        return False
+    try:
+        catalog = json.loads(catalog_path.read_text())
+    except Exception as exc:
+        logger.warning("Could not read catalog.json (%s); skipping refresh.", exc)
+        return False
+    catalog["static"] = static_catalog_block(precache_dir)
+    catalog_path.write_text(json.dumps(catalog, separators=(",", ":")))
+    logger.info("Refreshed catalog.json static block (paths + peak_windows).")
+    return True
+
+
 # ---------------------------------------------------------------------------
 # Entry point
 # ---------------------------------------------------------------------------
@@ -742,6 +774,11 @@ def build_static_maps(out_dir: Path = STATIC_DIR) -> dict[str, Path]:
             path, crash["meta"]["n_points"],
             f"{crash['years'][0]}-{crash['years'][-1]}" if crash["years"] else "(none)",
         )
+
+    # Keep the catalog's static block (paths + peak_windows) in sync so the
+    # front-end picks up the off-peak windows without a full precache rebuild.
+    if out_dir == STATIC_DIR:
+        refresh_catalog_static_block(PRECACHE_DIR)
 
     return written
 

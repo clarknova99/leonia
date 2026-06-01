@@ -44,3 +44,8 @@ env/
 .idea/
 .vscode/
 *.swp
+
+# ---------------------------------------------------------------------------
+# Local deploy helper — contains NAS credentials, never commit.
+# ---------------------------------------------------------------------------
+/scripts/sync_webapp_data.sh
