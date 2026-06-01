@@ -133,6 +133,42 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # NOTE: "Create PR in Talos Cluster repo" is intentionally omitted for now.
-      # The build_* steps expose ${{ steps.build_main.outputs.digest }} (etc.) so
-      # the deploy/PR step can be wired up later.
+      # Opens a PR against the pi-talos GitOps repo bumping the leonia
+      # HelmRelease image tag to the freshly built one. Requires a PAT with
+      # repo + workflow scope on clarknova99/pi-talos, stored as PI_TALOS_PAT.
+      - name: Create PR in pi-talos repo
+        if: github.ref_name == 'main'
+        env:
+          PI_TALOS_PAT: ${{ secrets.PI_TALOS_PAT }}
+          GH_TOKEN: ${{ secrets.PI_TALOS_PAT }}
+          IMAGE_TAG: ${{ env.IMAGE_TAG }}
+        run: |
+          set -euo pipefail
+
+          HELMRELEASE=kubernetes/apps/default/leonia/app/helmrelease.yaml
+          BRANCH_NAME=update-leonia-image-${IMAGE_TAG}
+
+          git clone https://x-access-token:${PI_TALOS_PAT}@github.com/clarknova99/pi-talos.git
+          cd pi-talos
+
+          # Recreate the branch from a clean main if it already exists remotely.
+          if git ls-remote --exit-code --heads origin ${BRANCH_NAME}; then
+            git push origin --delete ${BRANCH_NAME}
+          fi
+          git checkout -b ${BRANCH_NAME}
+
+          yq e ".spec.values.controllers.leonia.containers.app.image.tag = \"${IMAGE_TAG}\"" -i ${HELMRELEASE}
+          git add ${HELMRELEASE}
+
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git commit -m "Update leonia webapp image to ${IMAGE_TAG}"
+          git push origin ${BRANCH_NAME}
+
+          PR_URL=$(gh pr create \
+            --repo clarknova99/pi-talos \
+            --title "Update leonia webapp image to ${IMAGE_TAG}" \
+            --body "Bumps the leonia HelmRelease image tag to \`${IMAGE_TAG}\` (built from leonia@${{ github.sha }})." \
+            --head ${BRANCH_NAME} \
+            --base main)
+          echo "PR created: ${PR_URL}"
