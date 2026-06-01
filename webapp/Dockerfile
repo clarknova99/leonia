@@ -16,19 +16,31 @@
 #   * The full data/ tree — only the artefacts the webapp actually
 #     reads at request time.
 #
-# Build:
+# Build targets:
+#   * `base`    — code-only image. No data baked in; the precache is
+#                 expected to be mounted at runtime (k8s volume / -v).
+#                 This is what CI builds and what the Talos deploy runs.
+#   * `bundled` — extends `base` by baking the local data tree (precache
+#                 + borough polygon) for a self-contained local run.
+#                 This is the DEFAULT target (last stage) so the local
+#                 build command below keeps working unchanged.
+#
+# Build (self-contained, bakes local precache — DEFAULT target):
 #   docker build -t leonia-webapp -f webapp/Dockerfile .
 #
-# Run (in-image precache):
+# Build (code-only, data mounted at runtime — CI / k8s):
+#   docker build -t leonia-webapp --target base -f webapp/Dockerfile .
+#
+# Run (in-image precache, `bundled`):
 #   docker run --rm -p 8000:8000 leonia-webapp
 #
-# Run (mounted data dir, dev/iter):
+# Run (mounted data dir, dev/iter or `base`):
 #   docker run --rm -p 8000:8000 \
 #       -e LEONIA_DATA_DIR=/data \
 #       -v $PWD/data:/data \
 #       leonia-webapp
 
-FROM python:3.13-slim AS runtime
+FROM python:3.13-slim AS base
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
@@ -72,16 +84,6 @@ RUN pip install \
 COPY leonia_traffic/ /app/leonia_traffic/
 COPY webapp/ /app/webapp/
 
-# Network polygon — leonia_traffic.config.load_leonia_polygon reads it.
-COPY data/network/leonia_borough.geojson /app/data/network/leonia_borough.geojson
-
-# Precomputed scenario cache. This is the big payload.
-# In dev you can omit this and mount it via -v at runtime.
-# Prefix with the underscore-prefixed sentinel so a missing local
-# precache doesn't fail the build — operators who want a pure
-# "code only" image can pass --build-arg PRECACHE_PATH=/dev/null.
-COPY data/processed/sumo/runs_precache/ /app/data/processed/sumo/runs_precache/
-
 EXPOSE 8000
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
@@ -90,3 +92,18 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
 CMD ["uvicorn", "webapp.app.main:app", \
      "--host", "0.0.0.0", "--port", "8000", \
      "--proxy-headers"]
+
+# ---------------------------------------------------------------------------
+# `bundled` (default) — bakes the local data tree for a self-contained image.
+#
+# These paths live under data/ which is .gitignored, so this stage only
+# builds when the data tree is present in the build context. CI builds the
+# `base` target instead (--target base) and mounts the precache at runtime.
+# ---------------------------------------------------------------------------
+FROM base AS bundled
+
+# Network polygon — leonia_traffic.config.load_leonia_polygon reads it.
+COPY data/network/leonia_borough.geojson /app/data/network/leonia_borough.geojson
+
+# Precomputed scenario cache. This is the big payload.
+COPY data/processed/sumo/runs_precache/ /app/data/processed/sumo/runs_precache/

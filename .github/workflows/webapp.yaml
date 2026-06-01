@@ -1,0 +1,134 @@
+name: Build and Release Webapp
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-webapp:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # for the GitHub release step
+      packages: write   # to push images to ghcr.io
+
+    steps:
+      - name: Free Disk Space (Ubuntu)
+        uses: jlumbroso/free-disk-space@main
+        with:
+          # this might remove tools that are actually needed,
+          # if set to "true" but frees about 6 GB
+          tool-cache: false
+
+          # all of these default to true, but feel free to set to
+          # "false" if necessary for your workflow
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: false
+          docker-images: false
+          swap-storage: false
+
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0  # Ensure a full clone to avoid shallow clone issues
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Every run produces a unique, sortable tag: <branch>-YYYY-MM-DD-HH-MM-SS-<shortsha> (UTC).
+      # Digest is still used by Kubernetes for immutable pinning; the tag exists for traceability and rollback.
+      - name: Compute image tag
+        id: image_tag
+        env:
+          BRANCH_NAME: ${{ github.ref_name }}
+        run: |
+          TS=$(date -u +"%Y-%m-%d-%H-%M-%S")
+          SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+          IMAGE_TAG="${BRANCH_NAME}-${TS}-${SHA}"
+          echo "IMAGE_TAG=${IMAGE_TAG}" >> $GITHUB_ENV
+          echo "image_tag=${IMAGE_TAG}" >> $GITHUB_OUTPUT
+          echo "Computed tag: ${IMAGE_TAG}"
+
+      # The webapp image is built code-only (--target base): the precomputed
+      # scenario cache lives under the .gitignored data/ tree and is mounted at
+      # runtime (k8s volume), so it is not baked into the published image.
+      - name: Build and push Main
+        if: github.ref_name == 'main'
+        id: build_main
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: ./webapp/Dockerfile
+          target: base
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          push: true
+          platforms: linux/amd64
+          tags: ghcr.io/clarknova99/leonia/webapp, ghcr.io/clarknova99/leonia/webapp:${{ env.IMAGE_TAG }}
+
+      - name: Build and push Stage
+        if: github.ref_name == 'stage'
+        id: build_stage
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: ./webapp/Dockerfile
+          target: base
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          push: true
+          platforms: linux/amd64
+          tags: ghcr.io/clarknova99/leonia/webapp:${{ env.IMAGE_TAG }}
+
+      - name: Build and push dev
+        if: github.ref_name == 'dev'
+        id: build_dev
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: ./webapp/Dockerfile
+          target: base
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          push: true
+          platforms: linux/amd64
+          tags: ghcr.io/clarknova99/leonia/webapp:${{ env.IMAGE_TAG }}
+
+      - name: Delete existing release and tag if they exist
+        if: github.ref_name == 'main'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG_NAME="webapp-${{ env.IMAGE_TAG }}"
+          RELEASE_ID=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+          "https://api.github.com/repos/${{ github.repository }}/releases/tags/$TAG_NAME" | jq -r .id)
+
+          if [ "$RELEASE_ID" != "null" ]; then
+            curl -s -X DELETE -H "Authorization: token $GITHUB_TOKEN" \
+            "https://api.github.com/repos/${{ github.repository }}/releases/$RELEASE_ID"
+            curl -s -X DELETE -H "Authorization: token $GITHUB_TOKEN" \
+            "https://api.github.com/repos/${{ github.repository }}/git/refs/tags/$TAG_NAME"
+          fi
+
+      - name: Create or update GitHub release
+        if: github.ref_name == 'main'
+        id: create_release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: webapp-${{ env.IMAGE_TAG }}
+          name: Webapp Release ${{ env.IMAGE_TAG }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # NOTE: "Create PR in Talos Cluster repo" is intentionally omitted for now.
+      # The build_* steps expose ${{ steps.build_main.outputs.digest }} (etc.) so
+      # the deploy/PR step can be wired up later.
