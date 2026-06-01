@@ -1,0 +1,49 @@
+# Core scientific stack (already in venv but pinned here for reproducibility)
+numpy>=2.0,<3
+pandas>=2.2
+scipy>=1.13
+matplotlib>=3.9
+networkx>=3.3
+tqdm>=4.66
+
+# Traffic simulation
+uxsim>=1.13
+# (Static-assignment UE is implemented in-house on top of networkx — see
+# leonia_traffic/assignment/. We avoid AequilibraE because it has no
+# cp313 wheels on macOS arm64 and its source build needs OpenMP.)
+
+# Eclipse SUMO microscopic simulator. ``eclipse-sumo`` ships the
+# native binaries (sumo, netconvert, etc.) and ``libsumo``/``traci``/
+# ``sumolib`` give us the Python bindings — both are needed for the
+# interactive runtime in ``leonia_traffic/sumo/``. ``sumolib`` is
+# pulled transitively via ``traci`` but we list it explicitly so a
+# clean install lands all four together.
+eclipse-sumo>=1.20
+libsumo>=1.20
+traci>=1.20
+sumolib>=1.20
+
+# Geospatial
+geopandas>=1.0
+shapely>=2.0
+pyproj>=3.6
+pyogrio>=0.9
+osmnx>=2.0
+folium>=0.17
+contextily>=1.6
+
+# Storage / config
+pyarrow>=16
+pyyaml>=6.0
+
+# Notebook UI
+jupyter>=1.0
+ipywidgets>=8.1
+nbconvert>=7.16
+
+# Stakeholder visualisations (interactive HTML one-pagers + sparklines).
+plotly>=5.20
+jinja2>=3.1
+
+# Testing
+pytest>=8

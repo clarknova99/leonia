@@ -1,0 +1,54 @@
+# Keep the build context small.
+# Everything COPY'd into the image is whitelisted in webapp/Dockerfile.
+
+# Python build artefacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage*
+htmlcov/
+
+# Local venvs
+venv/
+.venv/
+env/
+.env
+
+# IDE / editor
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# Git, docs, scratch — webapp doesn't read these at runtime
+.git/
+.gitignore
+docs/
+reports/
+notebooks/
+scripts/
+tests/
+
+# Heavy raw data — only the runs_precache + the borough geojson are
+# COPY'd in. Everything else under data/ is excluded.
+data/raw/
+data/streetlight/
+data/processed/sumo/runs/
+data/processed/sumo/runs_*/
+data/processed/sumo/runs_precache/_nets/
+data/processed/sumo/leonia.osm.xml
+data/processed/sumo/leonia.net.xml
+data/processed/sumo/leonia.poly.xml
+data/processed/sumo/*.csv
+data/processed/sumo/*.parquet
+data/processed/*.parquet
+streetlight/
+
+# Build artefacts
+dist/
+build/
+*.egg-info/

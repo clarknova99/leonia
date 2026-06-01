@@ -1,0 +1,1 @@
+"""Leonia stakeholder webapp (FastAPI)."""

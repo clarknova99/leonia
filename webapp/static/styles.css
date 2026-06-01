@@ -1,0 +1,564 @@
+:root {
+  --bg: #fafafa;
+  --fg: #1a1a1a;
+  --muted: #666;
+  --accent: #0b5394;
+  --border: #d8d8d8;
+  --warn-bg: #fff7e6;
+  --warn-border: #f5a623;
+  --error-bg: #ffecec;
+  --error-border: #d0021b;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+               "Helvetica Neue", Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--fg);
+  background: var(--bg);
+}
+
+.page-header {
+  padding: 24px 32px 8px;
+  border-bottom: 1px solid var(--border);
+  background: #fff;
+}
+
+.page-header h1 {
+  margin: 0 0 8px;
+  font-size: 22px;
+}
+
+.lede {
+  margin: 0;
+  color: var(--muted);
+  max-width: 900px;
+}
+
+main {
+  padding: 24px 32px;
+}
+
+.banner {
+  padding: 12px 16px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  margin-bottom: 16px;
+}
+
+.banner-error {
+  background: var(--error-bg);
+  border-color: var(--error-border);
+}
+
+.banner-warn {
+  background: var(--warn-bg);
+  border-color: var(--warn-border);
+}
+
+/* Tabbed map container (Static Maps / Simulation). */
+.tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.tab {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  padding: 10px 18px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -1px;
+  border-radius: 6px 6px 0 0;
+}
+
+.tab:hover {
+  color: #111;
+  background: #f3f3f5;
+}
+
+.tab.is-active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.tab:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.tab-panel[hidden] {
+  display: none;
+}
+
+.scenario-picker,
+.static-panel {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+/* Crash severity legend (Static Maps · Crash). */
+.crash-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  font-size: 12px;
+  color: #333;
+  margin: 6px 0 2px;
+}
+
+.crash-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.crash-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+  border: 1px solid rgba(0, 0, 0, 0.25);
+}
+
+.crash-dot.crash-k { background: #b71c1c; }
+.crash-dot.crash-a { background: #d32f2f; }
+.crash-dot.crash-b { background: #ef6c00; }
+.crash-dot.crash-c { background: #f57c00; }
+.crash-dot.crash-o { background: #616161; }
+
+.deck-static-readout {
+  margin-top: 8px;
+}
+
+.picker-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.picker-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1 1 220px;
+  min-width: 220px;
+}
+
+/* The `display: flex` above is an author rule that outranks the UA
+   `[hidden] { display: none }`, so the hidden attribute alone won't
+   hide a field. Restore it for conditionally-shown controls. */
+.picker-field[hidden] {
+  display: none;
+}
+
+.picker-label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+select {
+  padding: 8px 10px;
+  font-size: 15px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+}
+
+select:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.scenario-status {
+  min-height: 20px;
+  padding: 6px 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.scenario-status.warn {
+  color: #aa6600;
+}
+
+.scenario-status.error {
+  color: var(--error-border);
+}
+
+.iframe-shell {
+  margin-top: 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  background: #f0f0f0;
+}
+
+#scenario-frame {
+  width: 100%;
+  height: 740px;
+  border: 0;
+  display: block;
+  background: #fff;
+}
+
+/* deck.gl WebGL map shell (replaces the old folium iframe). */
+.deck-shell {
+  margin-top: 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  background: #0b0f1a;
+}
+
+#deck-map,
+#static-map {
+  position: relative;
+  width: 100%;
+  height: 900px;
+}
+
+.deck-flow-host canvas {
+  outline: none;
+}
+
+/* In-map control panel: clock, play/pause, scrubber, speed. */
+.deck-panel {
+  position: absolute;
+  left: 14px;
+  top: 14px;
+  z-index: 5;
+  width: 320px;
+  max-width: calc(100% - 28px);
+  padding: 12px 14px;
+  border-radius: 12px;
+  color: #e5e7eb;
+  background: rgba(17, 24, 39, 0.92);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.deck-clock {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.deck-time {
+  font-variant-numeric: tabular-nums;
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.deck-stat {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.deck-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.deck-panel button {
+  background: #7c3aed;
+  color: #fff;
+  border: 0;
+  border-radius: 8px;
+  padding: 7px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.deck-panel button:hover {
+  background: #6d28d9;
+}
+
+.deck-panel .deck-speed {
+  background: #374151;
+  min-width: 42px;
+}
+
+.deck-panel input[type="range"] {
+  flex: 1;
+  min-width: 0;
+  accent-color: #7c3aed;
+}
+
+.deck-row-theme {
+  margin-top: 8px;
+}
+
+.deck-theme-label {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.deck-panel select.deck-theme {
+  flex: 1;
+  min-width: 0;
+  background: #374151;
+  color: #e5e7eb;
+  border: 0;
+  border-radius: 8px;
+  padding: 6px 8px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.deck-panel button.deck-labels {
+  background: #374151;
+}
+
+.deck-panel button.deck-labels.deck-toggle-on {
+  background: #7c3aed;
+}
+
+.deck-panel button.deck-impact {
+  background: #374151;
+  flex: 1;
+}
+
+.deck-panel button.deck-impact.deck-toggle-on {
+  background: #f97316;
+}
+
+.deck-panel button.deck-impact:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.deck-impact-key {
+  display: flex;
+  gap: 14px;
+  margin-top: 8px;
+  font-size: 11px;
+  color: #cbd5e1;
+}
+
+.deck-impact-key[hidden] {
+  display: none;
+}
+
+.deck-impact-key .deck-sw {
+  display: inline-block;
+  width: 14px;
+  height: 4px;
+  border-radius: 2px;
+  margin-right: 4px;
+  vertical-align: middle;
+}
+
+.deck-impact-key .deck-sw-up {
+  background: #f97316;
+}
+
+.deck-impact-key .deck-sw-down {
+  background: #38bdf8;
+}
+
+.deck-tip-delta {
+  font-variant-numeric: tabular-nums;
+  margin-top: 2px;
+}
+
+.deck-tip-delta.deck-tip-up {
+  color: #fb923c;
+}
+
+.deck-tip-delta.deck-tip-down {
+  color: #38bdf8;
+}
+
+/* Hover/click readout for a road. Positioned by JS in px. */
+.deck-tip {
+  position: absolute;
+  z-index: 10;
+  display: none;
+  pointer-events: none;
+  max-width: 220px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #4c1d95;
+  background: rgba(17, 24, 39, 0.96);
+  color: #e5e7eb;
+  font-size: 12px;
+  font-family: system-ui, -apple-system, sans-serif;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+  transform: translate(-50%, calc(-100% - 12px));
+}
+
+.deck-tip-name {
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.deck-tip-vph {
+  font-variant-numeric: tabular-nums;
+}
+
+.deck-tip-vph b {
+  color: #fbbf24;
+}
+
+.deck-tip-pin {
+  color: #9ca3af;
+  font-size: 10px;
+  margin-top: 3px;
+}
+
+/* Traffic-intensity legend rendered under the iframe (the
+   in-iframe overlay was too cramped on small panes; the
+   gradient stops here mirror _ABSOLUTE_VPH_STOPS in
+   leonia_traffic/sumo/visualizations.py). */
+.legend-card {
+  margin: 14px 0 0;
+  padding: 12px 16px;
+  background: #fff;
+  border: 1px solid #e1e1e4;
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #333;
+}
+
+.legend-title {
+  font-weight: 600;
+  font-size: 12px;
+  color: #222;
+  margin: 0 0 6px;
+}
+
+.legend-bar {
+  width: 100%;
+  height: 10px;
+  border-radius: 2px;
+  background: linear-gradient(
+    to right,
+    rgb(60, 200, 60)   0%,
+    rgb(180, 220, 40) 13%,
+    rgb(255, 215, 0)  25%,
+    rgb(255, 140, 0)  50%,
+    rgb(220, 30, 30)  100%
+  );
+}
+
+.legend-ticks {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: #555;
+  margin-top: 2px;
+}
+
+.legend-note {
+  margin: 6px 0 0;
+  font-size: 11px;
+  color: #666;
+}
+
+.legend-network-swatch {
+  display: inline-block;
+  width: 14px;
+  height: 3px;
+  vertical-align: middle;
+  margin: 0 6px 0 8px;
+  background: #cccccc;
+}
+
+.legend-network-label {
+  color: #999;
+  font-size: 11px;
+}
+
+.legend-stl-note {
+  margin-top: 8px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.legend-stl-swatch {
+  display: inline-block;
+  width: 14px;
+  height: 4px;
+  flex: 0 0 auto;
+  margin-top: 6px;
+  background: #3a3a3a;
+  opacity: 0.55;
+  border-radius: 1px;
+}
+
+/* Overlay toggle: a small checkbox row above the map. Default is
+   ON (matches the streetlight-toggle template default), so the
+   baseline volumes are visible from first render. */
+.overlay-controls {
+  display: flex;
+  align-items: center;
+  margin: 6px 0 8px;
+  font-size: 13px;
+  color: #333;
+}
+
+.overlay-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.overlay-toggle input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+  accent-color: #5b6dab;
+}
+
+.metadata {
+  margin-top: 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.metadata summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--fg);
+}
+
+.page-footer {
+  padding: 12px 32px 24px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.muted { color: var(--muted); }
+
+code {
+  background: #f0f0f0;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 13px;
+}

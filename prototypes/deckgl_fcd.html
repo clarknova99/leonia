@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Leonia flow — deck.gl TripsLayer (real SUMO FCD)</title>
+
+  <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" />
+  <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+  <script src="https://unpkg.com/deck.gl@9.0.36/dist.min.js"></script>
+
+  <style>
+    :root { --panel-bg: rgba(17, 24, 39, 0.92); --fg: #e5e7eb; }
+    html, body { margin: 0; height: 100%; font-family: system-ui, sans-serif; background:#0b0f1a; }
+    #map { position: absolute; inset: 0; }
+    .panel {
+      position: absolute; left: 16px; top: 16px; z-index: 5;
+      background: var(--panel-bg); color: var(--fg);
+      padding: 14px 16px; border-radius: 12px; width: 340px;
+      box-shadow: 0 8px 30px rgba(0,0,0,.4); backdrop-filter: blur(4px);
+    }
+    .panel h1 { font-size: 15px; margin: 0 0 2px; }
+    .panel .sub { font-size: 12px; color: #9ca3af; margin: 0 0 12px; }
+    .clock { font-variant-numeric: tabular-nums; font-size: 28px; font-weight: 700; }
+    .clock small { font-size: 12px; font-weight: 400; color: #9ca3af; margin-left: 6px; }
+    .row { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+    .row label { font-size: 11px; color:#9ca3af; width: 42px; }
+    button { background:#7c3aed; color:#fff; border:0; border-radius:8px; padding:8px 14px; font-size:13px; cursor:pointer; }
+    input[type=range] { flex: 1; accent-color: #7c3aed; }
+    .legend { margin-top: 14px; }
+    .legend .bar { height: 10px; border-radius: 5px;
+      background: linear-gradient(90deg,#ef4444,#f97316,#eab308,#22c55e); }
+    .legend .ticks { display: flex; justify-content: space-between; font-size: 11px; color:#9ca3af; margin-top:4px; }
+    .note { font-size: 11px; color: #9ca3af; margin-top: 12px; line-height: 1.4; }
+    .badge { display:inline-block; background:#065f46; color:#d1fae5; font-size:10px; padding:2px 7px; border-radius:999px; margin-left:6px; }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+
+  <div class="panel">
+    <h1>Leonia traffic <span class="badge">real SUMO FCD</span></h1>
+    <p class="sub">Every comet is a real simulated vehicle (<code>--fcd-output</code>), full 24h weekday baseline. Colour = speed.</p>
+
+    <div class="clock"><span id="clock">00:00:00</span><small id="stat"></small></div>
+
+    <div class="row">
+      <button id="play">⏸ Pause</button>
+      <input id="scrub" type="range" min="0" max="100" value="0" step="1" />
+    </div>
+    <div class="row">
+      <label>speed</label>
+      <input id="rate" type="range" min="100" max="4000" value="1500" step="100" />
+      <span id="rateLabel" style="font-size:11px;color:#9ca3af;width:46px">1500×</span>
+    </div>
+
+    <div class="legend">
+      <div class="bar"></div>
+      <div class="ticks"><span>0 mph</span><span>15</span><span>30+ mph</span></div>
+    </div>
+
+    <p class="note">
+      <b id="nveh">0</b> of <b id="ntot">0</b> vehicles shown · <b id="nwp">0</b> waypoints.
+      Real per-vehicle x/y/t from SUMO <code>--fcd-output</code>, fed to deck.gl
+      <code>TripsLayer</code>. Capped to ~10 trips per origin so the full 24h
+      stays browser-light (full set is ~33k vehicles / 100&nbsp;MB on the host).
+      Red comets are crawling (congestion), green are free-flowing.
+    </p>
+  </div>
+
+  <!-- grey network skeleton (reused) + real FCD trajectories -->
+  <script src="leonia_flow_data.js"></script>
+  <script src="leonia_fcd_data.js"></script>
+  <script>
+  (function () {
+    const FCD = window.LEONIA_FCD;
+    const NET = window.LEONIA_FLOW; // optional, for the grey skeleton
+    if (!FCD) { document.body.innerHTML = "<p style='padding:20px;color:#fff'>Run <code>run_fcd.py</code> first.</p>"; return; }
+
+    const { MapboxOverlay, PathLayer } = deck;
+    const TripsLayer = deck.TripsLayer;
+    const MAX_T = FCD.meta.max_t;
+    const BEGIN = FCD.meta.begin_s;
+    document.getElementById("nveh").textContent = FCD.meta.n_vehicles.toLocaleString();
+    document.getElementById("ntot").textContent = (FCD.meta.n_vehicles_total || FCD.meta.n_vehicles).toLocaleString();
+    document.getElementById("nwp").textContent = FCD.meta.n_waypoints.toLocaleString();
+
+    // speed (mph) -> colour: red (slow) -> orange -> yellow -> green (fast)
+    function speedColor(mph) {
+      const t = Math.max(0, Math.min(1, mph / 30));
+      const stops = [
+        [0.0, [239, 68, 68]], [0.33, [249, 115, 22]],
+        [0.66, [234, 179, 8]], [1.0, [34, 197, 94]],
+      ];
+      for (let i = 1; i < stops.length; i++) {
+        if (t <= stops[i][0]) {
+          const [t0, c0] = stops[i - 1], [t1, c1] = stops[i];
+          const f = (t - t0) / (t1 - t0 || 1);
+          return c0.map((c, j) => Math.round(c + (c1[j] - c) * f));
+        }
+      }
+      return stops[stops.length - 1][1];
+    }
+
+    // centre on the trajectory cloud
+    let sx = 0, sy = 0, n = 0;
+    for (const tr of FCD.trips) { for (const p of tr.path) { sx += p[0]; sy += p[1]; n++; } }
+    const center = [sx / n, sy / n];
+
+    const map = new maplibregl.Map({
+      container: "map",
+      style: "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json",
+      center, zoom: 14.2, pitch: 55, bearing: -15, antialias: true,
+    });
+    map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), "bottom-right");
+
+    function skeletonLayer() {
+      if (!NET || !NET.skeleton) return null;
+      return new PathLayer({
+        id: "skeleton", data: NET.skeleton, getPath: (d) => d,
+        getColor: [70, 80, 100, 110], getWidth: 0.7,
+        widthUnits: "pixels", widthMinPixels: 0.6, parameters: { depthTest: false },
+      });
+    }
+    function tripsLayer(time) {
+      return new TripsLayer({
+        id: "fcd",
+        data: FCD.trips,
+        getPath: (d) => d.path,
+        getTimestamps: (d) => d.ts,
+        getColor: (d) => speedColor(d.mean_mph),
+        currentTime: time,
+        trailLength: 280,
+        fadeTrail: true,
+        getWidth: 4, widthUnits: "pixels", widthMinPixels: 2.5,
+        capRounded: true, jointRounded: true, opacity: 0.95,
+        parameters: { depthTest: false },
+      });
+    }
+
+    const overlay = new MapboxOverlay({ interleaved: true, layers: [] });
+    map.on("load", () => { map.addControl(overlay); animate(); });
+
+    // ---- clock + animation -------------------------------------------------
+    const scrub = document.getElementById("scrub");
+    const rate = document.getElementById("rate");
+    const rateLabel = document.getElementById("rateLabel");
+    const playBtn = document.getElementById("play");
+    const clockEl = document.getElementById("clock");
+    const statEl = document.getElementById("stat");
+
+    let time = 0, playing = true, last = 0;
+
+    function hud() {
+      let moving = 0;
+      for (const tr of FCD.trips) {
+        if (time >= tr.ts[0] && time <= tr.ts[tr.ts.length - 1]) moving++;
+      }
+      const secs = BEGIN + time;
+      const hh = String(Math.floor(secs / 3600) % 24).padStart(2, "0");
+      const mm = String(Math.floor(secs / 60) % 60).padStart(2, "0");
+      const ss = String(Math.floor(secs) % 60).padStart(2, "0");
+      clockEl.textContent = `${hh}:${mm}:${ss}`;
+      statEl.textContent = `${moving} vehicles moving`;
+      scrub.value = (time / MAX_T) * 100;
+    }
+
+    function animate() {
+      function tick(ts) {
+        if (!last) last = ts;
+        const dt = (ts - last) / 1000; last = ts;
+        if (playing) {
+          time = (time + dt * (+rate.value)) % MAX_T;
+        }
+        overlay.setProps({ layers: [skeletonLayer(), tripsLayer(time)].filter(Boolean) });
+        hud();
+        requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    }
+
+    scrub.addEventListener("input", () => { playing = false; playBtn.textContent = "▶ Play"; time = (+scrub.value / 100) * MAX_T; });
+    rate.addEventListener("input", () => { rateLabel.textContent = `${rate.value}×`; });
+    playBtn.addEventListener("click", () => { playing = !playing; playBtn.textContent = playing ? "⏸ Pause" : "▶ Play"; });
+  })();
+  </script>
+</body>
+</html>

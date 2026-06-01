@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Leonia flow — deck.gl TripsLayer</title>
+
+  <!-- MapLibre basemap (open-source, NO token) + deck.gl (WebGL) -->
+  <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" />
+  <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+  <script src="https://unpkg.com/deck.gl@9.0.36/dist.min.js"></script>
+
+  <style>
+    :root { --panel-bg: rgba(17, 24, 39, 0.92); --fg: #e5e7eb; }
+    html, body { margin: 0; height: 100%; font-family: system-ui, sans-serif; background:#0b0f1a; }
+    #map { position: absolute; inset: 0; }
+
+    .panel {
+      position: absolute; left: 16px; top: 16px; z-index: 5;
+      background: var(--panel-bg); color: var(--fg);
+      padding: 14px 16px; border-radius: 12px; width: 330px;
+      box-shadow: 0 8px 30px rgba(0,0,0,.4); backdrop-filter: blur(4px);
+    }
+    .panel h1 { font-size: 15px; margin: 0 0 2px; }
+    .panel .sub { font-size: 12px; color: #9ca3af; margin: 0 0 12px; }
+    .clock { font-variant-numeric: tabular-nums; font-size: 28px; font-weight: 700; }
+    .clock small { font-size: 12px; font-weight: 400; color: #9ca3af; margin-left: 6px; }
+    .row { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+    button { background:#7c3aed; color:#fff; border:0; border-radius:8px; padding:8px 14px; font-size:13px; cursor:pointer; }
+    input[type=range] { flex: 1; accent-color: #7c3aed; }
+    .legend { margin-top: 14px; }
+    .legend .bar { height: 10px; border-radius: 5px;
+      background: linear-gradient(90deg,#22c55e,#eab308,#f97316,#ef4444); }
+    .legend .ticks { display: flex; justify-content: space-between; font-size: 11px; color:#9ca3af; margin-top:4px; }
+    .note { font-size: 11px; color: #9ca3af; margin-top: 12px; line-height: 1.4; }
+    .badge { display:inline-block; background:#4c1d95; color:#ede9fe; font-size:10px; padding:2px 7px; border-radius:999px; margin-left:6px; }
+    #tip {
+      position: absolute; z-index: 10; pointer-events: none; display: none;
+      background: rgba(17,24,39,0.96); color: #e5e7eb; border: 1px solid #4c1d95;
+      border-radius: 8px; padding: 8px 10px; font-size: 12px; max-width: 220px;
+      box-shadow: 0 6px 20px rgba(0,0,0,.45); transform: translate(-50%, calc(-100% - 12px));
+    }
+    #tip .tname { font-weight: 700; margin-bottom: 2px; }
+    #tip .tvph { font-variant-numeric: tabular-nums; }
+    #tip .tvph b { color: #fbbf24; }
+    #tip .tpin { color:#9ca3af; font-size:10px; margin-top:3px; }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <div id="tip"></div>
+
+  <div class="panel">
+    <h1>Leonia traffic flow <span class="badge">deck.gl · WebGL</span></h1>
+    <p class="sub">GPU PathLayer (link load) + TripsLayer (animated trails). MapLibre basemap, no token.</p>
+
+    <div class="clock"><span id="clock">--:--</span><small id="stat"></small></div>
+
+    <div class="row">
+      <button id="play">⏸ Pause</button>
+      <input id="scrub" type="range" min="0" max="0" value="0" step="1" />
+    </div>
+
+    <div class="legend">
+      <div class="bar"></div>
+      <div class="ticks"><span>idle</span><span>busy</span><span id="vmax">600+ vph</span></div>
+    </div>
+
+    <p class="note">
+      Static lines are coloured/sized by vehicles/hour for the current 15-min frame.
+      The flowing comets are a <b>TripsLayer</b> — here synthesised from edge flow so
+      you can see the look; a production version would feed it real per-vehicle
+      trajectories from SUMO <code>--fcd-output</code>.
+    </p>
+  </div>
+
+  <script src="leonia_flow_data.js"></script>
+  <script>
+  (function () {
+    const DATA = window.LEONIA_FLOW;
+    if (!DATA) { document.body.innerHTML = "<p style='padding:20px;color:#fff'>Run <code>extract_flow_data.py</code> first.</p>"; return; }
+
+    const { MapboxOverlay, PathLayer } = deck;
+    const TripsLayer = deck.TripsLayer;
+    const VMAX = DATA.meta.vmax_vph;
+    document.getElementById("vmax").textContent = `${VMAX}+ vph`;
+
+    // green -> yellow -> orange -> red ramp -> [r,g,b]
+    function rampColor(v) {
+      const t = Math.max(0, Math.min(1, v / VMAX));
+      const stops = [
+        [0.0, [34, 197, 94]], [0.25, [234, 179, 8]],
+        [0.5, [249, 115, 22]], [1.0, [239, 68, 68]],
+      ];
+      for (let i = 1; i < stops.length; i++) {
+        if (t <= stops[i][0]) {
+          const [t0, c0] = stops[i - 1], [t1, c1] = stops[i];
+          const f = (t - t0) / (t1 - t0 || 1);
+          return c0.map((c, j) => Math.round(c + (c1[j] - c) * f));
+        }
+      }
+      return stops[stops.length - 1][1];
+    }
+
+    const map = new maplibregl.Map({
+      container: "map",
+      style: "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json",
+      center: DATA.meta.center,
+      zoom: DATA.meta.zoom,
+      pitch: 50,
+      bearing: -15,
+      antialias: true,
+    });
+    map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), "bottom-right");
+
+    // ---- TripsLayer trip synthesis -----------------------------------------
+    // One looping "comet" per active edge. We give each edge a constant-speed
+    // path (timestamps ∝ cumulative length) so all comets move at a realistic,
+    // consistent ground speed. Brightness/width come from the edge's vph.
+    const LOOP = 100; // animation loop length (time units)
+    function buildTrips(frame) {
+      const trips = [];
+      for (const e of DATA.edges) {
+        const v = e.vph[frame] || 0;
+        if (v <= 0 || e.coords.length < 2) continue;
+        // cumulative length in degrees (good enough for relative timing)
+        const ts = [0];
+        for (let i = 1; i < e.coords.length; i++) {
+          const [x0, y0] = e.coords[i - 1], [x1, y1] = e.coords[i];
+          ts.push(ts[i - 1] + Math.hypot(x1 - x0, y1 - y0));
+        }
+        const total = ts[ts.length - 1] || 1;
+        // normalise each edge to traverse in a slice of the loop; busier
+        // edges get a slightly faster comet (shorter slice).
+        const slice = LOOP * (0.55 - 0.3 * Math.min(1, v / VMAX));
+        const start = Math.random() * LOOP; // stagger phase
+        trips.push({
+          path: e.coords,
+          timestamps: ts.map((t) => start + (t / total) * slice),
+          color: rampColor(v),
+        });
+      }
+      return trips;
+    }
+
+    // Tooltip state: `hover` follows the cursor; `pinned` survives until you
+    // click empty space. Both are redrawn every tick so the VPH stays live
+    // as the animation steps through the day.
+    const tipEl = document.getElementById("tip");
+    let hover = null;   // { edge, x, y }
+    let pinned = null;  // { edge, x, y }
+
+    function renderTip() {
+      const sel = pinned || hover;
+      if (!sel) { tipEl.style.display = "none"; return; }
+      const vph = sel.edge.vph[frame] || 0;
+      tipEl.style.display = "block";
+      tipEl.style.left = sel.x + "px";
+      tipEl.style.top = sel.y + "px";
+      tipEl.innerHTML =
+        `<div class="tname">${sel.edge.name}</div>` +
+        `<div class="tvph"><b>${vph}</b> vph &middot; ${DATA.frames[frame]}</div>` +
+        (pinned ? `<div class="tpin">pinned — click empty space to clear</div>`
+                : `<div class="tpin">click to pin</div>`);
+    }
+
+    function pathLayer(frame) {
+      return new PathLayer({
+        id: "links",
+        data: DATA.edges,
+        getPath: (e) => e.coords,
+        getColor: (e) => rampColor(e.vph[frame] || 0),
+        getWidth: (e) => 1.5 + 5 * Math.min(1, (e.vph[frame] || 0) / VMAX),
+        widthUnits: "pixels", widthMinPixels: 1.2, capRounded: true, jointRounded: true,
+        opacity: 0.55, parameters: { depthTest: false },
+        pickable: true,
+        // Generous picking radius so thin residential lines are easy to hit.
+        onHover: (info) => {
+          hover = info.object ? { edge: info.object, x: info.x, y: info.y } : null;
+          renderTip();
+        },
+        onClick: (info) => {
+          pinned = info.object ? { edge: info.object, x: info.x, y: info.y } : null;
+          renderTip();
+        },
+        updateTriggers: { getColor: frame, getWidth: frame },
+      });
+    }
+
+    function skeletonLayer() {
+      return new PathLayer({
+        id: "skeleton",
+        data: DATA.skeleton,
+        getPath: (d) => d,
+        getColor: [70, 80, 100, 120],
+        getWidth: 0.7, widthUnits: "pixels", widthMinPixels: 0.6,
+        parameters: { depthTest: false },
+      });
+    }
+
+    let tripsCache = buildTrips(0);
+    function tripsLayer(frame, time) {
+      return new TripsLayer({
+        id: "trips",
+        data: tripsCache,
+        getPath: (d) => d.path,
+        getTimestamps: (d) => d.timestamps,
+        getColor: (d) => d.color,
+        getWidth: 3, widthUnits: "pixels", widthMinPixels: 2,
+        capRounded: true, jointRounded: true,
+        opacity: 0.9, trailLength: LOOP * 0.18,
+        currentTime: time, fadeTrail: true,
+        parameters: { depthTest: false },
+      });
+    }
+
+    const overlay = new MapboxOverlay({ interleaved: true, pickingRadius: 6, layers: [] });
+    map.on("load", () => { map.addControl(overlay); startAnimation(); });
+
+    // ---- time + trip animation --------------------------------------------
+    const scrub = document.getElementById("scrub");
+    const playBtn = document.getElementById("play");
+    const clockEl = document.getElementById("clock");
+    const statEl = document.getElementById("stat");
+    scrub.max = DATA.frames.length - 1;
+
+    let frame = 0, playing = true, lastAdvance = 0, time = 0;
+    const FRAME_MS = 800;
+
+    function refreshHud() {
+      const active = DATA.edges.filter((e) => (e.vph[frame] || 0) > 0).length;
+      const peak = DATA.edges.reduce((m, e) => Math.max(m, e.vph[frame] || 0), 0);
+      clockEl.textContent = DATA.frames[frame];
+      statEl.textContent = `${active} active edges · peak ${peak} vph`;
+    }
+    function setFrame(f) {
+      frame = (f + DATA.frames.length) % DATA.frames.length;
+      scrub.value = frame;
+      tripsCache = buildTrips(frame);
+      refreshHud();
+    }
+
+    function startAnimation() {
+      setFrame(0);
+      function tick(ts) {
+        time = (time + 0.6) % LOOP;
+        if (playing && ts - lastAdvance > FRAME_MS) { lastAdvance = ts; setFrame(frame + 1); }
+        overlay.setProps({ layers: [skeletonLayer(), pathLayer(frame), tripsLayer(frame, time)] });
+        renderTip();
+        requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    }
+
+    scrub.addEventListener("input", () => { playing = false; playBtn.textContent = "▶ Play"; setFrame(+scrub.value); });
+    playBtn.addEventListener("click", () => { playing = !playing; playBtn.textContent = playing ? "⏸ Pause" : "▶ Play"; });
+  })();
+  </script>
+</body>
+</html>

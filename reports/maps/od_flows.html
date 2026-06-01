@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_8b282e471d8fe72b3582c5b269b72f50 {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+
+            <style>html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            </style>
+
+            <style>#map {
+                position:absolute;
+                top:0;
+                bottom:0;
+                right:0;
+                left:0;
+                }
+            </style>
+
+            <script>
+                L_NO_TOUCH = false;
+                L_DISABLE_3D = false;
+            </script>
+
+        
+</head>
+<body>
+    
+    
+            <div class="folium-map" id="map_8b282e471d8fe72b3582c5b269b72f50" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_8b282e471d8fe72b3582c5b269b72f50 = L.map(
+                "map_8b282e471d8fe72b3582c5b269b72f50",
+                {
+                    center: [40.864, -73.985],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  "zoom": 14,
+  "zoomControl": true,
+  "preferCanvas": false,
+}
+
+                }
+            );
+            L.control.scale().addTo(map_8b282e471d8fe72b3582c5b269b72f50);
+
+            
+
+        
+    
+            var tile_layer_6114d98891e280ce3a8bf84b28aeece3 = L.tileLayer(
+                "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+                {
+  "minZoom": 0,
+  "maxZoom": 20,
+  "maxNativeZoom": 20,
+  "noWrap": false,
+  "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors \u0026copy; \u003ca href=\"https://carto.com/attributions\"\u003eCARTO\u003c/a\u003e",
+  "subdomains": "abcd",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_6114d98891e280ce3a8bf84b28aeece3.addTo(map_8b282e471d8fe72b3582c5b269b72f50);
+        
+    
+            var circle_marker_0202efd5aa2aea64560c71ea82998e05 = L.circleMarker(
+                [40.87231564521798, -73.98032021522515],
+                {"bubblingMouseEvents": true, "color": "#1a9850", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#1a9850", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 6, "stroke": true, "weight": 3}
+            ).addTo(map_8b282e471d8fe72b3582c5b269b72f50);
+        
+    
+            circle_marker_0202efd5aa2aea64560c71ea82998e05.bindTooltip(
+                `<div>
+                     Origin: Broad Avenue / 10030557
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_3ce77dead2e0c7bb7b6468048eb72e8d = L.circleMarker(
+                [40.855007374889475, -73.99277668173501],
+                {"bubblingMouseEvents": true, "color": "#1a9850", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#1a9850", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 6, "stroke": true, "weight": 3}
+            ).addTo(map_8b282e471d8fe72b3582c5b269b72f50);
+        
+    
+            circle_marker_3ce77dead2e0c7bb7b6468048eb72e8d.bindTooltip(
+                `<div>
+                     Origin: Broad Avenue / 590566
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_374cdd9070396ab2f479775af053bbf9 = L.circleMarker(
+                [40.86603665351868, -73.9971079826355],
+                {"bubblingMouseEvents": true, "color": "#1a9850", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#1a9850", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 6, "stroke": true, "weight": 3}
+            ).addTo(map_8b282e471d8fe72b3582c5b269b72f50);
+        
+    
+            circle_marker_374cdd9070396ab2f479775af053bbf9.bindTooltip(
+                `<div>
+                     Origin: Fort Lee Road / 590576
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_eb2bcdff792066c05ab2ff3c7e7c748c = L.circleMarker(
+                [40.87111937529054, -73.98694570271725],
+                {"bubblingMouseEvents": true, "color": "#1a9850", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#1a9850", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 6, "stroke": true, "weight": 3}
+            ).addTo(map_8b282e471d8fe72b3582c5b269b72f50);
+        
+    
+            circle_marker_eb2bcdff792066c05ab2ff3c7e7c748c.bindTooltip(
+                `<div>
+                     Origin: Grand Avenue / 590560
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_64c9e124ae94f13c2abe5dda063d32f3 = L.circleMarker(
+                [40.8573462963105, -73.9967818260195],
+                {"bubblingMouseEvents": true, "color": "#1a9850", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#1a9850", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 6, "stroke": true, "weight": 3}
+            ).addTo(map_8b282e471d8fe72b3582c5b269b72f50);
+        
+    
+            circle_marker_64c9e124ae94f13c2abe5dda063d32f3.bindTooltip(
+                `<div>
+                     Origin: Grand Avenue / 590571
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_296250fe2bdfb69acefcec4e0167c6b6 = L.circleMarker(
+                [40.8723157644275, -73.9803204536435],
+                {"bubblingMouseEvents": true, "color": "#1a9850", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#1a9850", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 6, "stroke": true, "weight": 3}
+            ).addTo(map_8b282e471d8fe72b3582c5b269b72f50);
+        
+    
+            circle_marker_296250fe2bdfb69acefcec4e0167c6b6.bindTooltip(
+                `<div>
+                     Origin: Broad Avenue / 10030557
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_737f59c18dcbca5361e1cbe231eb61f1 = L.circleMarker(
+                [40.855007216018, -73.99278000778472],
+                {"bubblingMouseEvents": true, "color": "#1a9850", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#1a9850", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 6, "stroke": true, "weight": 3}
+            ).addTo(map_8b282e471d8fe72b3582c5b269b72f50);
+        
+    
+            circle_marker_737f59c18dcbca5361e1cbe231eb61f1.bindTooltip(
+                `<div>
+                     Origin: Broad Avenue / 590566
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_3626ec7ad427944d00fdcb8e393ac1fc = L.circleMarker(
+                [40.86603535374499, -73.9971087674839],
+                {"bubblingMouseEvents": true, "color": "#1a9850", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#1a9850", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 6, "stroke": true, "weight": 3}
+            ).addTo(map_8b282e471d8fe72b3582c5b269b72f50);
+        
+    
+            circle_marker_3626ec7ad427944d00fdcb8e393ac1fc.bindTooltip(
+                `<div>
+                     Origin: Fort Lee Road / 590576
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_0b57bbcff221e87b60568e73f21bb2f8 = L.circleMarker(
+                [40.871164768716355, -73.98706999611665],
+                {"bubblingMouseEvents": true, "color": "#1a9850", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#1a9850", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 6, "stroke": true, "weight": 3}
+            ).addTo(map_8b282e471d8fe72b3582c5b269b72f50);
+        
+    
+            circle_marker_0b57bbcff221e87b60568e73f21bb2f8.bindTooltip(
+                `<div>
+                     Origin: Grand Avenue / 590560
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_c6dd05a6fcaaed89415637462bd4b546 = L.circleMarker(
+                [40.85744425695302, -73.99697059111305],
+                {"bubblingMouseEvents": true, "color": "#1a9850", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#1a9850", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 6, "stroke": true, "weight": 3}
+            ).addTo(map_8b282e471d8fe72b3582c5b269b72f50);
+        
+    
+            circle_marker_c6dd05a6fcaaed89415637462bd4b546.bindTooltip(
+                `<div>
+                     Origin: Grand Avenue / 590571
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_d61dfb8ab0bb8f930d88a25d252e5374 = L.circleMarker(
+                [40.85167286526682, -73.95311226598098],
+                {"bubblingMouseEvents": true, "color": "#b2182b", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#b2182b", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_8b282e471d8fe72b3582c5b269b72f50);
+        
+    
+            circle_marker_d61dfb8ab0bb8f930d88a25d252e5374.bindTooltip(
+                `<div>
+                     Destination: George Washington Bridge (lower level) / 590410
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_3639904fee1a3b6b482b8fe4f39e3b39 = L.circleMarker(
+                [40.85366554410443, -73.96310926116233],
+                {"bubblingMouseEvents": true, "color": "#b2182b", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#b2182b", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_8b282e471d8fe72b3582c5b269b72f50);
+        
+    
+            circle_marker_3639904fee1a3b6b482b8fe4f39e3b39.bindTooltip(
+                `<div>
+                     Destination: George Washington Bridge (Upper Level) / 590431
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_ef99355d8a009e3e39226dcaeae24dff = L.circleMarker(
+                [40.851670702610356, -73.95311819296812],
+                {"bubblingMouseEvents": true, "color": "#b2182b", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#b2182b", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_8b282e471d8fe72b3582c5b269b72f50);
+        
+    
+            circle_marker_ef99355d8a009e3e39226dcaeae24dff.bindTooltip(
+                `<div>
+                     Destination: George Washington Bridge (lower level) / 590410
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_3f497eea8f9fd9f982c580060c76dc69 = L.circleMarker(
+                [40.853664925142894, -73.96310981143813],
+                {"bubblingMouseEvents": true, "color": "#b2182b", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#b2182b", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_8b282e471d8fe72b3582c5b269b72f50);
+        
+    
+            circle_marker_3f497eea8f9fd9f982c580060c76dc69.bindTooltip(
+                `<div>
+                     Destination: George Washington Bridge (Upper Level) / 590431
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_6c0a13881af9f8cc499e4bedf07b8ea3 = L.polyline(
+                [[40.8723157644275, -73.9803204536435], [40.853664925142894, -73.96310981143813]],
+                {"bubblingMouseEvents": true, "color": "#762a83", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#762a83", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 1.1258992805755397}
+            ).addTo(map_8b282e471d8fe72b3582c5b269b72f50);
+        
+    
+            poly_line_6c0a13881af9f8cc499e4bedf07b8ea3.bindTooltip(
+                `<div>
+                     Broad Avenue / 10030557 → George Washington Bridge (Upper Level) / 590431<br>Weekday Peak-AM total: 45 trips
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_a5727c515edbd056b87b3aeaa37cc060 = L.polyline(
+                [[40.8723157644275, -73.9803204536435], [40.851670702610356, -73.95311819296812]],
+                {"bubblingMouseEvents": true, "color": "#762a83", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#762a83", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 1.5119904076738608}
+            ).addTo(map_8b282e471d8fe72b3582c5b269b72f50);
+        
+    
+            poly_line_a5727c515edbd056b87b3aeaa37cc060.bindTooltip(
+                `<div>
+                     Broad Avenue / 10030557 → George Washington Bridge (lower level) / 590410<br>Weekday Peak-AM total: 183 trips
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_94a05f2fbe82558b3b59aaae7fc44518 = L.polyline(
+                [[40.855007216018, -73.99278000778472], [40.853664925142894, -73.96310981143813]],
+                {"bubblingMouseEvents": true, "color": "#762a83", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#762a83", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 1.0755395683453237}
+            ).addTo(map_8b282e471d8fe72b3582c5b269b72f50);
+        
+    
+            poly_line_94a05f2fbe82558b3b59aaae7fc44518.bindTooltip(
+                `<div>
+                     Broad Avenue / 590566 → George Washington Bridge (Upper Level) / 590431<br>Weekday Peak-AM total: 27 trips
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_c9ea9860defd5685a71056cb1713fad3 = L.polyline(
+                [[40.855007216018, -73.99278000778472], [40.851670702610356, -73.95311819296812]],
+                {"bubblingMouseEvents": true, "color": "#762a83", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#762a83", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 1.1063149480415668}
+            ).addTo(map_8b282e471d8fe72b3582c5b269b72f50);
+        
+    
+            poly_line_c9ea9860defd5685a71056cb1713fad3.bindTooltip(
+                `<div>
+                     Broad Avenue / 590566 → George Washington Bridge (lower level) / 590410<br>Weekday Peak-AM total: 38 trips
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_1e6dc5fa3f7b585169ea2ff4fcec3990 = L.polyline(
+                [[40.86603535374499, -73.9971087674839], [40.853664925142894, -73.96310981143813]],
+                {"bubblingMouseEvents": true, "color": "#762a83", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#762a83", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 3.7026378896882495}
+            ).addTo(map_8b282e471d8fe72b3582c5b269b72f50);
+        
+    
+            poly_line_1e6dc5fa3f7b585169ea2ff4fcec3990.bindTooltip(
+                `<div>
+                     Fort Lee Road / 590576 → George Washington Bridge (Upper Level) / 590431<br>Weekday Peak-AM total: 966 trips
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_9b0953699414196559bb557dfa25f294 = L.polyline(
+                [[40.86603535374499, -73.9971087674839], [40.851670702610356, -73.95311819296812]],
+                {"bubblingMouseEvents": true, "color": "#762a83", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#762a83", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 8.0}
+            ).addTo(map_8b282e471d8fe72b3582c5b269b72f50);
+        
+    
+            poly_line_9b0953699414196559bb557dfa25f294.bindTooltip(
+                `<div>
+                     Fort Lee Road / 590576 → George Washington Bridge (lower level) / 590410<br>Weekday Peak-AM total: 2,502 trips
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_081ff8d19d08c690fbadc091136f36be = L.polyline(
+                [[40.871164768716355, -73.98706999611665], [40.853664925142894, -73.96310981143813]],
+                {"bubblingMouseEvents": true, "color": "#762a83", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#762a83", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 1.1342925659472423}
+            ).addTo(map_8b282e471d8fe72b3582c5b269b72f50);
+        
+    
+            poly_line_081ff8d19d08c690fbadc091136f36be.bindTooltip(
+                `<div>
+                     Grand Avenue / 590560 → George Washington Bridge (Upper Level) / 590431<br>Weekday Peak-AM total: 48 trips
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_b0fbfe09b51bd5ce4986f2cb4af3a6ba = L.polyline(
+                [[40.871164768716355, -73.98706999611665], [40.851670702610356, -73.95311819296812]],
+                {"bubblingMouseEvents": true, "color": "#762a83", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#762a83", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 1.332933653077538}
+            ).addTo(map_8b282e471d8fe72b3582c5b269b72f50);
+        
+    
+            poly_line_b0fbfe09b51bd5ce4986f2cb4af3a6ba.bindTooltip(
+                `<div>
+                     Grand Avenue / 590560 → George Washington Bridge (lower level) / 590410<br>Weekday Peak-AM total: 119 trips
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_4ebb7f48c7c4dda3c7e1005df303a12b = L.polyline(
+                [[40.85744425695302, -73.99697059111305], [40.853664925142894, -73.96310981143813]],
+                {"bubblingMouseEvents": true, "color": "#762a83", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#762a83", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 1.2294164668265388}
+            ).addTo(map_8b282e471d8fe72b3582c5b269b72f50);
+        
+    
+            poly_line_4ebb7f48c7c4dda3c7e1005df303a12b.bindTooltip(
+                `<div>
+                     Grand Avenue / 590571 → George Washington Bridge (Upper Level) / 590431<br>Weekday Peak-AM total: 82 trips
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_e52e45ee5cc901ea1a91c64b6e20aebf = L.polyline(
+                [[40.85744425695302, -73.99697059111305], [40.851670702610356, -73.95311819296812]],
+                {"bubblingMouseEvents": true, "color": "#762a83", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#762a83", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 1.4700239808153477}
+            ).addTo(map_8b282e471d8fe72b3582c5b269b72f50);
+        
+    
+            poly_line_e52e45ee5cc901ea1a91c64b6e20aebf.bindTooltip(
+                `<div>
+                     Grand Avenue / 590571 → George Washington Bridge (lower level) / 590410<br>Weekday Peak-AM total: 168 trips
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+</script>
+</html>

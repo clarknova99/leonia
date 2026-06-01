@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Leonia traffic — scenario explorer</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+  <!-- MapLibre basemap (open-source, no token) + deck.gl (WebGL).
+       Loaded synchronously so the deck renderer and picker (deferred)
+       can rely on the globals being present. -->
+  <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" />
+  <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+  <script src="https://unpkg.com/deck.gl@9.0.36/dist.min.js"></script>
+</head>
+<body>
+  <header class="page-header">
+    <h1>Leonia traffic — map explorer</h1>
+    <p class="lede">
+      Two views of Leonia's streets. <strong>Static Maps</strong> show
+      average measured conditions for the day — traffic volumes by day
+      type and time window, or NJDOT crash locations by year.
+      <strong>Simulation</strong> animates a precomputed SUMO model of a
+      street change across a 24-hour day. All maps render on the GPU with
+      deck.gl over a token-free MapLibre basemap.
+    </p>
+  </header>
+
+  <main>
+    {% if not catalog_ready %}
+      <div class="banner banner-error">
+        <strong>Precache not loaded.</strong>
+        Run
+        <code>python webapp/scripts/build_precache.py</code>
+        to populate the scenario cache, then restart this server.
+      </div>
+    {% else %}
+      <div class="tabs" role="tablist" aria-label="Map type">
+        <button class="tab is-active" role="tab" type="button"
+                data-tab="static" aria-selected="true">Static Maps</button>
+        <button class="tab" role="tab" type="button"
+                data-tab="simulation" aria-selected="false">Simulation</button>
+      </div>
+
+      <section class="tab-panel static-panel is-active" data-panel="static"
+               aria-label="Static maps">
+        <div class="picker-row static-controls">
+          <label class="picker-field">
+            <span class="picker-label">Map type</span>
+            <select id="static-maptype" aria-label="Map type">
+              <option value="crash" selected>Crash</option>
+              <option value="traffic">Traffic</option>
+            </select>
+          </label>
+
+          <label class="picker-field" data-when="traffic" hidden>
+            <span class="picker-label">Day type</span>
+            <select id="static-daytype" aria-label="Day type">
+              <option value="weekday">Weekday</option>
+              <option value="sunday">Sunday</option>
+            </select>
+          </label>
+
+          <label class="picker-field" data-when="traffic" hidden>
+            <span class="picker-label">Day part</span>
+            <select id="static-daypart" aria-label="Day part">
+              <option value="all_day">All day</option>
+              <option value="peak_am">Peak AM</option>
+              <option value="peak_pm">Peak PM</option>
+            </select>
+          </label>
+
+          <label class="picker-field" data-when="crash">
+            <span class="picker-label">Year</span>
+            <select id="static-year" aria-label="Year">
+              <option value="all">All years</option>
+            </select>
+          </label>
+        </div>
+
+        <div id="static-status" class="scenario-status" role="status"
+             aria-live="polite"></div>
+
+        <div class="deck-shell">
+          <div id="static-map"></div>
+        </div>
+
+        <figure class="legend-card" data-when="traffic" hidden
+                aria-label="Traffic intensity legend">
+          <figcaption class="legend-title">
+            Measured traffic (average vehicles per hour)
+          </figcaption>
+          <div class="legend-bar"
+               aria-label="Green to red gradient"></div>
+          <div class="legend-ticks">
+            <span>low</span>
+            <span>moderate</span>
+            <span>busy</span>
+            <span>busiest</span>
+          </div>
+          <p class="legend-note">
+            Average vehicles/hour over the selected window, derived from
+            StreetLight measured volumes. Colour and width scale to the
+            busiest roads in this view.
+            <span class="legend-network-swatch"></span>
+            <span class="legend-network-label">network (no data)</span>
+          </p>
+        </figure>
+
+        <figure class="legend-card" data-when="crash"
+                aria-label="Crash severity legend">
+          <figcaption class="legend-title">NJDOT crashes by severity</figcaption>
+          <div class="crash-legend">
+            <span><i class="crash-dot crash-k"></i> Fatal</span>
+            <span><i class="crash-dot crash-a"></i> Serious injury</span>
+            <span><i class="crash-dot crash-b"></i> Minor injury</span>
+            <span><i class="crash-dot crash-c"></i> Possible injury</span>
+            <span><i class="crash-dot crash-o"></i> Property damage</span>
+          </div>
+          <p class="legend-note">
+            Geocoded crashes within the borough (state-system roads
+            excluded). Hover or click a point for date and severity; use
+            the Year filter to focus a single year.
+          </p>
+        </figure>
+
+        <details class="metadata">
+          <summary>About this view</summary>
+          <p>
+            Traffic averages come from StreetLight measured volumes
+            (Zone Activity hourly shape × StreetScanner daily levels),
+            keyed to the SUMO street network. Weekday peaks reflect the
+            AM/PM commute; Sunday peaks reflect a midday plateau, so the
+            Peak AM / Peak PM windows differ by day type.
+          </p>
+          <p>
+            Crash points are NJDOT records (2019–2026), borough-filtered
+            to local streets.
+          </p>
+        </details>
+      </section>
+
+      <section class="scenario-picker tab-panel" data-panel="simulation"
+               aria-label="Scenario selector" hidden>
+        <div class="picker-row">
+          <label class="picker-field">
+            <span class="picker-label">Street</span>
+            <select id="street-select" aria-label="Street"></select>
+          </label>
+
+          <label class="picker-field">
+            <span class="picker-label">Change</span>
+            <select id="change-select" aria-label="Change">
+              <option value="closure">Close the street</option>
+              <option value="speed_hump">Add speed humps (~10 mph)</option>
+              <option value="oneway">Convert to one-way</option>
+            </select>
+          </label>
+
+          <label class="picker-field">
+            <span class="picker-label">Demand</span>
+            <select id="demand-select" aria-label="Demand">
+              <option value="bridge_od_weekday_24h">Average weekday</option>
+              <option value="bridge_od_sunday_24h">Average Sunday</option>
+            </select>
+          </label>
+        </div>
+
+        <div id="scenario-status" class="scenario-status" role="status"
+             aria-live="polite"></div>
+
+        <!-- deck.gl renders into this container; the picker creates the
+             map once and re-feeds it each scenario's flow.json. -->
+        <div class="deck-shell">
+          <div id="deck-map"></div>
+        </div>
+
+        <!-- Legend lives outside the iframe so it gets full width
+             of the page rather than crowding the right pane. The
+             colour stops match _ABSOLUTE_VPH_STOPS in
+             leonia_traffic/sumo/visualizations.py — keep them in
+             sync if either is changed. -->
+        <figure class="legend-card" aria-label="Traffic intensity legend">
+          <figcaption class="legend-title">
+            Traffic intensity (vehicles per hour)
+          </figcaption>
+          <div class="legend-bar"
+               aria-label="Green to red gradient from 0 to 600+ vph"></div>
+          <div class="legend-ticks">
+            <span>0</span>
+            <span>150</span>
+            <span>300</span>
+            <span>600+</span>
+          </div>
+          <p class="legend-note">
+            Per-frame scale relative to this scenario's busy roads —
+            green is quiet, yellow/orange is moderate, red saturates at
+            the busiest 5% of links. Width also grows with vph.
+            <span class="legend-network-swatch"></span>
+            <span class="legend-network-label">network (no traffic)</span>
+          </p>
+          <p class="legend-note">
+            <strong>Tip:</strong> hover a road for live vehicles/hour at
+            the current time, or click to pin the readout. Use the
+            play/scrub/speed controls on the map to step through the day;
+            the selected street is outlined in white.
+          </p>
+        </figure>
+
+        <details class="metadata">
+          <summary>About this view</summary>
+          <p>
+            Each dropdown combination maps to a precomputed SUMO
+            simulation. The map animates that scenario's per-link
+            vehicles/hour in 15-minute frames across a 24-hour day,
+            drawn on the GPU with deck.gl over a token-free MapLibre
+            basemap.
+          </p>
+          <p>
+            Closures and speed humps apply at runtime via libsumo;
+            one-way conversions are baked into a fresh SUMO network
+            via netconvert before each scenario run, since lane
+            topology can't be changed mid-simulation.
+          </p>
+          <p id="catalog-meta"></p>
+        </details>
+      </section>
+    {% endif %}
+  </main>
+
+  <footer class="page-footer">
+    <span class="muted">Cached scenarios: <span id="n-scenarios">{{ n_scenarios }}</span></span>
+  </footer>
+
+  <script src="/static/deckgl_flow.js" defer></script>
+  <script src="/static/deckgl_static.js" defer></script>
+  <script src="/static/scenario_picker.js" defer></script>
+  <script src="/static/static_picker.js" defer></script>
+</body>
+</html>

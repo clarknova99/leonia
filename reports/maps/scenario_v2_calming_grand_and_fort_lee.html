@@ -1,0 +1,3146 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_ca36c5da2a3353b3db35cbb05d1c0e01 {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+
+            <style>html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            </style>
+
+            <style>#map {
+                position:absolute;
+                top:0;
+                bottom:0;
+                right:0;
+                left:0;
+                }
+            </style>
+
+            <script>
+                L_NO_TOUCH = false;
+                L_DISABLE_3D = false;
+            </script>
+
+        
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+</head>
+<body>
+    
+    
+            <div class="folium-map" id="map_ca36c5da2a3353b3db35cbb05d1c0e01" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_ca36c5da2a3353b3db35cbb05d1c0e01 = L.map(
+                "map_ca36c5da2a3353b3db35cbb05d1c0e01",
+                {
+                    center: [40.864, -73.985],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  "zoom": 14,
+  "zoomControl": true,
+  "preferCanvas": false,
+}
+
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_1a31384770899ff38cd5d3cbb588c688 = L.tileLayer(
+                "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+                {
+  "minZoom": 0,
+  "maxZoom": 20,
+  "maxNativeZoom": 20,
+  "noWrap": false,
+  "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors \u0026copy; \u003ca href=\"https://carto.com/attributions\"\u003eCARTO\u003c/a\u003e",
+  "subdomains": "abcd",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_1a31384770899ff38cd5d3cbb588c688.addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            var poly_line_26d1355aab802fa698943c70e61b0cd9 = L.polyline(
+                [[40.864193, -73.992304], [40.8663606, -73.9903616]],
+                {"bubblingMouseEvents": true, "color": "#2166acff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#2166acff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 8}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_26d1355aab802fa698943c70e61b0cd9.bindTooltip(
+                `<div>
+                     Grand Avenue<br>baseline: 300 veh/h<br>scenario: 0 veh/h<br>delta: -300 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_bd0f0ba02c67137c7cdddb04a19776b5 = L.polyline(
+                [[40.8663606, -73.9903616], [40.867233, -73.989475]],
+                {"bubblingMouseEvents": true, "color": "#2166acff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#2166acff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 8}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_bd0f0ba02c67137c7cdddb04a19776b5.bindTooltip(
+                `<div>
+                     Grand Avenue<br>baseline: 255 veh/h<br>scenario: 0 veh/h<br>delta: -255 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_4efd817372bf3845caaf66083b736cc0 = L.polyline(
+                [[40.864193, -73.992304], [40.8638533, -73.9915326]],
+                {"bubblingMouseEvents": true, "color": "#2166acff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#2166acff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 8}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_4efd817372bf3845caaf66083b736cc0.bindTooltip(
+                `<div>
+                     Fort Lee Road<br>baseline: 435 veh/h<br>scenario: 210 veh/h<br>delta: -225 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_5c337e11098f1dd151271290df3aa703 = L.polyline(
+                [[40.8638533, -73.9915326], [40.864193, -73.992304]],
+                {"bubblingMouseEvents": true, "color": "#2166acff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#2166acff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 8}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_5c337e11098f1dd151271290df3aa703.bindTooltip(
+                `<div>
+                     Fort Lee Road<br>baseline: 225 veh/h<br>scenario: 0 veh/h<br>delta: -225 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_44da451165ede940837eafd4bdf4fd7e = L.polyline(
+                [[40.8663606, -73.9903616], [40.864193, -73.992304]],
+                {"bubblingMouseEvents": true, "color": "#2166acff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#2166acff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 8}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_44da451165ede940837eafd4bdf4fd7e.bindTooltip(
+                `<div>
+                     Grand Avenue<br>baseline: 195 veh/h<br>scenario: 0 veh/h<br>delta: -195 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_c8419476962298032953ef132668c161 = L.polyline(
+                [[40.867233, -73.989475], [40.8679427, -73.9888926]],
+                {"bubblingMouseEvents": true, "color": "#2166acff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#2166acff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 8}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_c8419476962298032953ef132668c161.bindTooltip(
+                `<div>
+                     Grand Avenue<br>baseline: 165 veh/h<br>scenario: 0 veh/h<br>delta: -165 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_17c32f034294f0d02d29422578308a72 = L.polyline(
+                [[40.867233, -73.989475], [40.8663606, -73.9903616]],
+                {"bubblingMouseEvents": true, "color": "#2166acff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#2166acff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 8}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_17c32f034294f0d02d29422578308a72.bindTooltip(
+                `<div>
+                     Grand Avenue<br>baseline: 150 veh/h<br>scenario: 0 veh/h<br>delta: -150 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_b5799b873b263d91d3644e6922dbb819 = L.polyline(
+                [[40.8648301, -73.9938893], [40.8638989, -73.994889]],
+                {"bubblingMouseEvents": true, "color": "#b2182bff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#b2182bff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 8}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_b5799b873b263d91d3644e6922dbb819.bindTooltip(
+                `<div>
+                     Station Parkway<br>baseline: 75 veh/h<br>scenario: 225 veh/h<br>delta: +150 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_aef268d63fc285dd4ec6aabb1ed471c6 = L.polyline(
+                [[40.86297, -73.983866], [40.862534, -73.983031]],
+                {"bubblingMouseEvents": true, "color": "#2166acff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#2166acff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 8}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_aef268d63fc285dd4ec6aabb1ed471c6.bindTooltip(
+                `<div>
+                     Woodland Place<br>baseline: 135 veh/h<br>scenario: 0 veh/h<br>delta: -135 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_88f457ee15ebb02d0e14b8d47612a778 = L.polyline(
+                [[40.862507, -73.9930416], [40.8628261, -73.9935546]],
+                {"bubblingMouseEvents": true, "color": "#2166acff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#2166acff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 8}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_88f457ee15ebb02d0e14b8d47612a778.bindTooltip(
+                `<div>
+                     Prospect Street<br>baseline: 135 veh/h<br>scenario: 0 veh/h<br>delta: -135 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_dd10aef3996146a0bdf0986c4f3f63c2 = L.polyline(
+                [[40.863507, -73.992932], [40.864193, -73.992304]],
+                {"bubblingMouseEvents": true, "color": "#2166acff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#2166acff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 8}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_dd10aef3996146a0bdf0986c4f3f63c2.bindTooltip(
+                `<div>
+                     Grand Avenue<br>baseline: 135 veh/h<br>scenario: 0 veh/h<br>delta: -135 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_7c11d4fbcc586acbdf7940915eecf943 = L.polyline(
+                [[40.859684, -73.98519], [40.859841, -73.983762]],
+                {"bubblingMouseEvents": true, "color": "#b2182bff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#b2182bff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 8}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_7c11d4fbcc586acbdf7940915eecf943.bindTooltip(
+                `<div>
+                     Fort Lee Road<br>baseline: 210 veh/h<br>scenario: 330 veh/h<br>delta: +120 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_02f3ac955d4c0ab80b05329c8f37cd3e = L.polyline(
+                [[40.8642805, -73.9830176], [40.863619, -73.983417]],
+                {"bubblingMouseEvents": true, "color": "#2166acff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#2166acff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 8}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_02f3ac955d4c0ab80b05329c8f37cd3e.bindTooltip(
+                `<div>
+                     Glenwood Avenue<br>baseline: 120 veh/h<br>scenario: 0 veh/h<br>delta: -120 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_d14c3930b43273c6209cb0ba252638c0 = L.polyline(
+                [[40.855326, -73.977338], [40.8569433, -73.9793681]],
+                {"bubblingMouseEvents": true, "color": "#2166acff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#2166acff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 8}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_d14c3930b43273c6209cb0ba252638c0.bindTooltip(
+                `<div>
+                     Main Street<br>baseline: 120 veh/h<br>scenario: 0 veh/h<br>delta: -120 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_adff3a60a2951719d8694ddf3178a6b7 = L.polyline(
+                [[40.863619, -73.983417], [40.86297, -73.983866]],
+                {"bubblingMouseEvents": true, "color": "#2166acff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#2166acff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 8}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_adff3a60a2951719d8694ddf3178a6b7.bindTooltip(
+                `<div>
+                     Glenwood Avenue<br>baseline: 120 veh/h<br>scenario: 0 veh/h<br>delta: -120 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_f376009ea968f2814ca708fe07917822 = L.polyline(
+                [[40.8679427, -73.9888926], [40.867233, -73.989475]],
+                {"bubblingMouseEvents": true, "color": "#2166acff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#2166acff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 8}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_f376009ea968f2814ca708fe07917822.bindTooltip(
+                `<div>
+                     Grand Avenue<br>baseline: 120 veh/h<br>scenario: 0 veh/h<br>delta: -120 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_602a9aaabc1090b7eeedaa6d45afa6d1 = L.polyline(
+                [[40.8638989, -73.994889], [40.8648301, -73.9938893]],
+                {"bubblingMouseEvents": true, "color": "#b2182bff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#b2182bff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 8}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_602a9aaabc1090b7eeedaa6d45afa6d1.bindTooltip(
+                `<div>
+                     Station Parkway<br>baseline: 30 veh/h<br>scenario: 135 veh/h<br>delta: +105 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_1fa42a5358275c80460df356d7815838 = L.polyline(
+                [[40.8546866, -73.9707653], [40.8536766, -73.9685159]],
+                {"bubblingMouseEvents": true, "color": "#b2182bff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#b2182bff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 8}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_1fa42a5358275c80460df356d7815838.bindTooltip(
+                `<div>
+                     Bruce Reynolds Boulevard<br>baseline: 165 veh/h<br>scenario: 270 veh/h<br>delta: +105 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_b3615d94e84124630846a6277a8dc358 = L.polyline(
+                [[40.862534, -73.983031], [40.86297, -73.983866]],
+                {"bubblingMouseEvents": true, "color": "#2166acff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#2166acff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 8}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_b3615d94e84124630846a6277a8dc358.bindTooltip(
+                `<div>
+                     Woodland Place<br>baseline: 90 veh/h<br>scenario: 0 veh/h<br>delta: -90 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_f58a946c2a7c492093b36857c85cd6c5 = L.polyline(
+                [[40.863619, -73.983417], [40.8642805, -73.9830176]],
+                {"bubblingMouseEvents": true, "color": "#2166acff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#2166acff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 8}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_f58a946c2a7c492093b36857c85cd6c5.bindTooltip(
+                `<div>
+                     Glenwood Avenue<br>baseline: 105 veh/h<br>scenario: 15 veh/h<br>delta: -90 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_10395271bfaa2db5ccdfbc53df7e9e85 = L.polyline(
+                [[40.86297, -73.983866], [40.863619, -73.983417]],
+                {"bubblingMouseEvents": true, "color": "#2166acff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#2166acff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 8}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_10395271bfaa2db5ccdfbc53df7e9e85.bindTooltip(
+                `<div>
+                     Glenwood Avenue<br>baseline: 105 veh/h<br>scenario: 15 veh/h<br>delta: -90 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_388ae22b82bd0f840690432ec7c12018 = L.polyline(
+                [[40.8628261, -73.9935546], [40.862507, -73.9930416]],
+                {"bubblingMouseEvents": true, "color": "#2166acff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#2166acff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 8}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_388ae22b82bd0f840690432ec7c12018.bindTooltip(
+                `<div>
+                     Prospect Street<br>baseline: 120 veh/h<br>scenario: 30 veh/h<br>delta: -90 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_0a3104016f943a958f1dab0396254bb2 = L.polyline(
+                [[40.861739, -73.987951], [40.8609978, -73.9866828]],
+                {"bubblingMouseEvents": true, "color": "#b2182bff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#b2182bff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 8}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_0a3104016f943a958f1dab0396254bb2.bindTooltip(
+                `<div>
+                     Fort Lee Road<br>baseline: 180 veh/h<br>scenario: 270 veh/h<br>delta: +90 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_9eccf7366b260cfacfd18a4f4aade4ef = L.polyline(
+                [[40.8609978, -73.9866828], [40.860398, -73.985675]],
+                {"bubblingMouseEvents": true, "color": "#b2182bff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#b2182bff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 8}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_9eccf7366b260cfacfd18a4f4aade4ef.bindTooltip(
+                `<div>
+                     Fort Lee Road<br>baseline: 180 veh/h<br>scenario: 270 veh/h<br>delta: +90 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_ac57cca3dacb5b99075fb043661148a2 = L.polyline(
+                [[40.8638989, -73.994889], [40.863349, -73.9952683]],
+                {"bubblingMouseEvents": true, "color": "#b2182bff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#b2182bff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 8}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_ac57cca3dacb5b99075fb043661148a2.bindTooltip(
+                `<div>
+                     Station Parkway<br>baseline: 60 veh/h<br>scenario: 150 veh/h<br>delta: +90 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_87b26c6757e538d68a59756989b319fa = L.polyline(
+                [[40.8568903, -73.9753459], [40.8566089, -73.974881]],
+                {"bubblingMouseEvents": true, "color": "#2166acff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#2166acff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 8}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_87b26c6757e538d68a59756989b319fa.bindTooltip(
+                `<div>
+                     Lewis Street<br>baseline: 105 veh/h<br>scenario: 30 veh/h<br>delta: -75 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_54346492c98a28ca28e124b1a3400ee3 = L.polyline(
+                [[40.853489, -73.9680031], [40.853157, -73.9670687]],
+                {"bubblingMouseEvents": true, "color": "#b2182bff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#b2182bff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 8}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_54346492c98a28ca28e124b1a3400ee3.bindTooltip(
+                `<div>
+                     Bruce Reynolds Boulevard<br>baseline: 165 veh/h<br>scenario: 240 veh/h<br>delta: +75 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_5bf4e98dd721dc8aed11b257847a5156 = L.polyline(
+                [[40.864193, -73.992304], [40.863507, -73.992932]],
+                {"bubblingMouseEvents": true, "color": "#2166acff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#2166acff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 8}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_5bf4e98dd721dc8aed11b257847a5156.bindTooltip(
+                `<div>
+                     Grand Avenue<br>baseline: 105 veh/h<br>scenario: 30 veh/h<br>delta: -75 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_0a5740e2570166b2d981c180f6dee1ed = L.polyline(
+                [[40.8562676, -73.9721865], [40.8559936, -73.9717364]],
+                {"bubblingMouseEvents": true, "color": "#2166acff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#2166acff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 8}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_0a5740e2570166b2d981c180f6dee1ed.bindTooltip(
+                `<div>
+                     George Washington Bridge Upper Level<br>baseline: 120 veh/h<br>scenario: 45 veh/h<br>delta: -75 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_4035d88944235731a4cf1040eae7640a = L.polyline(
+                [[40.8561187, -73.9726533], [40.8546866, -73.9707653]],
+                {"bubblingMouseEvents": true, "color": "#b2182bff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#b2182bff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 8}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_4035d88944235731a4cf1040eae7640a.bindTooltip(
+                `<div>
+                     Bruce Reynolds Boulevard<br>baseline: 120 veh/h<br>scenario: 195 veh/h<br>delta: +75 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_53ddddba2387e7d19619621dd9fef043 = L.polyline(
+                [[40.8611895, -73.9930778], [40.8610812, -73.9919243]],
+                {"bubblingMouseEvents": true, "color": "#b2182bff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#b2182bff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 8}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_53ddddba2387e7d19619621dd9fef043.bindTooltip(
+                `<div>
+                     Crescent Avenue<br>baseline: 15 veh/h<br>scenario: 90 veh/h<br>delta: +75 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_c46ec755516f5877b88d98a4a55637c8 = L.polyline(
+                [[40.8590754, -73.9816914], [40.8582018, -73.9807504]],
+                {"bubblingMouseEvents": true, "color": "#b2182bff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#b2182bff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 8}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_c46ec755516f5877b88d98a4a55637c8.bindTooltip(
+                `<div>
+                     Main Street<br>baseline: 240 veh/h<br>scenario: 315 veh/h<br>delta: +75 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_440de7aa888b695a1beebcf419a0b49f = L.polyline(
+                [[40.8628261, -73.9935546], [40.863507, -73.992932]],
+                {"bubblingMouseEvents": true, "color": "#2166acff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#2166acff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 8}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_440de7aa888b695a1beebcf419a0b49f.bindTooltip(
+                `<div>
+                     Grand Avenue<br>baseline: 75 veh/h<br>scenario: 0 veh/h<br>delta: -75 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_ddf551f2ce9a3ae980110266492ffa55 = L.polyline(
+                [[40.861749, -73.984711], [40.8623622, -73.9842856]],
+                {"bubblingMouseEvents": true, "color": "#2166acff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#2166acff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 8}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_ddf551f2ce9a3ae980110266492ffa55.bindTooltip(
+                `<div>
+                     Glenwood Avenue<br>baseline: 60 veh/h<br>scenario: 0 veh/h<br>delta: -60 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_e1e0aabbf16f9410549c7315041b5c81 = L.polyline(
+                [[40.8621776, -73.9886847], [40.861739, -73.987951]],
+                {"bubblingMouseEvents": true, "color": "#b2182bff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#b2182bff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 8}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_e1e0aabbf16f9410549c7315041b5c81.bindTooltip(
+                `<div>
+                     Fort Lee Road<br>baseline: 150 veh/h<br>scenario: 210 veh/h<br>delta: +60 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_3359afdf29c63f2ac833818e1fea4735 = L.polyline(
+                [[40.8582018, -73.9807504], [40.8577622, -73.9802208]],
+                {"bubblingMouseEvents": true, "color": "#b2182bff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#b2182bff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 8}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_3359afdf29c63f2ac833818e1fea4735.bindTooltip(
+                `<div>
+                     Main Street<br>baseline: 240 veh/h<br>scenario: 300 veh/h<br>delta: +60 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_bd73ecb699af2e99c71fa4e19616e698 = L.polyline(
+                [[40.8610812, -73.9919243], [40.8612451, -73.9909881]],
+                {"bubblingMouseEvents": true, "color": "#b2182bff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#b2182bff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 8}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_bd73ecb699af2e99c71fa4e19616e698.bindTooltip(
+                `<div>
+                     Crescent Avenue<br>baseline: 0 veh/h<br>scenario: 60 veh/h<br>delta: +60 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_f034cd281b571ce4989b63f9f95fa5e2 = L.polyline(
+                [[40.8569134, -73.9742222], [40.8568903, -73.9753459]],
+                {"bubblingMouseEvents": true, "color": "#2166acff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#2166acff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 8}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_f034cd281b571ce4989b63f9f95fa5e2.bindTooltip(
+                `<div>
+                     Country Road<br>baseline: 60 veh/h<br>scenario: 0 veh/h<br>delta: -60 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_5b5b34343f3e69c6e1fcb070910d457a = L.polyline(
+                [[40.867233, -73.989475], [40.8665015, -73.9879902]],
+                {"bubblingMouseEvents": true, "color": "#2166acff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#2166acff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 8}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_5b5b34343f3e69c6e1fcb070910d457a.bindTooltip(
+                `<div>
+                     Hillside Avenue<br>baseline: 60 veh/h<br>scenario: 0 veh/h<br>delta: -60 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_abe7aa25af75e89fa553f0e2494ed2da = L.polyline(
+                [[40.8566089, -73.974881], [40.8568903, -73.9753459]],
+                {"bubblingMouseEvents": true, "color": "#2166acff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#2166acff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 8}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_abe7aa25af75e89fa553f0e2494ed2da.bindTooltip(
+                `<div>
+                     Lewis Street<br>baseline: 90 veh/h<br>scenario: 30 veh/h<br>delta: -60 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_5c62a10fdddc1375b3d6c8763beb101b = L.polyline(
+                [[40.8626794, -73.9895107], [40.8621776, -73.9886847]],
+                {"bubblingMouseEvents": true, "color": "#b2182bff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#b2182bff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 8}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_5c62a10fdddc1375b3d6c8763beb101b.bindTooltip(
+                `<div>
+                     Fort Lee Road<br>baseline: 150 veh/h<br>scenario: 210 veh/h<br>delta: +60 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_dd8eca03ae2db641f00bb682a6f2fd71 = L.polyline(
+                [[40.86297, -73.983866], [40.8623622, -73.9842856]],
+                {"bubblingMouseEvents": true, "color": "#2166acff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#2166acff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 8}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_dd8eca03ae2db641f00bb682a6f2fd71.bindTooltip(
+                `<div>
+                     Glenwood Avenue<br>baseline: 60 veh/h<br>scenario: 0 veh/h<br>delta: -60 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_46f40bf8e57a04d47ce80fbfb7f552e7 = L.polyline(
+                [[40.8623622, -73.9842856], [40.86297, -73.983866]],
+                {"bubblingMouseEvents": true, "color": "#2166acff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#2166acff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 8}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_46f40bf8e57a04d47ce80fbfb7f552e7.bindTooltip(
+                `<div>
+                     Glenwood Avenue<br>baseline: 60 veh/h<br>scenario: 0 veh/h<br>delta: -60 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_0c12b1793b3e8801ac86d52ebd4d2a3f = L.polyline(
+                [[40.8623622, -73.9842856], [40.861749, -73.984711]],
+                {"bubblingMouseEvents": true, "color": "#2166acff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#2166acff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 8}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_0c12b1793b3e8801ac86d52ebd4d2a3f.bindTooltip(
+                `<div>
+                     Glenwood Avenue<br>baseline: 60 veh/h<br>scenario: 0 veh/h<br>delta: -60 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_115736d8a825efb7b70dcc35403577dc = L.polyline(
+                [[40.8536766, -73.9685159], [40.853489, -73.9680031]],
+                {"bubblingMouseEvents": true, "color": "#b2182bff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#b2182bff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 8}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_115736d8a825efb7b70dcc35403577dc.bindTooltip(
+                `<div>
+                     Bridge Plaza South<br>baseline: 195 veh/h<br>scenario: 255 veh/h<br>delta: +60 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_1de7f5ad60208a0191ff2070b4918c14 = L.polyline(
+                [[40.8596248, -73.9894429], [40.8605426, -73.9887935]],
+                {"bubblingMouseEvents": true, "color": "#2166acff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#2166acff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 8}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_1de7f5ad60208a0191ff2070b4918c14.bindTooltip(
+                `<div>
+                     Broad Avenue<br>baseline: 60 veh/h<br>scenario: 0 veh/h<br>delta: -60 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_8923bedaeac5966910006cedf9e604b5 = L.polyline(
+                [[40.862534, -73.983031], [40.859841, -73.983762]],
+                {"bubblingMouseEvents": true, "color": "#2166acff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#2166acff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 8}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_8923bedaeac5966910006cedf9e604b5.bindTooltip(
+                `<div>
+                     Linden Terrace<br>baseline: 90 veh/h<br>scenario: 30 veh/h<br>delta: -60 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_9718d26af71a9a639a946be10d818ba4 = L.polyline(
+                [[40.8644601, -73.9929817], [40.8648301, -73.9938893]],
+                {"bubblingMouseEvents": true, "color": "#b2182bff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#b2182bff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 8}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_9718d26af71a9a639a946be10d818ba4.bindTooltip(
+                `<div>
+                     Fort Lee Road<br>baseline: 45 veh/h<br>scenario: 105 veh/h<br>delta: +60 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_4921e4351436fce3c157b79693519fd8 = L.polyline(
+                [[40.860398, -73.985675], [40.859684, -73.98519]],
+                {"bubblingMouseEvents": true, "color": "#b2182bff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#b2182bff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 8}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_4921e4351436fce3c157b79693519fd8.bindTooltip(
+                `<div>
+                     Fort Lee Road<br>baseline: 225 veh/h<br>scenario: 285 veh/h<br>delta: +60 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_4fd569ef156941b2a12c1e077031a263 = L.polyline(
+                [[40.8569433, -73.9793681], [40.855326, -73.977338]],
+                {"bubblingMouseEvents": true, "color": "#2166acff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#2166acff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 8}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_4fd569ef156941b2a12c1e077031a263.bindTooltip(
+                `<div>
+                     Main Street<br>baseline: 285 veh/h<br>scenario: 225 veh/h<br>delta: -60 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_82a58dc8fc85f7fbb5852f9f3c8f2a22 = L.polyline(
+                [[40.8661417, -73.9871834], [40.865308, -73.985374]],
+                {"bubblingMouseEvents": true, "color": "#2166acff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#2166acff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 8}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_82a58dc8fc85f7fbb5852f9f3c8f2a22.bindTooltip(
+                `<div>
+                     Hillside Avenue<br>baseline: 60 veh/h<br>scenario: 0 veh/h<br>delta: -60 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_d3b9ba2d17300d04e690b16bfd6e6eee = L.polyline(
+                [[40.8569134, -73.9742222], [40.8561187, -73.9726533]],
+                {"bubblingMouseEvents": true, "color": "#b2182bff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#b2182bff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 8}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_d3b9ba2d17300d04e690b16bfd6e6eee.bindTooltip(
+                `<div>
+                     Kelby Street<br>baseline: 135 veh/h<br>scenario: 195 veh/h<br>delta: +60 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_62a6bf8d394b174a8ce308305411fb95 = L.polyline(
+                [[40.8665015, -73.9879902], [40.8661417, -73.9871834]],
+                {"bubblingMouseEvents": true, "color": "#2166acff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#2166acff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 8}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_62a6bf8d394b174a8ce308305411fb95.bindTooltip(
+                `<div>
+                     Hillside Avenue<br>baseline: 60 veh/h<br>scenario: 0 veh/h<br>delta: -60 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_e36698be2c3389ae66c7348a67cb872e = L.polyline(
+                [[40.861959, -73.994378], [40.8611895, -73.9930778]],
+                {"bubblingMouseEvents": true, "color": "#b2182bff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#b2182bff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 8}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_e36698be2c3389ae66c7348a67cb872e.bindTooltip(
+                `<div>
+                     Maple Street<br>baseline: 30 veh/h<br>scenario: 90 veh/h<br>delta: +60 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_f746041b7032706ba44f06afeaa7305f = L.polyline(
+                [[40.8679427, -73.9888926], [40.868657, -73.988472]],
+                {"bubblingMouseEvents": true, "color": "#2166acff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#2166acff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 8}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_f746041b7032706ba44f06afeaa7305f.bindTooltip(
+                `<div>
+                     Grand Avenue<br>baseline: 60 veh/h<br>scenario: 0 veh/h<br>delta: -60 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_202f156a35d3ad40cab7a6042481231a = L.polyline(
+                [[40.859637, -73.982719], [40.8590754, -73.9816914]],
+                {"bubblingMouseEvents": true, "color": "#b2182bff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#b2182bff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 8}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_202f156a35d3ad40cab7a6042481231a.bindTooltip(
+                `<div>
+                     Fort Lee Road<br>baseline: 255 veh/h<br>scenario: 315 veh/h<br>delta: +60 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_a657e1c6e54b75d3bb4059ce445a0d8a = L.polyline(
+                [[40.863349, -73.9952683], [40.8638989, -73.994889]],
+                {"bubblingMouseEvents": true, "color": "#be2e36ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#be2e36ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 7.6}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_a657e1c6e54b75d3bb4059ce445a0d8a.bindTooltip(
+                `<div>
+                     Station Parkway<br>baseline: 15 veh/h<br>scenario: 60 veh/h<br>delta: +45 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_fcc164f467c0d78c9709c57301fdce6e = L.polyline(
+                [[40.863349, -73.9952683], [40.86291, -73.995989]],
+                {"bubblingMouseEvents": true, "color": "#be2e36ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#be2e36ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 7.6}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_fcc164f467c0d78c9709c57301fdce6e.bindTooltip(
+                `<div>
+                     Station Parkway<br>baseline: 45 veh/h<br>scenario: 90 veh/h<br>delta: +45 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_ddbd679b8c784207eaa15a73aaa642bf = L.polyline(
+                [[40.8632066, -73.9904175], [40.8638533, -73.9915326]],
+                {"bubblingMouseEvents": true, "color": "#2f73b3ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#2f73b3ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 7.6}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_ddbd679b8c784207eaa15a73aaa642bf.bindTooltip(
+                `<div>
+                     Fort Lee Road<br>baseline: 45 veh/h<br>scenario: 0 veh/h<br>delta: -45 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_8f02f62214a2491d5e2b5b5ac31ef7cc = L.polyline(
+                [[40.8685103, -73.9732422], [40.8646526, -73.9745649]],
+                {"bubblingMouseEvents": true, "color": "#2f73b3ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#2f73b3ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 7.6}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_8f02f62214a2491d5e2b5b5ac31ef7cc.bindTooltip(
+                `<div>
+                     #72<br>baseline: 75 veh/h<br>scenario: 30 veh/h<br>delta: -45 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_becf6995f20f7306a91133fe267ce53b = L.polyline(
+                [[40.8568903, -73.9753459], [40.8562671, -73.9765712]],
+                {"bubblingMouseEvents": true, "color": "#2f73b3ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#2f73b3ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 7.6}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_becf6995f20f7306a91133fe267ce53b.bindTooltip(
+                `<div>
+                     South Bridge Plaza<br>baseline: 60 veh/h<br>scenario: 15 veh/h<br>delta: -45 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_d7474acf947ad99dceef3fb2874fe4ce = L.polyline(
+                [[40.8591693, -73.9752738], [40.8562676, -73.9721865]],
+                {"bubblingMouseEvents": true, "color": "#2f73b3ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#2f73b3ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 7.6}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_d7474acf947ad99dceef3fb2874fe4ce.bindTooltip(
+                `<div>
+                     New Jersey Turnpike Express Roadway<br>baseline: 75 veh/h<br>scenario: 30 veh/h<br>delta: -45 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_d2861da35272129d938a854ee9cefed8 = L.polyline(
+                [[40.8617529, -73.9747336], [40.8591693, -73.9752738]],
+                {"bubblingMouseEvents": true, "color": "#2f73b3ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#2f73b3ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 7.6}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_d2861da35272129d938a854ee9cefed8.bindTooltip(
+                `<div>
+                     New Jersey Turnpike Express Roadway<br>baseline: 75 veh/h<br>scenario: 30 veh/h<br>delta: -45 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_68cc86ef13d82465f33cf0c8bbc4261e = L.polyline(
+                [[40.8575332, -73.9790526], [40.856915, -73.978216]],
+                {"bubblingMouseEvents": true, "color": "#be2e36ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#be2e36ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 7.6}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_68cc86ef13d82465f33cf0c8bbc4261e.bindTooltip(
+                `<div>
+                     Summit Avenue<br>baseline: 0 veh/h<br>scenario: 45 veh/h<br>delta: +45 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_301ccc7f3846483a945a5048dd42971a = L.polyline(
+                [[40.853157, -73.9670687], [40.8539181, -73.965127]],
+                {"bubblingMouseEvents": true, "color": "#be2e36ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#be2e36ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 7.6}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_301ccc7f3846483a945a5048dd42971a.bindTooltip(
+                `<div>
+                     #63<br>baseline: 195 veh/h<br>scenario: 240 veh/h<br>delta: +45 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_76adba3e0daa0d48e3921f3ee5e716b8 = L.polyline(
+                [[40.8614603, -73.9948562], [40.861959, -73.994378]],
+                {"bubblingMouseEvents": true, "color": "#be2e36ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#be2e36ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 7.6}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_76adba3e0daa0d48e3921f3ee5e716b8.bindTooltip(
+                `<div>
+                     Grand Avenue<br>baseline: 45 veh/h<br>scenario: 90 veh/h<br>delta: +45 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_6c5e08d4c002cbc85eab4838d1f0a028 = L.polyline(
+                [[40.8605426, -73.9887935], [40.8596248, -73.9894429]],
+                {"bubblingMouseEvents": true, "color": "#2f73b3ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#2f73b3ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 7.6}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_6c5e08d4c002cbc85eab4838d1f0a028.bindTooltip(
+                `<div>
+                     Broad Avenue<br>baseline: 60 veh/h<br>scenario: 15 veh/h<br>delta: -45 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_070a0c3160e52c64311675324d67eaa4 = L.polyline(
+                [[40.872053, -73.986366], [40.8733228, -73.9856827]],
+                {"bubblingMouseEvents": true, "color": "#2f73b3ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#2f73b3ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 7.6}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_070a0c3160e52c64311675324d67eaa4.bindTooltip(
+                `<div>
+                     Grand Avenue<br>baseline: 45 veh/h<br>scenario: 0 veh/h<br>delta: -45 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_076b9f1600cecc790ed540e6050f1036 = L.polyline(
+                [[40.8611131, -73.9897808], [40.8605426, -73.9887935]],
+                {"bubblingMouseEvents": true, "color": "#be2e36ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#be2e36ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 7.6}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_076b9f1600cecc790ed540e6050f1036.bindTooltip(
+                `<div>
+                     Crescent Avenue<br>baseline: 45 veh/h<br>scenario: 90 veh/h<br>delta: +45 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_b090a1289d0403baeb5cdbcb507b0e98 = L.polyline(
+                [[40.8695836, -73.98791], [40.87084, -73.9871237]],
+                {"bubblingMouseEvents": true, "color": "#2f73b3ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#2f73b3ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 7.6}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_b090a1289d0403baeb5cdbcb507b0e98.bindTooltip(
+                `<div>
+                     Grand Avenue<br>baseline: 45 veh/h<br>scenario: 0 veh/h<br>delta: -45 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_4d75db73ed068f26baf7d3c4225b184e = L.polyline(
+                [[40.86291, -73.995989], [40.8619232, -73.9955832]],
+                {"bubblingMouseEvents": true, "color": "#be2e36ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#be2e36ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 7.6}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_4d75db73ed068f26baf7d3c4225b184e.bindTooltip(
+                `<div>
+                     Station Parkway<br>baseline: 45 veh/h<br>scenario: 90 veh/h<br>delta: +45 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_0020daa0351880a8f30804a5c85544b3 = L.polyline(
+                [[40.868657, -73.988472], [40.8695836, -73.98791]],
+                {"bubblingMouseEvents": true, "color": "#2f73b3ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#2f73b3ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 7.6}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_0020daa0351880a8f30804a5c85544b3.bindTooltip(
+                `<div>
+                     Grand Avenue<br>baseline: 45 veh/h<br>scenario: 0 veh/h<br>delta: -45 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_f2537f79ebd6760ab67b94c8822ead5b = L.polyline(
+                [[40.8611895, -73.9930778], [40.862507, -73.9930416]],
+                {"bubblingMouseEvents": true, "color": "#2f73b3ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#2f73b3ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 7.6}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_f2537f79ebd6760ab67b94c8822ead5b.bindTooltip(
+                `<div>
+                     Crescent Avenue<br>baseline: 45 veh/h<br>scenario: 0 veh/h<br>delta: -45 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_b92c3e9b992db49ebf876dd2962ea317 = L.polyline(
+                [[40.8644601, -73.9929817], [40.864193, -73.992304]],
+                {"bubblingMouseEvents": true, "color": "#2f73b3ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#2f73b3ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 7.6}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_b92c3e9b992db49ebf876dd2962ea317.bindTooltip(
+                `<div>
+                     Fort Lee Road<br>baseline: 285 veh/h<br>scenario: 240 veh/h<br>delta: -45 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_ece6e83ee4c79c7d4357d47c3568bceb = L.polyline(
+                [[40.8619232, -73.9955832], [40.8614603, -73.9948562]],
+                {"bubblingMouseEvents": true, "color": "#be2e36ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#be2e36ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 7.6}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_ece6e83ee4c79c7d4357d47c3568bceb.bindTooltip(
+                `<div>
+                     Station Parkway<br>baseline: 45 veh/h<br>scenario: 90 veh/h<br>delta: +45 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_bf32e6eec5a2d7b65d50390cb483cef7 = L.polyline(
+                [[40.8741462, -73.985252], [40.8757546, -73.9843577]],
+                {"bubblingMouseEvents": true, "color": "#2f73b3ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#2f73b3ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 7.6}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_bf32e6eec5a2d7b65d50390cb483cef7.bindTooltip(
+                `<div>
+                     Grand Avenue<br>baseline: 45 veh/h<br>scenario: 0 veh/h<br>delta: -45 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_d52855fb5584c90aa59bc24c92ade597 = L.polyline(
+                [[40.865308, -73.985374], [40.8642805, -73.9830176]],
+                {"bubblingMouseEvents": true, "color": "#2f73b3ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#2f73b3ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 7.6}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_d52855fb5584c90aa59bc24c92ade597.bindTooltip(
+                `<div>
+                     Hillside Avenue<br>baseline: 45 veh/h<br>scenario: 0 veh/h<br>delta: -45 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_d59fb427e19fe87791e3febb98590109 = L.polyline(
+                [[40.8714678, -73.9867262], [40.872053, -73.986366]],
+                {"bubblingMouseEvents": true, "color": "#2f73b3ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#2f73b3ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 7.6}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_d59fb427e19fe87791e3febb98590109.bindTooltip(
+                `<div>
+                     Grand Avenue<br>baseline: 45 veh/h<br>scenario: 0 veh/h<br>delta: -45 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_5e5c1590ce1b557da755a2139194ad05 = L.polyline(
+                [[40.8577622, -73.9802208], [40.8569433, -73.9793681]],
+                {"bubblingMouseEvents": true, "color": "#be2e36ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#be2e36ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 7.6}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_5e5c1590ce1b557da755a2139194ad05.bindTooltip(
+                `<div>
+                     Main Street<br>baseline: 195 veh/h<br>scenario: 240 veh/h<br>delta: +45 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_02af87f047801f72130b201388e1c401 = L.polyline(
+                [[40.8638533, -73.9915326], [40.863108, -73.992185]],
+                {"bubblingMouseEvents": true, "color": "#be2e36ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#be2e36ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 7.6}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_02af87f047801f72130b201388e1c401.bindTooltip(
+                `<div>
+                     Romaine Place<br>baseline: 0 veh/h<br>scenario: 45 veh/h<br>delta: +45 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_675c52a2df02d4b8a80d0eae6a6df80b = L.polyline(
+                [[40.863108, -73.992185], [40.8638533, -73.9915326]],
+                {"bubblingMouseEvents": true, "color": "#be2e36ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#be2e36ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 7.6}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_675c52a2df02d4b8a80d0eae6a6df80b.bindTooltip(
+                `<div>
+                     Romaine Place<br>baseline: 0 veh/h<br>scenario: 45 veh/h<br>delta: +45 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_61424a27abe0368ce72821e671901901 = L.polyline(
+                [[40.8757546, -73.9843577], [40.8762888, -73.9838646]],
+                {"bubblingMouseEvents": true, "color": "#2f73b3ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#2f73b3ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 7.6}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_61424a27abe0368ce72821e671901901.bindTooltip(
+                `<div>
+                     Grand Avenue<br>baseline: 45 veh/h<br>scenario: 0 veh/h<br>delta: -45 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_acdcaf52e70576f1c9deb4be897e5f1d = L.polyline(
+                [[40.8646526, -73.9745649], [40.8617529, -73.9747336]],
+                {"bubblingMouseEvents": true, "color": "#2f73b3ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#2f73b3ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 7.6}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_acdcaf52e70576f1c9deb4be897e5f1d.bindTooltip(
+                `<div>
+                     #19<br>baseline: 75 veh/h<br>scenario: 30 veh/h<br>delta: -45 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_6cb3a6a264031a978d63fcab261f8537 = L.polyline(
+                [[40.87084, -73.9871237], [40.8714678, -73.9867262]],
+                {"bubblingMouseEvents": true, "color": "#2f73b3ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#2f73b3ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 7.6}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_6cb3a6a264031a978d63fcab261f8537.bindTooltip(
+                `<div>
+                     Grand Avenue<br>baseline: 45 veh/h<br>scenario: 0 veh/h<br>delta: -45 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_3dbfd71ea5da9253ecade6a1afb60fac = L.polyline(
+                [[40.8762888, -73.9838646], [40.8777345, -73.982327]],
+                {"bubblingMouseEvents": true, "color": "#2f73b3ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#2f73b3ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 7.6}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_3dbfd71ea5da9253ecade6a1afb60fac.bindTooltip(
+                `<div>
+                     Grand Avenue<br>baseline: 45 veh/h<br>scenario: 0 veh/h<br>delta: -45 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_daa737a83084ab84feec164248b45447 = L.polyline(
+                [[40.8559936, -73.9717364], [40.8551956, -73.9706802]],
+                {"bubblingMouseEvents": true, "color": "#2f73b3ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#2f73b3ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 7.6}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_daa737a83084ab84feec164248b45447.bindTooltip(
+                `<div>
+                     #4<br>baseline: 90 veh/h<br>scenario: 45 veh/h<br>delta: -45 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_92e275246acf87e9e4d62b5ef615576c = L.polyline(
+                [[40.8733228, -73.9856827], [40.8741462, -73.985252]],
+                {"bubblingMouseEvents": true, "color": "#2f73b3ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#2f73b3ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 7.6}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_92e275246acf87e9e4d62b5ef615576c.bindTooltip(
+                `<div>
+                     Grand Avenue<br>baseline: 45 veh/h<br>scenario: 0 veh/h<br>delta: -45 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_54796b0558a56d9afcf339fa6ec00717 = L.polyline(
+                [[40.8612451, -73.9909881], [40.8611131, -73.9897808]],
+                {"bubblingMouseEvents": true, "color": "#be2e36ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#be2e36ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 7.6}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_54796b0558a56d9afcf339fa6ec00717.bindTooltip(
+                `<div>
+                     Crescent Avenue<br>baseline: 45 veh/h<br>scenario: 90 veh/h<br>delta: +45 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_3be73c8edb6d4f9d1a4ed9cb212e440b = L.polyline(
+                [[40.859637, -73.982719], [40.859841, -73.983762]],
+                {"bubblingMouseEvents": true, "color": "#2f73b3ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#2f73b3ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 7.6}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_3be73c8edb6d4f9d1a4ed9cb212e440b.bindTooltip(
+                `<div>
+                     Fort Lee Road<br>baseline: 45 veh/h<br>scenario: 0 veh/h<br>delta: -45 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_1fc13cd0f79a97b6c55e5c1b4cc33a64 = L.polyline(
+                [[40.8551956, -73.9706802], [40.8544146, -73.9684701]],
+                {"bubblingMouseEvents": true, "color": "#2f73b3ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#2f73b3ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 7.6}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_1fc13cd0f79a97b6c55e5c1b4cc33a64.bindTooltip(
+                `<div>
+                     #90<br>baseline: 90 veh/h<br>scenario: 45 veh/h<br>delta: -45 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_7b8269bc1812506f1b678927da28bbbc = L.polyline(
+                [[40.8695714, -73.9728624], [40.8685103, -73.9732422]],
+                {"bubblingMouseEvents": true, "color": "#599cc8ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#599cc8ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 6.4}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_7b8269bc1812506f1b678927da28bbbc.bindTooltip(
+                `<div>
+                     #70<br>baseline: 45 veh/h<br>scenario: 15 veh/h<br>delta: -30 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_8879cf5ae446744e4776ac59213a3158 = L.polyline(
+                [[40.862507, -73.9930416], [40.8611895, -73.9930778]],
+                {"bubblingMouseEvents": true, "color": "#599cc8ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#599cc8ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 6.4}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_8879cf5ae446744e4776ac59213a3158.bindTooltip(
+                `<div>
+                     Crescent Avenue<br>baseline: 30 veh/h<br>scenario: 0 veh/h<br>delta: -30 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_c04a880807a1e970790367240f7bf1f5 = L.polyline(
+                [[40.856915, -73.978216], [40.856507, -73.977669]],
+                {"bubblingMouseEvents": true, "color": "#e37357ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#e37357ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 6.4}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_c04a880807a1e970790367240f7bf1f5.bindTooltip(
+                `<div>
+                     Summit Avenue<br>baseline: 0 veh/h<br>scenario: 30 veh/h<br>delta: +30 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_c577aedf1e2900235009171d33880e26 = L.polyline(
+                [[40.861739, -73.987951], [40.8605426, -73.9887935]],
+                {"bubblingMouseEvents": true, "color": "#599cc8ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#599cc8ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 6.4}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_c577aedf1e2900235009171d33880e26.bindTooltip(
+                `<div>
+                     Broad Avenue<br>baseline: 45 veh/h<br>scenario: 15 veh/h<br>delta: -30 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_144cc3350be3380cfafc9dd1d3393c4c = L.polyline(
+                [[40.878556, -73.9814248], [40.8790976, -73.9821144]],
+                {"bubblingMouseEvents": true, "color": "#599cc8ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#599cc8ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 6.4}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_144cc3350be3380cfafc9dd1d3393c4c.bindTooltip(
+                `<div>
+                     #32<br>baseline: 30 veh/h<br>scenario: 0 veh/h<br>delta: -30 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_9291ed757394dc4cc9990a6468492002 = L.polyline(
+                [[40.8790976, -73.9821144], [40.8775178, -73.9799021]],
+                {"bubblingMouseEvents": true, "color": "#599cc8ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#599cc8ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 6.4}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_9291ed757394dc4cc9990a6468492002.bindTooltip(
+                `<div>
+                     #33<br>baseline: 30 veh/h<br>scenario: 0 veh/h<br>delta: -30 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_27149434940368d92718d1e21f8bf8b5 = L.polyline(
+                [[40.856507, -73.977669], [40.8562671, -73.9765712]],
+                {"bubblingMouseEvents": true, "color": "#e37357ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#e37357ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 6.4}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_27149434940368d92718d1e21f8bf8b5.bindTooltip(
+                `<div>
+                     Louis Street<br>baseline: 0 veh/h<br>scenario: 30 veh/h<br>delta: +30 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_b69eb76244e3d3de84e2e7593d390ef4 = L.polyline(
+                [[40.853489, -73.9680031], [40.8536766, -73.9685159]],
+                {"bubblingMouseEvents": true, "color": "#599cc8ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#599cc8ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 6.4}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_b69eb76244e3d3de84e2e7593d390ef4.bindTooltip(
+                `<div>
+                     Bridge Plaza South<br>baseline: 30 veh/h<br>scenario: 0 veh/h<br>delta: -30 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_c0e2ca79afc29390e678c2bae3dbf500 = L.polyline(
+                [[40.8586973, -73.9859744], [40.859684, -73.98519]],
+                {"bubblingMouseEvents": true, "color": "#e37357ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#e37357ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 6.4}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_c0e2ca79afc29390e678c2bae3dbf500.bindTooltip(
+                `<div>
+                     Paulin Boulevard<br>baseline: 30 veh/h<br>scenario: 60 veh/h<br>delta: +30 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_8f00a65afc6751f8e3c366f4c103951a = L.polyline(
+                [[40.859684, -73.98519], [40.860398, -73.985675]],
+                {"bubblingMouseEvents": true, "color": "#599cc8ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#599cc8ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 6.4}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_8f00a65afc6751f8e3c366f4c103951a.bindTooltip(
+                `<div>
+                     Fort Lee Road<br>baseline: 45 veh/h<br>scenario: 15 veh/h<br>delta: -30 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_2e0c1cef820fe69f38d30c230b4fb6a4 = L.polyline(
+                [[40.8638533, -73.9915326], [40.8632066, -73.9904175]],
+                {"bubblingMouseEvents": true, "color": "#599cc8ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#599cc8ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 6.4}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_2e0c1cef820fe69f38d30c230b4fb6a4.bindTooltip(
+                `<div>
+                     Fort Lee Road<br>baseline: 240 veh/h<br>scenario: 210 veh/h<br>delta: -30 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_4db0ea355ec318ff94d9b8af90b3d3d5 = L.polyline(
+                [[40.8528155, -73.9690465], [40.8536766, -73.9685159]],
+                {"bubblingMouseEvents": true, "color": "#e37357ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#e37357ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 6.4}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_4db0ea355ec318ff94d9b8af90b3d3d5.bindTooltip(
+                `<div>
+                     Lemoine Avenue<br>baseline: 15 veh/h<br>scenario: 45 veh/h<br>delta: +30 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_ce33cc385fe6db134b462c6ac9044455 = L.polyline(
+                [[40.8778181, -73.9790869], [40.8752224, -73.974577]],
+                {"bubblingMouseEvents": true, "color": "#599cc8ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#599cc8ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 6.4}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_ce33cc385fe6db134b462c6ac9044455.bindTooltip(
+                `<div>
+                     #108<br>baseline: 30 veh/h<br>scenario: 0 veh/h<br>delta: -30 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_c42e67dba4b41c190bf0729ff0b62db8 = L.polyline(
+                [[40.8587774, -73.9803782], [40.8582018, -73.9807504]],
+                {"bubblingMouseEvents": true, "color": "#599cc8ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#599cc8ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 6.4}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_c42e67dba4b41c190bf0729ff0b62db8.bindTooltip(
+                `<div>
+                     Hoefleys Lane<br>baseline: 30 veh/h<br>scenario: 0 veh/h<br>delta: -30 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_0b247d01ba29e7587565c36a40612552 = L.polyline(
+                [[40.8583744, -73.9782914], [40.8575105, -73.9744717]],
+                {"bubblingMouseEvents": true, "color": "#599cc8ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#599cc8ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 6.4}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_0b247d01ba29e7587565c36a40612552.bindTooltip(
+                `<div>
+                     #85<br>baseline: 75 veh/h<br>scenario: 45 veh/h<br>delta: -30 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_2b4ff5ed88a970a6aeda2c0154ddce59 = L.polyline(
+                [[40.8752224, -73.974577], [40.8719899, -73.9724723]],
+                {"bubblingMouseEvents": true, "color": "#599cc8ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#599cc8ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 6.4}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_2b4ff5ed88a970a6aeda2c0154ddce59.bindTooltip(
+                `<div>
+                     #81<br>baseline: 30 veh/h<br>scenario: 0 veh/h<br>delta: -30 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_856e6764fbf3c7f12e0afa2b755bfcf8 = L.polyline(
+                [[40.8596248, -73.9894429], [40.8585733, -73.9872182]],
+                {"bubblingMouseEvents": true, "color": "#e37357ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#e37357ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 6.4}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_856e6764fbf3c7f12e0afa2b755bfcf8.bindTooltip(
+                `<div>
+                     Allaire Avenue<br>baseline: 30 veh/h<br>scenario: 60 veh/h<br>delta: +30 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_47f1f2b88db692d615a9b136248fafca = L.polyline(
+                [[40.8559936, -73.9717364], [40.8538852, -73.964284]],
+                {"bubblingMouseEvents": true, "color": "#599cc8ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#599cc8ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 6.4}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_47f1f2b88db692d615a9b136248fafca.bindTooltip(
+                `<div>
+                     George Washington Bridge Upper Level<br>baseline: 30 veh/h<br>scenario: 0 veh/h<br>delta: -30 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_8d6f74ab6768a9d278397d17aa899fb7 = L.polyline(
+                [[40.8775178, -73.9799021], [40.8778181, -73.9790869]],
+                {"bubblingMouseEvents": true, "color": "#599cc8ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#599cc8ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 6.4}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_8d6f74ab6768a9d278397d17aa899fb7.bindTooltip(
+                `<div>
+                     #107<br>baseline: 30 veh/h<br>scenario: 0 veh/h<br>delta: -30 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_b9a13cae3438982b8206a91349814a18 = L.polyline(
+                [[40.8719899, -73.9724723], [40.8705292, -73.9725478]],
+                {"bubblingMouseEvents": true, "color": "#599cc8ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#599cc8ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 6.4}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_b9a13cae3438982b8206a91349814a18.bindTooltip(
+                `<div>
+                     #68<br>baseline: 45 veh/h<br>scenario: 15 veh/h<br>delta: -30 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_9fc6d04b1fb9652a9d11f7eb2d1a411a = L.polyline(
+                [[40.8705292, -73.9725478], [40.8695714, -73.9728624]],
+                {"bubblingMouseEvents": true, "color": "#599cc8ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#599cc8ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 6.4}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_9fc6d04b1fb9652a9d11f7eb2d1a411a.bindTooltip(
+                `<div>
+                     #69<br>baseline: 45 veh/h<br>scenario: 15 veh/h<br>delta: -30 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_2ec71c04f874fdf99711dfde57bc08d1 = L.polyline(
+                [[40.8544146, -73.9684701], [40.8542152, -73.9675572]],
+                {"bubblingMouseEvents": true, "color": "#599cc8ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#599cc8ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 6.4}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_2ec71c04f874fdf99711dfde57bc08d1.bindTooltip(
+                `<div>
+                     #121<br>baseline: 105 veh/h<br>scenario: 75 veh/h<br>delta: -30 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_99cf9935ff0561c1662189f90e358785 = L.polyline(
+                [[40.8569433, -73.9793681], [40.8575332, -73.9790526]],
+                {"bubblingMouseEvents": true, "color": "#e37357ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#e37357ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 6.4}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_99cf9935ff0561c1662189f90e358785.bindTooltip(
+                `<div>
+                     Jones Road<br>baseline: 0 veh/h<br>scenario: 30 veh/h<br>delta: +30 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_0745b5df70eeb6eeffd9d1b8c5186b4a = L.polyline(
+                [[40.8611477, -73.9851242], [40.861749, -73.984711]],
+                {"bubblingMouseEvents": true, "color": "#599cc8ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#599cc8ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 6.4}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_0745b5df70eeb6eeffd9d1b8c5186b4a.bindTooltip(
+                `<div>
+                     Glenwood Avenue<br>baseline: 30 veh/h<br>scenario: 0 veh/h<br>delta: -30 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_82493aaa4466a89d1bd4400f6e2cf5a2 = L.polyline(
+                [[40.859841, -73.983762], [40.859637, -73.982719]],
+                {"bubblingMouseEvents": true, "color": "#e37357ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#e37357ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 6.4}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_82493aaa4466a89d1bd4400f6e2cf5a2.bindTooltip(
+                `<div>
+                     Fort Lee Road<br>baseline: 285 veh/h<br>scenario: 315 veh/h<br>delta: +30 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_6097ebc0d2334c5cab4135501eaf3d2e = L.polyline(
+                [[40.8632066, -73.9904175], [40.8626794, -73.9895107]],
+                {"bubblingMouseEvents": true, "color": "#e37357ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#e37357ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 6.4}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_6097ebc0d2334c5cab4135501eaf3d2e.bindTooltip(
+                `<div>
+                     Fort Lee Road<br>baseline: 180 veh/h<br>scenario: 210 veh/h<br>delta: +30 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_71bb10c65410aaed3afa039edcf55090 = L.polyline(
+                [[40.8632066, -73.9904175], [40.8617589, -73.9918589]],
+                {"bubblingMouseEvents": true, "color": "#599cc8ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#599cc8ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 6.4}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_71bb10c65410aaed3afa039edcf55090.bindTooltip(
+                `<div>
+                     Leonia Avenue<br>baseline: 30 veh/h<br>scenario: 0 veh/h<br>delta: -30 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_08a86092b0b9a2624943ff551995c635 = L.polyline(
+                [[40.8549089, -73.9767211], [40.8566089, -73.974881]],
+                {"bubblingMouseEvents": true, "color": "#e37357ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#e37357ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 6.4}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_08a86092b0b9a2624943ff551995c635.bindTooltip(
+                `<div>
+                     Fletcher Avenue<br>baseline: 165 veh/h<br>scenario: 195 veh/h<br>delta: +30 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_891e18e9650b5540ccce940f0ab3d6d4 = L.polyline(
+                [[40.8777345, -73.982327], [40.878556, -73.9814248]],
+                {"bubblingMouseEvents": true, "color": "#599cc8ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#599cc8ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 6.4}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_891e18e9650b5540ccce940f0ab3d6d4.bindTooltip(
+                `<div>
+                     Grand Avenue<br>baseline: 30 veh/h<br>scenario: 0 veh/h<br>delta: -30 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_07b64f028cb7f4e70742df9cd45a7267 = L.polyline(
+                [[40.8626794, -73.9895107], [40.8612451, -73.9909881]],
+                {"bubblingMouseEvents": true, "color": "#599cc8ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#599cc8ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 6.4}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_07b64f028cb7f4e70742df9cd45a7267.bindTooltip(
+                `<div>
+                     Gladwin Avenue<br>baseline: 30 veh/h<br>scenario: 0 veh/h<br>delta: -30 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_0ba75a5be3b392a367e9fbb6b7263cff = L.polyline(
+                [[40.8575105, -73.9744717], [40.8562676, -73.9721865]],
+                {"bubblingMouseEvents": true, "color": "#599cc8ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#599cc8ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 6.4}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_0ba75a5be3b392a367e9fbb6b7263cff.bindTooltip(
+                `<div>
+                     #139<br>baseline: 45 veh/h<br>scenario: 15 veh/h<br>delta: -30 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_1f3ac38d74db708e3ed07ead892c6d18 = L.polyline(
+                [[40.861749, -73.984711], [40.8611477, -73.9851242]],
+                {"bubblingMouseEvents": true, "color": "#599cc8ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#599cc8ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 6.4}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_1f3ac38d74db708e3ed07ead892c6d18.bindTooltip(
+                `<div>
+                     Glenwood Avenue<br>baseline: 30 veh/h<br>scenario: 0 veh/h<br>delta: -30 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_42d7a6ac2a11422dbec528291e11f005 = L.polyline(
+                [[40.8585733, -73.9872182], [40.8586973, -73.9859744]],
+                {"bubblingMouseEvents": true, "color": "#e37357ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#e37357ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 6.4}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_42d7a6ac2a11422dbec528291e11f005.bindTooltip(
+                `<div>
+                     Allaire Avenue<br>baseline: 30 veh/h<br>scenario: 60 veh/h<br>delta: +30 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_9d3d8f1053efafe112105e906af50b8c = L.polyline(
+                [[40.859841, -73.983762], [40.862534, -73.983031]],
+                {"bubblingMouseEvents": true, "color": "#599cc8ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#599cc8ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 6.4}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_9d3d8f1053efafe112105e906af50b8c.bindTooltip(
+                `<div>
+                     Linden Terrace<br>baseline: 60 veh/h<br>scenario: 30 veh/h<br>delta: -30 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_ea98dc3dc0116614192e17042aaf705a = L.polyline(
+                [[40.8539181, -73.965127], [40.8538852, -73.964284]],
+                {"bubblingMouseEvents": true, "color": "#e37357ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#e37357ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 6.4}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_ea98dc3dc0116614192e17042aaf705a.bindTooltip(
+                `<div>
+                     #145<br>baseline: 285 veh/h<br>scenario: 315 veh/h<br>delta: +30 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_cef5cb03840b43f34dd3f675b8000ceb = L.polyline(
+                [[40.855326, -73.977338], [40.8549089, -73.9767211]],
+                {"bubblingMouseEvents": true, "color": "#e37357ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#e37357ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 6.4}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_cef5cb03840b43f34dd3f675b8000ceb.bindTooltip(
+                `<div>
+                     Main Street<br>baseline: 225 veh/h<br>scenario: 255 veh/h<br>delta: +30 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_2d86024789e99b8b76791762431af2ce = L.polyline(
+                [[40.8569433, -73.9793681], [40.8577622, -73.9802208]],
+                {"bubblingMouseEvents": true, "color": "#599cc8ff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#599cc8ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 6.4}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_2d86024789e99b8b76791762431af2ce.bindTooltip(
+                `<div>
+                     Main Street<br>baseline: 30 veh/h<br>scenario: 0 veh/h<br>delta: -30 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_4964424b634cb2a220580e335539326f = L.polyline(
+                [[40.855634, -73.9700867], [40.856034, -73.969679]],
+                {"bubblingMouseEvents": true, "color": "#a1c8dfff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#a1c8dfff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 5.2}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_4964424b634cb2a220580e335539326f.bindTooltip(
+                `<div>
+                     Center Avenue<br>baseline: 15 veh/h<br>scenario: 0 veh/h<br>delta: -15 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_609906c4000646001fd061eaf58ceb08 = L.polyline(
+                [[40.8552068, -73.9704513], [40.855634, -73.9700867]],
+                {"bubblingMouseEvents": true, "color": "#a1c8dfff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#a1c8dfff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 5.2}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_609906c4000646001fd061eaf58ceb08.bindTooltip(
+                `<div>
+                     Center Avenue<br>baseline: 15 veh/h<br>scenario: 0 veh/h<br>delta: -15 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_f546526795974aadb279145adfe89e26 = L.polyline(
+                [[40.8552068, -73.9704513], [40.8544146, -73.9684701]],
+                {"bubblingMouseEvents": true, "color": "#f3b69eff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#f3b69eff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 5.2}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_f546526795974aadb279145adfe89e26.bindTooltip(
+                `<div>
+                     #97<br>baseline: 15 veh/h<br>scenario: 30 veh/h<br>delta: +15 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_185ecd381636a7dc46abe5cc46681a8d = L.polyline(
+                [[40.856034, -73.969679], [40.8551733, -73.9675921]],
+                {"bubblingMouseEvents": true, "color": "#a1c8dfff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#a1c8dfff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 5.2}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_185ecd381636a7dc46abe5cc46681a8d.bindTooltip(
+                `<div>
+                     Bridge Plaza North<br>baseline: 15 veh/h<br>scenario: 0 veh/h<br>delta: -15 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_c6a41ad312fd8a1a85e87cb9c7899d80 = L.polyline(
+                [[40.8556021, -73.9732025], [40.8566089, -73.974881]],
+                {"bubblingMouseEvents": true, "color": "#a1c8dfff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#a1c8dfff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 5.2}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_c6a41ad312fd8a1a85e87cb9c7899d80.bindTooltip(
+                `<div>
+                     Lewis Street<br>baseline: 15 veh/h<br>scenario: 0 veh/h<br>delta: -15 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_7f21f3f56c8c4cad8c2d1dd51b98ff59 = L.polyline(
+                [[40.8551733, -73.9675921], [40.8536766, -73.9685159]],
+                {"bubblingMouseEvents": true, "color": "#a1c8dfff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#a1c8dfff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 5.2}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_7f21f3f56c8c4cad8c2d1dd51b98ff59.bindTooltip(
+                `<div>
+                     Lemoine Avenue<br>baseline: 15 veh/h<br>scenario: 0 veh/h<br>delta: -15 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_d525dba351d88d8229ed4f2ef7b76e95 = L.polyline(
+                [[40.8684035, -73.9758763], [40.8700564, -73.9748268]],
+                {"bubblingMouseEvents": true, "color": "#a1c8dfff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#a1c8dfff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 5.2}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_d525dba351d88d8229ed4f2ef7b76e95.bindTooltip(
+                `<div>
+                     Jones Road<br>baseline: 30 veh/h<br>scenario: 15 veh/h<br>delta: -15 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_540d109f245636de6a73f8e067985aa6 = L.polyline(
+                [[40.8673935, -73.9783878], [40.86789, -73.9770551]],
+                {"bubblingMouseEvents": true, "color": "#a1c8dfff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#a1c8dfff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 5.2}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_540d109f245636de6a73f8e067985aa6.bindTooltip(
+                `<div>
+                     Edgewood Road<br>baseline: 30 veh/h<br>scenario: 15 veh/h<br>delta: -15 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_abb66a0f9bcf1d300f48f143bfd92c59 = L.polyline(
+                [[40.869641, -73.9740796], [40.8691788, -73.9732722]],
+                {"bubblingMouseEvents": true, "color": "#a1c8dfff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#a1c8dfff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 5.2}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_abb66a0f9bcf1d300f48f143bfd92c59.bindTooltip(
+                `<div>
+                     Kenwood Street<br>baseline: 30 veh/h<br>scenario: 15 veh/h<br>delta: -15 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_24078542ff23c07f6f1f573754c544a8 = L.polyline(
+                [[40.853084, -73.971362], [40.8546866, -73.9707653]],
+                {"bubblingMouseEvents": true, "color": "#f3b69eff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#f3b69eff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 5.2}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_24078542ff23c07f6f1f573754c544a8.bindTooltip(
+                `<div>
+                     Center Avenue<br>baseline: 45 veh/h<br>scenario: 60 veh/h<br>delta: +15 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_846c647cce4508b557e8dfb4ac72643e = L.polyline(
+                [[40.8521006, -73.972313], [40.853084, -73.971362]],
+                {"bubblingMouseEvents": true, "color": "#f3b69eff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#f3b69eff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 5.2}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_846c647cce4508b557e8dfb4ac72643e.bindTooltip(
+                `<div>
+                     Center Avenue<br>baseline: 45 veh/h<br>scenario: 60 veh/h<br>delta: +15 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_b580307184ff7e1de4be78f8dc17b30f = L.polyline(
+                [[40.8542152, -73.9675572], [40.8539181, -73.965127]],
+                {"bubblingMouseEvents": true, "color": "#a1c8dfff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#a1c8dfff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 5.2}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_b580307184ff7e1de4be78f8dc17b30f.bindTooltip(
+                `<div>
+                     #91<br>baseline: 90 veh/h<br>scenario: 75 veh/h<br>delta: -15 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_4f3c75a8a151ff4fc11b3c0a851428f5 = L.polyline(
+                [[40.864973, -73.980923], [40.8673935, -73.9783878]],
+                {"bubblingMouseEvents": true, "color": "#a1c8dfff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#a1c8dfff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 5.2}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_4f3c75a8a151ff4fc11b3c0a851428f5.bindTooltip(
+                `<div>
+                     Pine Hill Road<br>baseline: 30 veh/h<br>scenario: 15 veh/h<br>delta: -15 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_8ae170e95f347389390474bc400bb763 = L.polyline(
+                [[40.8585818, -73.9784606], [40.8575332, -73.9790526]],
+                {"bubblingMouseEvents": true, "color": "#f3b69eff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#f3b69eff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 5.2}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_8ae170e95f347389390474bc400bb763.bindTooltip(
+                `<div>
+                     Jones Road<br>baseline: 0 veh/h<br>scenario: 15 veh/h<br>delta: +15 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_61a9b48c1168b83aa410737264cc78e5 = L.polyline(
+                [[40.8577622, -73.9802208], [40.8583744, -73.9782914]],
+                {"bubblingMouseEvents": true, "color": "#a1c8dfff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#a1c8dfff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 5.2}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_61a9b48c1168b83aa410737264cc78e5.bindTooltip(
+                `<div>
+                     #36<br>baseline: 75 veh/h<br>scenario: 60 veh/h<br>delta: -15 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_95fa73325cf2f5448bf586c53b38c1c6 = L.polyline(
+                [[40.863507, -73.992932], [40.8628261, -73.9935546]],
+                {"bubblingMouseEvents": true, "color": "#a1c8dfff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#a1c8dfff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 5.2}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_95fa73325cf2f5448bf586c53b38c1c6.bindTooltip(
+                `<div>
+                     Grand Avenue<br>baseline: 45 veh/h<br>scenario: 30 veh/h<br>delta: -15 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_ad62e61270b753fb30284d5d9b5c469d = L.polyline(
+                [[40.863507, -73.992932], [40.863108, -73.992185]],
+                {"bubblingMouseEvents": true, "color": "#f3b69eff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#f3b69eff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 5.2}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_ad62e61270b753fb30284d5d9b5c469d.bindTooltip(
+                `<div>
+                     Palisade Avenue<br>baseline: 0 veh/h<br>scenario: 15 veh/h<br>delta: +15 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_d68c13a0880dd343e8138db63c05abe9 = L.polyline(
+                [[40.8542824, -73.9757329], [40.8538476, -73.9750124]],
+                {"bubblingMouseEvents": true, "color": "#f3b69eff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#f3b69eff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 5.2}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_d68c13a0880dd343e8138db63c05abe9.bindTooltip(
+                `<div>
+                     Main Street<br>baseline: 45 veh/h<br>scenario: 60 veh/h<br>delta: +15 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_c54252378c1310aac1e9d193a297bfa9 = L.polyline(
+                [[40.863108, -73.992185], [40.863507, -73.992932]],
+                {"bubblingMouseEvents": true, "color": "#f3b69eff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#f3b69eff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 5.2}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_c54252378c1310aac1e9d193a297bfa9.bindTooltip(
+                `<div>
+                     Palisade Avenue<br>baseline: 0 veh/h<br>scenario: 15 veh/h<br>delta: +15 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_813f6b856496185d938736f7db1b6cee = L.polyline(
+                [[40.8542152, -73.9675572], [40.853157, -73.9670687]],
+                {"bubblingMouseEvents": true, "color": "#a1c8dfff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#a1c8dfff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 5.2}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_813f6b856496185d938736f7db1b6cee.bindTooltip(
+                `<div>
+                     #92<br>baseline: 15 veh/h<br>scenario: 0 veh/h<br>delta: -15 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_3b9d42511dcdc1a0b770603055020662 = L.polyline(
+                [[40.8549089, -73.9767211], [40.8542824, -73.9757329]],
+                {"bubblingMouseEvents": true, "color": "#f3b69eff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#f3b69eff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 5.2}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_3b9d42511dcdc1a0b770603055020662.bindTooltip(
+                `<div>
+                     Main Street<br>baseline: 45 veh/h<br>scenario: 60 veh/h<br>delta: +15 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_c10e04f1252772abd7bffee50e499072 = L.polyline(
+                [[40.8549089, -73.9767211], [40.855326, -73.977338]],
+                {"bubblingMouseEvents": true, "color": "#a1c8dfff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#a1c8dfff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 5.2}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_c10e04f1252772abd7bffee50e499072.bindTooltip(
+                `<div>
+                     Main Street<br>baseline: 15 veh/h<br>scenario: 0 veh/h<br>delta: -15 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_21ccbaedaf3b1be924aa431d67c9b301 = L.polyline(
+                [[40.8582018, -73.9807504], [40.8587774, -73.9803782]],
+                {"bubblingMouseEvents": true, "color": "#a1c8dfff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#a1c8dfff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 5.2}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_21ccbaedaf3b1be924aa431d67c9b301.bindTooltip(
+                `<div>
+                     Hoefleys Lane<br>baseline: 30 veh/h<br>scenario: 15 veh/h<br>delta: -15 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_d9a61f618ae1622bd70595fc34b185d3 = L.polyline(
+                [[40.8610812, -73.9919243], [40.8596248, -73.9894429]],
+                {"bubblingMouseEvents": true, "color": "#f3b69eff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#f3b69eff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 5.2}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_d9a61f618ae1622bd70595fc34b185d3.bindTooltip(
+                `<div>
+                     High Street<br>baseline: 15 veh/h<br>scenario: 30 veh/h<br>delta: +15 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_c243da1067924d71da4e7f0489377656 = L.polyline(
+                [[40.8562671, -73.9765712], [40.855326, -73.977338]],
+                {"bubblingMouseEvents": true, "color": "#a1c8dfff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#a1c8dfff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 5.2}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_c243da1067924d71da4e7f0489377656.bindTooltip(
+                `<div>
+                     Edwin Avenue<br>baseline: 45 veh/h<br>scenario: 30 veh/h<br>delta: -15 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_33be01e935311793524248fc4871ec95 = L.polyline(
+                [[40.861959, -73.994378], [40.8628261, -73.9935546]],
+                {"bubblingMouseEvents": true, "color": "#a1c8dfff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#a1c8dfff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 5.2}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_33be01e935311793524248fc4871ec95.bindTooltip(
+                `<div>
+                     Grand Avenue<br>baseline: 15 veh/h<br>scenario: 0 veh/h<br>delta: -15 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_5cbbe0c003ea719253b613e31404af5c = L.polyline(
+                [[40.868657, -73.988472], [40.8679427, -73.9888926]],
+                {"bubblingMouseEvents": true, "color": "#a1c8dfff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#a1c8dfff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 5.2}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_5cbbe0c003ea719253b613e31404af5c.bindTooltip(
+                `<div>
+                     Grand Avenue<br>baseline: 15 veh/h<br>scenario: 0 veh/h<br>delta: -15 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_19afeb4c0146c368f2c55d942cc2b8f3 = L.polyline(
+                [[40.8617589, -73.9918589], [40.8632066, -73.9904175]],
+                {"bubblingMouseEvents": true, "color": "#a1c8dfff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#a1c8dfff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 5.2}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_19afeb4c0146c368f2c55d942cc2b8f3.bindTooltip(
+                `<div>
+                     Leonia Avenue<br>baseline: 15 veh/h<br>scenario: 0 veh/h<br>delta: -15 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_d9ce2a9a35cb9cc1fb1aeb4f17e55e6a = L.polyline(
+                [[40.852934, -73.974959], [40.8538476, -73.9750124]],
+                {"bubblingMouseEvents": true, "color": "#a1c8dfff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#a1c8dfff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 5.2}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_d9ce2a9a35cb9cc1fb1aeb4f17e55e6a.bindTooltip(
+                `<div>
+                     Main Street<br>baseline: 15 veh/h<br>scenario: 0 veh/h<br>delta: -15 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_7eebe0533bdb8ac48edcd9207091eaf6 = L.polyline(
+                [[40.8617589, -73.9918589], [40.862507, -73.9930416]],
+                {"bubblingMouseEvents": true, "color": "#a1c8dfff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#a1c8dfff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 5.2}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_7eebe0533bdb8ac48edcd9207091eaf6.bindTooltip(
+                `<div>
+                     Prospect Street<br>baseline: 15 veh/h<br>scenario: 0 veh/h<br>delta: -15 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_d3a6552af8c028854eab30b1957a8249 = L.polyline(
+                [[40.8617589, -73.9918589], [40.8612451, -73.9909881]],
+                {"bubblingMouseEvents": true, "color": "#f3b69eff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#f3b69eff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 5.2}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_d3a6552af8c028854eab30b1957a8249.bindTooltip(
+                `<div>
+                     Prospect Street<br>baseline: 15 veh/h<br>scenario: 30 veh/h<br>delta: +15 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_44c7c2f6af447735680388a877820dcb = L.polyline(
+                [[40.8575332, -73.9790526], [40.8569433, -73.9793681]],
+                {"bubblingMouseEvents": true, "color": "#f3b69eff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#f3b69eff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 5.2}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_44c7c2f6af447735680388a877820dcb.bindTooltip(
+                `<div>
+                     Jones Road<br>baseline: 0 veh/h<br>scenario: 15 veh/h<br>delta: +15 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_689d20e0de2cf27ff47ba68ff04815de = L.polyline(
+                [[40.8691788, -73.9732722], [40.8685103, -73.9732422]],
+                {"bubblingMouseEvents": true, "color": "#a1c8dfff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#a1c8dfff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 5.2}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_689d20e0de2cf27ff47ba68ff04815de.bindTooltip(
+                `<div>
+                     #82<br>baseline: 30 veh/h<br>scenario: 15 veh/h<br>delta: -15 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_1c2582d6169f7280a60401acc027fdde = L.polyline(
+                [[40.8648301, -73.9938893], [40.8644601, -73.9929817]],
+                {"bubblingMouseEvents": true, "color": "#f3b69eff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#f3b69eff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 5.2}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_1c2582d6169f7280a60401acc027fdde.bindTooltip(
+                `<div>
+                     Fort Lee Road<br>baseline: 330 veh/h<br>scenario: 345 veh/h<br>delta: +15 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_5248f4514a73fe507ef8a0172dd57c2e = L.polyline(
+                [[40.8583744, -73.9782914], [40.8574648, -73.9756647]],
+                {"bubblingMouseEvents": true, "color": "#f3b69eff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#f3b69eff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 5.2}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_5248f4514a73fe507ef8a0172dd57c2e.bindTooltip(
+                `<div>
+                     #84<br>baseline: 0 veh/h<br>scenario: 15 veh/h<br>delta: +15 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_3ecd65b913f9e3d60eefd87e915af7f8 = L.polyline(
+                [[40.8574648, -73.9756647], [40.8569134, -73.9742222]],
+                {"bubblingMouseEvents": true, "color": "#f3b69eff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#f3b69eff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 5.2}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_3ecd65b913f9e3d60eefd87e915af7f8.bindTooltip(
+                `<div>
+                     #86<br>baseline: 0 veh/h<br>scenario: 15 veh/h<br>delta: +15 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_d38c5a0a7c371b6264fa3eaff55284b6 = L.polyline(
+                [[40.865308, -73.985374], [40.862972, -73.98706]],
+                {"bubblingMouseEvents": true, "color": "#a1c8dfff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#a1c8dfff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 5.2}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_d38c5a0a7c371b6264fa3eaff55284b6.bindTooltip(
+                `<div>
+                     Broad Avenue<br>baseline: 15 veh/h<br>scenario: 0 veh/h<br>delta: -15 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_5f99bc3bb60ec1ee98f6014bc0310342 = L.polyline(
+                [[40.856915, -73.978216], [40.8575332, -73.9790526]],
+                {"bubblingMouseEvents": true, "color": "#f3b69eff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#f3b69eff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 5.2}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_5f99bc3bb60ec1ee98f6014bc0310342.bindTooltip(
+                `<div>
+                     Summit Avenue<br>baseline: 0 veh/h<br>scenario: 15 veh/h<br>delta: +15 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_0f996614546144015e34cc9aa1b2c69f = L.polyline(
+                [[40.8623674, -73.9874865], [40.861739, -73.987951]],
+                {"bubblingMouseEvents": true, "color": "#a1c8dfff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#a1c8dfff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 5.2}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_0f996614546144015e34cc9aa1b2c69f.bindTooltip(
+                `<div>
+                     Broad Avenue<br>baseline: 30 veh/h<br>scenario: 15 veh/h<br>delta: -15 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_de18f0008850f1612987c98b944d25b5 = L.polyline(
+                [[40.861739, -73.987951], [40.8623674, -73.9874865]],
+                {"bubblingMouseEvents": true, "color": "#a1c8dfff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#a1c8dfff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 5.2}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_de18f0008850f1612987c98b944d25b5.bindTooltip(
+                `<div>
+                     Broad Avenue<br>baseline: 45 veh/h<br>scenario: 30 veh/h<br>delta: -15 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_365c57164b2a507dc64f65a18f592a24 = L.polyline(
+                [[40.8569134, -73.9742222], [40.8559602, -73.9720894]],
+                {"bubblingMouseEvents": true, "color": "#f3b69eff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#f3b69eff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 5.2}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_365c57164b2a507dc64f65a18f592a24.bindTooltip(
+                `<div>
+                     #41<br>baseline: 0 veh/h<br>scenario: 15 veh/h<br>delta: +15 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_5c1baf99e385486eba92e8bb1533d954 = L.polyline(
+                [[40.8587774, -73.9803782], [40.8585818, -73.9784606]],
+                {"bubblingMouseEvents": true, "color": "#f3b69eff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#f3b69eff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 5.2}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_5c1baf99e385486eba92e8bb1533d954.bindTooltip(
+                `<div>
+                     Caspar Lane<br>baseline: 0 veh/h<br>scenario: 15 veh/h<br>delta: +15 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_7c650bb45b24e5689f50991abe547a99 = L.polyline(
+                [[40.8561187, -73.9726533], [40.8556021, -73.9732025]],
+                {"bubblingMouseEvents": true, "color": "#a1c8dfff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#a1c8dfff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 5.2}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_7c650bb45b24e5689f50991abe547a99.bindTooltip(
+                `<div>
+                     Linwood Avenue<br>baseline: 15 veh/h<br>scenario: 0 veh/h<br>delta: -15 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_3926e7578925d13eaf4ee527a96d234b = L.polyline(
+                [[40.8590754, -73.9816914], [40.859637, -73.982719]],
+                {"bubblingMouseEvents": true, "color": "#a1c8dfff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#a1c8dfff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 5.2}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_3926e7578925d13eaf4ee527a96d234b.bindTooltip(
+                `<div>
+                     Fort Lee Road<br>baseline: 15 veh/h<br>scenario: 0 veh/h<br>delta: -15 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_4f3fe108af00622953bd171cd7cbf43f = L.polyline(
+                [[40.862507, -73.9930416], [40.8617589, -73.9918589]],
+                {"bubblingMouseEvents": true, "color": "#f3b69eff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#f3b69eff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 5.2}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_4f3fe108af00622953bd171cd7cbf43f.bindTooltip(
+                `<div>
+                     Prospect Street<br>baseline: 15 veh/h<br>scenario: 30 veh/h<br>delta: +15 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_7e86d09ec8c6c4a0e13805b1ea45d1d0 = L.polyline(
+                [[40.8559602, -73.9720894], [40.8546866, -73.9707653]],
+                {"bubblingMouseEvents": true, "color": "#f3b69eff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#f3b69eff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 5.2}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_7e86d09ec8c6c4a0e13805b1ea45d1d0.bindTooltip(
+                `<div>
+                     #10<br>baseline: 30 veh/h<br>scenario: 45 veh/h<br>delta: +15 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_d004c9b015694f1ab5cccdac11af7f7f = L.polyline(
+                [[40.8644728, -73.9879982], [40.8661417, -73.9871834]],
+                {"bubblingMouseEvents": true, "color": "#a1c8dfff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#a1c8dfff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 5.2}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_d004c9b015694f1ab5cccdac11af7f7f.bindTooltip(
+                `<div>
+                     Wood Terrace<br>baseline: 15 veh/h<br>scenario: 0 veh/h<br>delta: -15 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_b2e785d559d6e3c45e2c26fb86c08861 = L.polyline(
+                [[40.8536766, -73.9685159], [40.8528155, -73.9690465]],
+                {"bubblingMouseEvents": true, "color": "#f3b69eff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#f3b69eff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 5.2}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_b2e785d559d6e3c45e2c26fb86c08861.bindTooltip(
+                `<div>
+                     Lemoine Avenue<br>baseline: 30 veh/h<br>scenario: 45 veh/h<br>delta: +15 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_9a1e207ad18f1e6a084d2d519d433500 = L.polyline(
+                [[40.8642805, -73.9830176], [40.8653094, -73.9821009]],
+                {"bubblingMouseEvents": true, "color": "#a1c8dfff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#a1c8dfff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 5.2}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_9a1e207ad18f1e6a084d2d519d433500.bindTooltip(
+                `<div>
+                     Glenwood Avenue<br>baseline: 30 veh/h<br>scenario: 15 veh/h<br>delta: -15 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_3b98cff4662be86da4441cc6f0c7b2c2 = L.polyline(
+                [[40.852934, -73.974959], [40.8521006, -73.972313]],
+                {"bubblingMouseEvents": true, "color": "#f3b69eff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#f3b69eff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 5.2}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_3b98cff4662be86da4441cc6f0c7b2c2.bindTooltip(
+                `<div>
+                     Main Street<br>baseline: 45 veh/h<br>scenario: 60 veh/h<br>delta: +15 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_3de7dacaa4ed44b328de5b1f2388ba14 = L.polyline(
+                [[40.8700564, -73.9748268], [40.869641, -73.9740796]],
+                {"bubblingMouseEvents": true, "color": "#a1c8dfff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#a1c8dfff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 5.2}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_3de7dacaa4ed44b328de5b1f2388ba14.bindTooltip(
+                `<div>
+                     Kenwood Street<br>baseline: 30 veh/h<br>scenario: 15 veh/h<br>delta: -15 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_42da6d8961b9e1ad46613fc58bcd53ae = L.polyline(
+                [[40.8523972, -73.9675061], [40.853157, -73.9670687]],
+                {"bubblingMouseEvents": true, "color": "#a1c8dfff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#a1c8dfff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 5.2}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_42da6d8961b9e1ad46613fc58bcd53ae.bindTooltip(
+                `<div>
+                     Park Avenue<br>baseline: 15 veh/h<br>scenario: 0 veh/h<br>delta: -15 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_719c23985c1b933fe61f7f6165505373 = L.polyline(
+                [[40.86789, -73.9770551], [40.8684035, -73.9758763]],
+                {"bubblingMouseEvents": true, "color": "#a1c8dfff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#a1c8dfff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 5.2}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_719c23985c1b933fe61f7f6165505373.bindTooltip(
+                `<div>
+                     Edgewood Road<br>baseline: 30 veh/h<br>scenario: 15 veh/h<br>delta: -15 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_ba818fc86c57a2e74eaaaa956a77d657 = L.polyline(
+                [[40.8653094, -73.9821009], [40.864973, -73.980923]],
+                {"bubblingMouseEvents": true, "color": "#a1c8dfff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#a1c8dfff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 5.2}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_ba818fc86c57a2e74eaaaa956a77d657.bindTooltip(
+                `<div>
+                     Dogwood Court<br>baseline: 30 veh/h<br>scenario: 15 veh/h<br>delta: -15 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_5c991dd0abcf1ce35a594d02b6708328 = L.polyline(
+                [[40.8526127, -73.9684136], [40.8523972, -73.9675061]],
+                {"bubblingMouseEvents": true, "color": "#a1c8dfff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#a1c8dfff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 5.2}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_5c991dd0abcf1ce35a594d02b6708328.bindTooltip(
+                `<div>
+                     Central Avenue<br>baseline: 15 veh/h<br>scenario: 0 veh/h<br>delta: -15 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_53afc9daab1798f8e015678ee9f47e44 = L.polyline(
+                [[40.860398, -73.985675], [40.8593627, -73.9867246]],
+                {"bubblingMouseEvents": true, "color": "#f3b69eff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#f3b69eff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 5.2}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_53afc9daab1798f8e015678ee9f47e44.bindTooltip(
+                `<div>
+                     Glenwood Avenue<br>baseline: 0 veh/h<br>scenario: 15 veh/h<br>delta: +15 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_5bdf001e1a8a4e6e622352751e63d7b0 = L.polyline(
+                [[40.8661417, -73.9871834], [40.8644728, -73.9879982]],
+                {"bubblingMouseEvents": true, "color": "#a1c8dfff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#a1c8dfff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 5.2}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_5bdf001e1a8a4e6e622352751e63d7b0.bindTooltip(
+                `<div>
+                     Wood Terrace<br>baseline: 15 veh/h<br>scenario: 0 veh/h<br>delta: -15 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_6caf7cb1d16ede373ad6cb697a3cd16e = L.polyline(
+                [[40.8528155, -73.9690465], [40.8526127, -73.9684136]],
+                {"bubblingMouseEvents": true, "color": "#a1c8dfff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#a1c8dfff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 5.2}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_6caf7cb1d16ede373ad6cb697a3cd16e.bindTooltip(
+                `<div>
+                     Central Avenue<br>baseline: 15 veh/h<br>scenario: 0 veh/h<br>delta: -15 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_860ff2582b5358cc3256ae1f076febb7 = L.polyline(
+                [[40.8593627, -73.9867246], [40.860398, -73.985675]],
+                {"bubblingMouseEvents": true, "color": "#f3b69eff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#f3b69eff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 5.2}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_860ff2582b5358cc3256ae1f076febb7.bindTooltip(
+                `<div>
+                     Glenwood Avenue<br>baseline: 0 veh/h<br>scenario: 15 veh/h<br>delta: +15 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_28757e456b0be9b5a142e1fdae2ad670 = L.polyline(
+                [[40.862972, -73.98706], [40.86297, -73.983866]],
+                {"bubblingMouseEvents": true, "color": "#a1c8dfff", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#a1c8dfff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.85, "smoothFactor": 1.0, "stroke": true, "weight": 5.2}
+            ).addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+        
+    
+            poly_line_28757e456b0be9b5a142e1fdae2ad670.bindTooltip(
+                `<div>
+                     Woodland Place<br>baseline: 30 veh/h<br>scenario: 15 veh/h<br>delta: -15 veh/h
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+    var color_map_24e02fcc656bb801b3731c114690da01 = {};
+
+    
+    color_map_24e02fcc656bb801b3731c114690da01.color = d3.scale.threshold()
+              .domain([-50.0, -49.79959919839679, -49.59919839679359, -49.39879759519038, -49.19839679358717, -48.99799599198397, -48.79759519038076, -48.59719438877755, -48.39679358717435, -48.19639278557114, -47.99599198396793, -47.79559118236473, -47.59519038076152, -47.394789579158314, -47.19438877755511, -46.9939879759519, -46.793587174348694, -46.59318637274549, -46.392785571142284, -46.192384769539075, -45.99198396793587, -45.791583166332664, -45.59118236472946, -45.390781563126254, -45.190380761523045, -44.989979959919836, -44.789579158316634, -44.589178356713425, -44.388777555110224, -44.188376753507015, -43.987975951903806, -43.7875751503006, -43.587174348697395, -43.38677354709419, -43.186372745490985, -42.985971943887776, -42.78557114228457, -42.585170340681366, -42.38476953907816, -42.18436873747495, -41.983967935871746, -41.78356713426854, -41.58316633266533, -41.38276553106213, -41.18236472945892, -40.98196392785571, -40.78156312625251, -40.5811623246493, -40.38076152304609, -40.18036072144289, -39.97995991983968, -39.77955911823647, -39.57915831663327, -39.37875751503006, -39.17835671342685, -38.97795591182365, -38.77755511022044, -38.57715430861724, -38.37675350701403, -38.17635270541082, -37.97595190380761, -37.77555110220441, -37.5751503006012, -37.374749498998, -37.17434869739479, -36.97394789579158, -36.77354709418837, -36.57314629258517, -36.37274549098196, -36.17234468937876, -35.97194388777555, -35.77154308617234, -35.571142284569135, -35.37074148296593, -35.170340681362724, -34.96993987975952, -34.76953907815631, -34.569138276553105, -34.368737474949896, -34.168336673346694, -33.96793587174349, -33.76753507014028, -33.567134268537075, -33.366733466933866, -33.16633266533066, -32.965931863727455, -32.76553106212425, -32.565130260521045, -32.364729458917836, -32.16432865731463, -31.96392785571142, -31.763527054108216, -31.56312625250501, -31.362725450901802, -31.162324649298597, -30.96192384769539, -30.761523046092183, -30.561122244488978, -30.360721442885772, -30.160320641282564, -29.95991983967936, -29.759519038076153, -29.559118236472944, -29.35871743486974, -29.158316633266534, -28.95791583166333, -28.75751503006012, -28.557114228456914, -28.35671342685371, -28.1563126252505, -27.955911823647295, -27.75551102204409, -27.55511022044088, -27.354709418837675, -27.15430861723447, -26.95390781563126, -26.753507014028056, -26.55310621242485, -26.352705410821642, -26.152304609218437, -25.95190380761523, -25.751503006012022, -25.551102204408817, -25.350701402805612, -25.150300601202403, -24.949899799599198, -24.749498997995993, -24.549098196392787, -24.34869739478958, -24.148296593186373, -23.947895791583168, -23.74749498997996, -23.547094188376754, -23.34669338677355, -23.14629258517034, -22.945891783567134, -22.74549098196393, -22.54509018036072, -22.344689378757515, -22.14428857715431, -21.9438877755511, -21.743486973947896, -21.54308617234469, -21.34268537074148, -21.142284569138276, -20.94188376753507, -20.741482965931862, -20.541082164328657, -20.34068136272545, -20.140280561122246, -19.939879759519037, -19.739478957915832, -19.539078156312627, -19.338677354709418, -19.138276553106213, -18.937875751503007, -18.7374749498998, -18.537074148296593, -18.336673346693388, -18.13627254509018, -17.935871743486977, -17.73547094188377, -17.53507014028056, -17.334669338677358, -17.13426853707415, -16.93386773547094, -16.73346693386774, -16.53306613226453, -16.33266533066132, -16.13226452905812, -15.93186372745491, -15.731462925851702, -15.5310621242485, -15.330661322645291, -15.130260521042082, -14.92985971943888, -14.729458917835672, -14.529058116232463, -14.328657314629261, -14.128256513026052, -13.927855711422843, -13.727454909819642, -13.527054108216433, -13.326653306613224, -13.126252505010022, -12.925851703406813, -12.725450901803605, -12.525050100200403, -12.324649298597194, -12.124248496993985, -11.923847695390783, -11.723446893787575, -11.523046092184366, -11.322645290581164, -11.122244488977955, -10.921843687374746, -10.721442885771545, -10.521042084168336, -10.320641282565127, -10.120240480961925, -9.919839679358716, -9.719438877755508, -9.519038076152306, -9.318637274549097, -9.118236472945888, -8.917835671342687, -8.717434869739478, -8.517034068136276, -8.316633266533067, -8.116232464929858, -7.9158316633266566, -7.715430861723448, -7.515030060120239, -7.314629258517037, -7.114228456913828, -6.9138276553106195, -6.713426853707418, -6.513026052104209, -6.312625250501, -6.112224448897798, -5.9118236472945895, -5.711422845691381, -5.511022044088179, -5.31062124248497, -5.110220440881761, -4.90981963927856, -4.709418837675351, -4.509018036072142, -4.30861723446894, -4.108216432865731, -3.9078156312625225, -3.707414829659321, -3.507014028056112, -3.306613226452903, -3.1062124248497014, -2.9058116232464926, -2.7054108216432837, -2.505010020040082, -2.304609218436873, -2.1042084168336643, -1.9038076152304626, -1.7034068136272538, -1.503006012024045, -1.3026052104208432, -1.1022044088176344, -0.9018036072144255, -0.7014028056112238, -0.501002004008015, -0.30060120240480614, -0.10020040080160442, 0.10020040080160442, 0.30060120240480614, 0.501002004008015, 0.7014028056112238, 0.9018036072144255, 1.1022044088176344, 1.3026052104208432, 1.503006012024045, 1.7034068136272538, 1.9038076152304626, 2.1042084168336643, 2.304609218436873, 2.505010020040082, 2.7054108216432837, 2.9058116232464926, 3.1062124248497014, 3.306613226452903, 3.507014028056112, 3.707414829659321, 3.9078156312625225, 4.108216432865731, 4.30861723446894, 4.509018036072142, 4.709418837675351, 4.90981963927856, 5.110220440881761, 5.31062124248497, 5.511022044088179, 5.711422845691381, 5.9118236472945895, 6.112224448897798, 6.312625250501, 6.513026052104209, 6.713426853707418, 6.9138276553106195, 7.114228456913828, 7.314629258517037, 7.515030060120239, 7.715430861723448, 7.9158316633266566, 8.116232464929858, 8.316633266533067, 8.517034068136276, 8.717434869739478, 8.917835671342687, 9.118236472945888, 9.318637274549097, 9.519038076152306, 9.719438877755508, 9.919839679358716, 10.120240480961925, 10.320641282565127, 10.521042084168336, 10.721442885771545, 10.921843687374746, 11.122244488977955, 11.322645290581164, 11.523046092184366, 11.723446893787575, 11.923847695390783, 12.124248496993985, 12.324649298597194, 12.525050100200403, 12.725450901803605, 12.925851703406813, 13.126252505010022, 13.326653306613224, 13.527054108216433, 13.727454909819642, 13.927855711422843, 14.128256513026045, 14.328657314629254, 14.529058116232463, 14.729458917835672, 14.92985971943888, 15.13026052104209, 15.330661322645284, 15.531062124248493, 15.731462925851702, 15.93186372745491, 16.13226452905812, 16.332665330661328, 16.533066132264523, 16.73346693386773, 16.93386773547094, 17.13426853707415, 17.334669338677358, 17.535070140280567, 17.73547094188376, 17.93587174348697, 18.13627254509018, 18.336673346693388, 18.537074148296597, 18.737474949899806, 18.937875751503, 19.13827655310621, 19.338677354709418, 19.539078156312627, 19.739478957915836, 19.939879759519044, 20.14028056112224, 20.340681362725448, 20.541082164328657, 20.741482965931866, 20.941883767535074, 21.142284569138283, 21.342685370741478, 21.543086172344687, 21.743486973947896, 21.943887775551104, 22.144288577154313, 22.344689378757522, 22.545090180360717, 22.745490981963925, 22.945891783567134, 23.146292585170343, 23.346693386773552, 23.547094188376747, 23.747494989979955, 23.947895791583164, 24.148296593186373, 24.348697394789582, 24.54909819639279, 24.749498997995985, 24.949899799599194, 25.150300601202403, 25.350701402805612, 25.55110220440882, 25.75150300601203, 25.951903807615224, 26.152304609218433, 26.352705410821642, 26.55310621242485, 26.75350701402806, 26.95390781563127, 27.154308617234463, 27.354709418837672, 27.55511022044088, 27.75551102204409, 27.9559118236473, 28.156312625250507, 28.3567134268537, 28.55711422845691, 28.75751503006012, 28.95791583166333, 29.158316633266537, 29.358717434869746, 29.55911823647294, 29.75951903807615, 29.95991983967936, 30.160320641282567, 30.360721442885776, 30.561122244488985, 30.76152304609218, 30.961923847695388, 31.162324649298597, 31.362725450901806, 31.563126252505015, 31.763527054108224, 31.963927855711418, 32.16432865731463, 32.364729458917836, 32.565130260521045, 32.76553106212425, 32.96593186372745, 33.16633266533066, 33.366733466933866, 33.567134268537075, 33.76753507014028, 33.96793587174349, 34.16833667334669, 34.368737474949896, 34.569138276553105, 34.76953907815631, 34.96993987975952, 35.17034068136273, 35.370741482965926, 35.571142284569135, 35.77154308617234, 35.97194388777555, 36.17234468937876, 36.37274549098197, 36.573146292585164, 36.77354709418837, 36.97394789579158, 37.17434869739479, 37.374749498998, 37.57515030060121, 37.7755511022044, 37.97595190380761, 38.17635270541082, 38.37675350701403, 38.57715430861724, 38.77755511022045, 38.97795591182364, 39.17835671342685, 39.37875751503006, 39.57915831663327, 39.77955911823648, 39.979959919839686, 40.18036072144288, 40.38076152304609, 40.5811623246493, 40.78156312625251, 40.981963927855716, 41.18236472945891, 41.38276553106212, 41.58316633266533, 41.78356713426854, 41.983967935871746, 42.184368737474955, 42.38476953907815, 42.58517034068136, 42.78557114228457, 42.985971943887776, 43.186372745490985, 43.386773547094194, 43.58717434869739, 43.7875751503006, 43.987975951903806, 44.188376753507015, 44.388777555110224, 44.58917835671343, 44.78957915831663, 44.989979959919836, 45.190380761523045, 45.390781563126254, 45.59118236472946, 45.79158316633267, 45.991983967935866, 46.192384769539075, 46.392785571142284, 46.59318637274549, 46.7935871743487, 46.99398797595191, 47.194388777555105, 47.394789579158314, 47.59519038076152, 47.79559118236473, 47.99599198396794, 48.19639278557115, 48.39679358717434, 48.59719438877755, 48.79759519038076, 48.99799599198397, 49.19839679358718, 49.39879759519039, 49.59919839679358, 49.79959919839679, 50.0])
+              .range(['#2166acff', '#2166acff', '#2267adff', '#2268adff', '#2368adff', '#2369aeff', '#2469aeff', '#256aaeff', '#256aaeff', '#266bafff', '#266bafff', '#276cafff', '#276cb0ff', '#286db0ff', '#296db0ff', '#296eb0ff', '#2a6fb1ff', '#2a6fb1ff', '#2b70b1ff', '#2b70b2ff', '#2c71b2ff', '#2c71b2ff', '#2d72b2ff', '#2e72b3ff', '#2e73b3ff', '#2f73b3ff', '#2f74b3ff', '#3074b4ff', '#3075b4ff', '#3176b4ff', '#3276b5ff', '#3277b5ff', '#3377b5ff', '#3378b5ff', '#3478b6ff', '#3479b6ff', '#3579b6ff', '#357ab7ff', '#367ab7ff', '#377bb7ff', '#377bb7ff', '#387cb8ff', '#387db8ff', '#397db8ff', '#397eb9ff', '#3a7eb9ff', '#3b7fb9ff', '#3b7fb9ff', '#3c80baff', '#3c80baff', '#3d81baff', '#3d81bbff', '#3e82bbff', '#3e82bbff', '#3f83bbff', '#4084bcff', '#4084bcff', '#4185bcff', '#4185bdff', '#4286bdff', '#4286bdff', '#4387bdff', '#4487beff', '#4488beff', '#4588beff', '#4589beff', '#4689bfff', '#468abfff', '#478bbfff', '#478bc0ff', '#488cc0ff', '#498cc0ff', '#498dc0ff', '#4a8dc1ff', '#4a8ec1ff', '#4b8ec1ff', '#4b8fc2ff', '#4c8fc2ff', '#4d90c2ff', '#4d90c2ff', '#4e91c3ff', '#4e92c3ff', '#4f92c3ff', '#4f93c4ff', '#5093c4ff', '#5194c4ff', '#5194c4ff', '#5295c5ff', '#5295c5ff', '#5396c5ff', '#5396c6ff', '#5497c6ff', '#5498c6ff', '#5598c6ff', '#5699c7ff', '#5699c7ff', '#579ac7ff', '#579ac7ff', '#589bc8ff', '#589bc8ff', '#599cc8ff', '#5a9cc9ff', '#5a9dc9ff', '#5b9dc9ff', '#5b9ec9ff', '#5c9fcaff', '#5c9fcaff', '#5da0caff', '#5da0cbff', '#5ea1cbff', '#5fa1cbff', '#5fa2cbff', '#60a2ccff', '#60a3ccff', '#61a3ccff', '#61a4cdff', '#62a4cdff', '#63a5cdff', '#63a6cdff', '#64a6ceff', '#64a7ceff', '#65a7ceff', '#65a8cfff', '#66a8cfff', '#66a9cfff', '#67a9cfff', '#68aad0ff', '#6aabd0ff', '#6babd0ff', '#6cacd1ff', '#6dacd1ff', '#6eadd1ff', '#6faed2ff', '#70aed2ff', '#72afd2ff', '#73b0d3ff', '#74b0d3ff', '#75b1d3ff', '#76b1d4ff', '#77b2d4ff', '#79b3d4ff', '#7ab3d5ff', '#7bb4d5ff', '#7cb5d5ff', '#7db5d6ff', '#7eb6d6ff', '#80b7d6ff', '#81b7d6ff', '#82b8d7ff', '#83b8d7ff', '#84b9d7ff', '#85bad8ff', '#86bad8ff', '#88bbd8ff', '#89bcd9ff', '#8abcd9ff', '#8bbdd9ff', '#8cbddaff', '#8dbedaff', '#8fbfdaff', '#90bfdbff', '#91c0dbff', '#92c1dbff', '#93c1dcff', '#94c2dcff', '#96c2dcff', '#97c3ddff', '#98c4ddff', '#99c4ddff', '#9ac5deff', '#9bc6deff', '#9cc6deff', '#9ec7dfff', '#9fc7dfff', '#a0c8dfff', '#a1c9dfff', '#a2c9e0ff', '#a3cae0ff', '#a5cbe0ff', '#a6cbe1ff', '#a7cce1ff', '#a8cce1ff', '#a9cde2ff', '#aacee2ff', '#accee2ff', '#adcfe3ff', '#aed0e3ff', '#afd0e3ff', '#b0d1e4ff', '#b1d1e4ff', '#b3d2e4ff', '#b4d3e5ff', '#b5d3e5ff', '#b6d4e5ff', '#b7d5e6ff', '#b8d5e6ff', '#b9d6e6ff', '#bbd7e7ff', '#bcd7e7ff', '#bdd8e7ff', '#bed8e8ff', '#bfd9e8ff', '#c0dae8ff', '#c2dae9ff', '#c3dbe9ff', '#c4dce9ff', '#c5dce9ff', '#c6ddeaff', '#c7ddeaff', '#c9deeaff', '#cadfebff', '#cbdfebff', '#cce0ebff', '#cde1ecff', '#cee1ecff', '#cfe2ecff', '#d1e2edff', '#d2e3edff', '#d3e4edff', '#d4e4eeff', '#d5e5eeff', '#d6e6eeff', '#d8e6efff', '#d9e7efff', '#dae7efff', '#dbe8f0ff', '#dce9f0ff', '#dde9f0ff', '#dfeaf1ff', '#e0ebf1ff', '#e1ebf1ff', '#e2ecf2ff', '#e3ecf2ff', '#e4edf2ff', '#e6eef2ff', '#e7eef3ff', '#e8eff3ff', '#e9f0f3ff', '#eaf0f4ff', '#ebf1f4ff', '#ecf2f4ff', '#eef2f5ff', '#eff3f5ff', '#f0f3f5ff', '#f1f4f6ff', '#f2f5f6ff', '#f3f5f6ff', '#f5f6f7ff', '#f6f7f7ff', '#f7f7f7ff', '#f7f7f7ff', '#f7f6f6ff', '#f7f5f4ff', '#f7f4f3ff', '#f7f4f2ff', '#f7f3f1ff', '#f7f2f0ff', '#f7f1eeff', '#f7f0edff', '#f7efecff', '#f7eeebff', '#f7edeaff', '#f7ede8ff', '#f7ece7ff', '#f7ebe6ff', '#f6eae5ff', '#f6e9e4ff', '#f6e8e2ff', '#f6e7e1ff', '#f6e6e0ff', '#f6e5dfff', '#f6e5deff', '#f6e4dcff', '#f6e3dbff', '#f6e2daff', '#f6e1d9ff', '#f6e0d8ff', '#f6dfd6ff', '#f6ded5ff', '#f6ded4ff', '#f6ddd3ff', '#f5dcd2ff', '#f5dbd0ff', '#f5dacfff', '#f5d9ceff', '#f5d8cdff', '#f5d7ccff', '#f5d7cbff', '#f5d6c9ff', '#f5d5c8ff', '#f5d4c7ff', '#f5d3c6ff', '#f5d2c5ff', '#f5d1c3ff', '#f5d0c2ff', '#f5d0c1ff', '#f4cfc0ff', '#f4cebfff', '#f4cdbdff', '#f4ccbcff', '#f4cbbbff', '#f4cabaff', '#f4c9b9ff', '#f4c9b7ff', '#f4c8b6ff', '#f4c7b5ff', '#f4c6b4ff', '#f4c5b3ff', '#f4c4b1ff', '#f4c3b0ff', '#f4c2afff', '#f4c2aeff', '#f3c1adff', '#f3c0abff', '#f3bfaaff', '#f3bea9ff', '#f3bda8ff', '#f3bca7ff', '#f3bba5ff', '#f3bba4ff', '#f3baa3ff', '#f3b9a2ff', '#f3b8a1ff', '#f3b79fff', '#f3b69eff', '#f3b59dff', '#f3b49cff', '#f2b39bff', '#f2b399ff', '#f2b298ff', '#f2b197ff', '#f2b096ff', '#f2af95ff', '#f2ae93ff', '#f2ad92ff', '#f2ac91ff', '#f2ac90ff', '#f2ab8fff', '#f2aa8dff', '#f2a98cff', '#f2a88bff', '#f2a78aff', '#f2a689ff', '#f1a587ff', '#f1a586ff', '#f1a485ff', '#f1a384ff', '#f1a283ff', '#f1a181ff', '#f1a080ff', '#f19f7fff', '#f19e7eff', '#f19e7dff', '#f19d7bff', '#f19c7aff', '#f19b79ff', '#f19a78ff', '#f19977ff', '#f09875ff', '#f09774ff', '#f09773ff', '#f09672ff', '#f09571ff', '#f0946fff', '#f0936eff', '#f0926dff', '#f0916cff', '#f0906bff', '#f09069ff', '#f08f68ff', '#f08e67ff', '#f08d66ff', '#f08c65ff', '#f08b63ff', '#ef8a62ff', '#ef8962ff', '#ef8861ff', '#ee8861ff', '#ee8760ff', '#ed8660ff', '#ed855fff', '#ec845fff', '#ec835eff', '#eb825eff', '#eb815eff', '#ea805dff', '#ea7f5dff', '#e97e5cff', '#e97d5cff', '#e87d5bff', '#e87c5bff', '#e77b5aff', '#e77a5aff', '#e6795aff', '#e67859ff', '#e57759ff', '#e57658ff', '#e47558ff', '#e47457ff', '#e37357ff', '#e37256ff', '#e27256ff', '#e27156ff', '#e17055ff', '#e16f55ff', '#e06e54ff', '#e06d54ff', '#df6c53ff', '#df6b53ff', '#de6a53ff', '#de6952ff', '#dd6852ff', '#dd6751ff', '#dc6651ff', '#dc6650ff', '#db6550ff', '#db644fff', '#da634fff', '#da624fff', '#d9614eff', '#d9604eff', '#d85f4dff', '#d85e4dff', '#d85d4cff', '#d75c4cff', '#d75b4bff', '#d65b4bff', '#d65a4bff', '#d5594aff', '#d5584aff', '#d45749ff', '#d45649ff', '#d35548ff', '#d35448ff', '#d25347ff', '#d25247ff', '#d15147ff', '#d15046ff', '#d05046ff', '#d04f45ff', '#cf4e45ff', '#cf4d44ff', '#ce4c44ff', '#ce4b43ff', '#cd4a43ff', '#cd4943ff', '#cc4842ff', '#cc4742ff', '#cb4641ff', '#cb4541ff', '#ca4540ff', '#ca4440ff', '#c9433fff', '#c9423fff', '#c8413fff', '#c8403eff', '#c73f3eff', '#c73e3dff', '#c63d3dff', '#c63c3cff', '#c53b3cff', '#c53a3bff', '#c43a3bff', '#c4393bff', '#c3383aff', '#c3373aff', '#c23639ff', '#c23539ff', '#c13438ff', '#c13338ff', '#c03238ff', '#c03137ff', '#bf3037ff', '#bf2f36ff', '#be2f36ff', '#be2e35ff', '#bd2d35ff', '#bd2c34ff', '#bd2b34ff', '#bc2a34ff', '#bc2933ff', '#bb2833ff', '#bb2732ff', '#ba2632ff', '#ba2531ff', '#b92431ff', '#b92430ff', '#b82330ff', '#b82230ff', '#b7212fff', '#b7202fff', '#b61f2eff', '#b61e2eff', '#b51d2dff', '#b51c2dff', '#b41b2cff', '#b41a2cff', '#b3192cff', '#b3192bff', '#b2182bff']);
+    
+
+    color_map_24e02fcc656bb801b3731c114690da01.x = d3.scale.linear()
+              .domain([-50.0, 50.0])
+              .range([0, 450 - 50]);
+
+    color_map_24e02fcc656bb801b3731c114690da01.legend = L.control({position: 'topright'});
+    color_map_24e02fcc656bb801b3731c114690da01.legend.onAdd = function (map) {var div = L.DomUtil.create('div', 'legend'); return div};
+    color_map_24e02fcc656bb801b3731c114690da01.legend.addTo(map_ca36c5da2a3353b3db35cbb05d1c0e01);
+
+    color_map_24e02fcc656bb801b3731c114690da01.xAxis = d3.svg.axis()
+        .scale(color_map_24e02fcc656bb801b3731c114690da01.x)
+        .orient("top")
+        .tickSize(1)
+        .tickValues([-50.0, -25.0, 0.0, 25.0, 50.0]);
+
+    color_map_24e02fcc656bb801b3731c114690da01.svg = d3.select(".legend.leaflet-control").append("svg")
+        .attr("id", 'legend')
+        .attr("width", 450)
+        .attr("height", 40);
+
+    color_map_24e02fcc656bb801b3731c114690da01.g = color_map_24e02fcc656bb801b3731c114690da01.svg.append("g")
+        .attr("class", "key")
+        .attr("fill", "black")
+        .attr("transform", "translate(25,16)");
+
+    color_map_24e02fcc656bb801b3731c114690da01.g.selectAll("rect")
+        .data(color_map_24e02fcc656bb801b3731c114690da01.color.range().map(function(d, i) {
+          return {
+            x0: i ? color_map_24e02fcc656bb801b3731c114690da01.x(color_map_24e02fcc656bb801b3731c114690da01.color.domain()[i - 1]) : color_map_24e02fcc656bb801b3731c114690da01.x.range()[0],
+            x1: i < color_map_24e02fcc656bb801b3731c114690da01.color.domain().length ? color_map_24e02fcc656bb801b3731c114690da01.x(color_map_24e02fcc656bb801b3731c114690da01.color.domain()[i]) : color_map_24e02fcc656bb801b3731c114690da01.x.range()[1],
+            z: d
+          };
+        }))
+      .enter().append("rect")
+        .attr("height", 40 - 30)
+        .attr("x", function(d) { return d.x0; })
+        .attr("width", function(d) { return d.x1 - d.x0; })
+        .style("fill", function(d) { return d.z; });
+
+    color_map_24e02fcc656bb801b3731c114690da01.g.call(color_map_24e02fcc656bb801b3731c114690da01.xAxis).append("text")
+        .attr("class", "caption")
+        .attr("y", 21)
+        .attr("fill", "black")
+        .text("\u0394 veh/h vs. v2 baseline (calming_grand_and_fort_lee)");
+</script>
+</html>

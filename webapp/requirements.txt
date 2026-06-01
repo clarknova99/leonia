@@ -1,0 +1,5 @@
+# Webapp runtime — keep minimal. The leonia_traffic library brings
+# pandas, geopandas, shapely, etc. transitively.
+fastapi>=0.115
+uvicorn[standard]>=0.30
+jinja2>=3.1
