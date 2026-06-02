@@ -68,6 +68,7 @@ def _run_worker(args: argparse.Namespace) -> int:
         seed=args.seed,
         sample_interval_s=args.sample_interval,
         end_time_s=end_t,
+        tripinfo_path=out_dir / "tripinfo.xml",
     )
     t0 = time.time()
     try:
@@ -126,6 +127,17 @@ def _post_process(args: argparse.Namespace, run_dir: Path) -> dict:
 
     sumo_score = score_sumo_run(summary, day_part=_demand_to_day_part(args.demand))
 
+    # Trip-level KPIs from SUMO's tripinfo output (commute time / delay).
+    from leonia_traffic.sumo.trip_metrics import (
+        compute_trip_kpis,
+        parse_tripinfo,
+        write_trip_metrics,
+    )
+
+    trip_df = parse_tripinfo(run_dir / "tripinfo.xml")
+    trip_kpis = compute_trip_kpis(trip_df)
+    write_trip_metrics(run_dir, trip_df, trip_kpis)
+
     manifest = {
         "demand": args.demand,
         "seed": args.seed,
@@ -135,6 +147,7 @@ def _post_process(args: argparse.Namespace, run_dir: Path) -> dict:
         "worker": worker_stats,
         "stakeholder": not args.no_stakeholder,
         "command": " ".join(sys.argv),
+        "trip_kpis": trip_kpis.to_dict(),
     }
     write_run_outputs(
         run_dir,
@@ -204,6 +217,7 @@ def _post_process(args: argparse.Namespace, run_dir: Path) -> dict:
         "pct_lt_5": sumo_score.score.pct_lt_5,
         "n_links_scored": sumo_score.score.n_links_scored,
         "rows": int(summary.shape[0]),
+        "trip_kpis": trip_kpis.to_dict(),
     }
 
 
@@ -260,6 +274,40 @@ def _write_markdown_report(args: argparse.Namespace, run_dir: Path,
     )
     lines.append(f"| SUMO edges seen | {summary_stats.get('rows', 0):,} |")
     lines.append("")
+
+    trip_kpis = summary_stats.get("trip_kpis") or {}
+    if trip_kpis:
+        lines.append("## Trip-level KPIs (from tripinfo)")
+        lines.append("")
+        lines.append("| Metric | Value |")
+        lines.append("| --- | --- |")
+        lines.append(f"| Trips | {trip_kpis.get('n_trips', 0):,} |")
+        lines.append(
+            f"| Completion rate | "
+            f"{trip_kpis.get('completion_rate', 0) * 100:.1f}% |"
+        )
+        lines.append(
+            f"| Mean travel time | "
+            f"{trip_kpis.get('mean_travel_min', float('nan')):.1f} min |"
+        )
+        lines.append(
+            f"| Median travel time | "
+            f"{trip_kpis.get('median_travel_min', float('nan')):.1f} min |"
+        )
+        lines.append(
+            f"| p90 travel time | "
+            f"{trip_kpis.get('p90_travel_min', float('nan')):.1f} min |"
+        )
+        lines.append(
+            f"| Total delay | "
+            f"{trip_kpis.get('total_delay_h', 0):.1f} veh·h |"
+        )
+        lines.append(
+            f"| Mean waiting | "
+            f"{trip_kpis.get('mean_waiting_min', float('nan')):.1f} min |"
+        )
+        lines.append("")
+
     lines.append(f"Run artefacts: `{rel_run}/`")
     lines.append("")
     if not args.no_stakeholder:

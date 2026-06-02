@@ -22,24 +22,36 @@ from __future__ import annotations
 
 __all__ = [
     "BRIDGE_OD_WINDOWS",
+    "AdaptivePressureController",
+    "AdaptiveSignalConfig",
     "DemandSource",
     "SumoRuntime",
+    "TripKpis",
     "build_routes",
+    "compare_runs",
+    "compute_trip_kpis",
     "edges_for_osm_ways",
     "load_crash_points_if_available",
     "load_crash_segments_if_available",
     "load_meta_lookup",
     "load_osm_to_sumo_lookup",
     "load_sumo_edge_geometries",
+    "parse_tripinfo",
     "score_sumo_run",
     "spatial_resolve_zones",
+    "write_trip_metrics",
 ]
 
 
 _LAZY = {
     "BRIDGE_OD_WINDOWS": ("demand_builder", "BRIDGE_OD_WINDOWS"),
+    "AdaptivePressureController": ("signal_control",
+                                   "AdaptivePressureController"),
+    "AdaptiveSignalConfig": ("signal_control", "AdaptiveSignalConfig"),
     "DemandSource": ("demand_builder", "DemandSource"),
     "build_routes": ("demand_builder", "build_routes"),
+    "compare_runs": ("comparison", "compare_runs"),
+    "compute_trip_kpis": ("trip_metrics", "compute_trip_kpis"),
     "edges_for_osm_ways": ("net_lookup", "edges_for_osm_ways"),
     "load_crash_points_if_available":
         ("visualizations", "load_crash_points_if_available"),
@@ -48,9 +60,12 @@ _LAZY = {
     "load_meta_lookup": ("net_lookup", "load_meta_lookup"),
     "load_osm_to_sumo_lookup": ("net_lookup", "load_osm_to_sumo_lookup"),
     "load_sumo_edge_geometries": ("net_lookup", "load_sumo_edge_geometries"),
+    "parse_tripinfo": ("trip_metrics", "parse_tripinfo"),
     "score_sumo_run": ("scoring", "score_sumo_run"),
     "spatial_resolve_zones": ("net_lookup", "spatial_resolve_zones"),
     "SumoRuntime": ("runtime", "SumoRuntime"),
+    "TripKpis": ("trip_metrics", "TripKpis"),
+    "write_trip_metrics": ("trip_metrics", "write_trip_metrics"),
 }
 
 

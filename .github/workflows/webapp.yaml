@@ -133,10 +133,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Opens a PR against the pi-talos GitOps repo bumping the leonia
-      # HelmRelease image tag to the freshly built one. Requires a PAT with
-      # repo + workflow scope on clarknova99/pi-talos, stored as PI_TALOS_PAT.
-      - name: Create PR in pi-talos repo
+      # Opens AND auto-merges a PR against the pi-talos GitOps repo bumping the
+      # leonia HelmRelease image tag to the freshly built one, so Flux rolls out
+      # the new image without manual intervention. Requires a PAT with repo +
+      # workflow scope on clarknova99/pi-talos, stored as PI_TALOS_PAT.
+      - name: Create and merge PR in pi-talos repo
         if: github.ref_name == 'main'
         env:
           PI_TALOS_PAT: ${{ secrets.PI_TALOS_PAT }}
@@ -172,3 +173,13 @@ jobs:
             --head ${BRANCH_NAME} \
             --base main)
           echo "PR created: ${PR_URL}"
+
+          # Auto-merge so the new image rolls out without manual intervention.
+          # --admin bypasses any required reviews/checks (the PAT user owns the
+          # repo); --delete-branch cleans up the bump branch afterwards.
+          gh pr merge "${PR_URL}" \
+            --repo clarknova99/pi-talos \
+            --merge \
+            --admin \
+            --delete-branch
+          echo "PR merged: ${PR_URL}"

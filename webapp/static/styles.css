@@ -450,6 +450,63 @@ select:focus {
   margin: 0 0 6px;
 }
 
+/* Before / after KPI panel (Simulation tab). */
+.kpi-delta-panel {
+  margin: 14px 0 0;
+  padding: 12px 16px;
+  background: #fff;
+  border: 1px solid #e1e1e4;
+  border-radius: 6px;
+  color: #333;
+}
+
+.kpi-delta-title {
+  font-weight: 600;
+  font-size: 13px;
+  color: #222;
+  margin: 0 0 8px;
+}
+
+.kpi-delta-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.kpi-delta-table th,
+.kpi-delta-table td {
+  padding: 6px 10px;
+  text-align: right;
+  border-bottom: 1px solid #eceef2;
+}
+
+.kpi-delta-table th:first-child,
+.kpi-delta-table td:first-child {
+  text-align: left;
+}
+
+.kpi-delta-table thead th {
+  background: #1a2233;
+  color: #fff;
+  font-weight: 600;
+}
+
+.kpi-delta-table td.improved {
+  color: #157f3b;
+  font-weight: 600;
+}
+
+.kpi-delta-table td.worse {
+  color: #c0392b;
+  font-weight: 600;
+}
+
+.kpi-delta-note {
+  margin: 8px 0 0;
+  font-size: 11px;
+  color: #666;
+}
+
 .legend-bar {
   width: 100%;
   height: 10px;

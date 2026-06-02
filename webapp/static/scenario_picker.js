@@ -38,6 +38,10 @@
     status: document.getElementById("scenario-status"),
     catalogMeta: document.getElementById("catalog-meta"),
     nScenarios: document.getElementById("n-scenarios"),
+    kpiPanel: document.getElementById("kpi-delta-panel"),
+    kpiBody: document.querySelector("#kpi-delta tbody"),
+    kpiColBase: document.getElementById("kpi-col-base"),
+    kpiColScenario: document.getElementById("kpi-col-scenario"),
   };
 
   if (!els.street || !els.deckMap) {
@@ -64,6 +68,82 @@
     els.status.classList.remove("warn", "error");
     if (variant === "warn") els.status.classList.add("warn");
     if (variant === "error") els.status.classList.add("error");
+  }
+
+  function clearKpi() {
+    if (els.kpiPanel) els.kpiPanel.hidden = true;
+    if (els.kpiBody) els.kpiBody.innerHTML = "";
+  }
+
+  function fmtValue(value, fmt) {
+    if (value === null || value === undefined || Number.isNaN(value)) {
+      return "—";
+    }
+    if (fmt === "pct") return `${(value * 100).toFixed(1)}%`;
+    return Number(value).toFixed(2);
+  }
+
+  function fmtDelta(metric) {
+    const d = metric.delta;
+    if (d === null || d === undefined || Number.isNaN(d)) return "—";
+    const arrow = d < 0 ? "\u25BC" : d > 0 ? "\u25B2" : "";
+    if (metric.fmt === "pct") {
+      return `${arrow} ${d >= 0 ? "+" : ""}${(d * 100).toFixed(1)} pts`;
+    }
+    const pct = metric.delta_pct;
+    const pctStr =
+      pct === null || pct === undefined || Number.isNaN(pct)
+        ? ""
+        : ` (${pct >= 0 ? "+" : ""}${pct.toFixed(1)}%)`;
+    return `${arrow} ${d >= 0 ? "+" : ""}${d.toFixed(2)}${pctStr}`;
+  }
+
+  // Render the before/after KPI table from a compare_kpis.json payload.
+  function renderKpiDelta(payload) {
+    if (!els.kpiPanel || !els.kpiBody || !payload || !payload.metrics) {
+      clearKpi();
+      return;
+    }
+    const labels = payload.labels || {};
+    if (els.kpiColBase && labels.baseline) {
+      els.kpiColBase.textContent = labels.baseline;
+    }
+    if (els.kpiColScenario && labels.scenario) {
+      els.kpiColScenario.textContent = labels.scenario;
+    }
+    els.kpiBody.innerHTML = "";
+    payload.metrics.forEach((m) => {
+      const tr = document.createElement("tr");
+      const cls = m.improved ? "improved" : "worse";
+      tr.innerHTML =
+        `<td>${m.label}</td>` +
+        `<td>${fmtValue(m.base, m.fmt)}</td>` +
+        `<td>${fmtValue(m.scenario, m.fmt)}</td>` +
+        `<td class="${cls}">${fmtDelta(m)}</td>`;
+      els.kpiBody.appendChild(tr);
+    });
+    els.kpiPanel.hidden = payload.metrics.length === 0;
+  }
+
+  // Fetch a scenario's compare_kpis.json (best-effort; the panel just
+  // stays hidden when it's missing or a newer selection supersedes us).
+  async function loadKpiDelta(entry, seq) {
+    if (!entry || !entry.compare_kpis) {
+      clearKpi();
+      return;
+    }
+    try {
+      const res = await fetch(`/precache/${entry.compare_kpis}`, {
+        cache: "no-cache",
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const payload = await res.json();
+      if (seq !== requestSeq) return; // superseded
+      renderKpiDelta(payload);
+    } catch (_err) {
+      if (seq !== requestSeq) return;
+      clearKpi();
+    }
   }
 
   function ensureDeck() {
@@ -122,6 +202,7 @@
     if (!els.street.value) {
       const seq = ++requestSeq;
       ctl.setHighlight([]);
+      clearKpi();
       const demandVal = els.demand.value;
       const base = (catalog.baselines || {})[demandVal];
       if (!base || !base.flow_json) {
@@ -157,6 +238,7 @@
         "warn",
       );
       ctl.clear();
+      clearKpi();
       return;
     }
 
@@ -170,6 +252,7 @@
         "warn",
       );
       ctl.clear();
+      clearKpi();
       return;
     }
 
@@ -188,12 +271,14 @@
       if (seq !== requestSeq) return; // superseded
       setStatus(`Could not load scenario flow: ${err.message}`, "error");
       ctl.clear();
+      clearKpi();
       return;
     }
     if (data === null) return; // a newer selection won
 
     ctl.setHighlight(streetEdgeIndex.get(els.street.value) || []);
     ctl.update(data);
+    loadKpiDelta(entry, seq);
     setStatus(
       hasWarnings
         ? `${baseStatus} (warnings: ${entry.warnings.join("; ")})`

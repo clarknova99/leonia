@@ -34,7 +34,7 @@ import os
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Iterable
+from typing import Callable, Iterable
 
 import pandas as pd
 
@@ -163,6 +163,7 @@ class SumoRuntime:
         step_length: float = 1.0,
         sample_interval_s: int = 60,
         end_time_s: int | None = None,
+        tripinfo_path: Path | None = None,
         extra_args: list[str] | None = None,
     ) -> "SumoRuntime":
         """Boot a SUMO simulation and return a controlling runtime.
@@ -178,6 +179,8 @@ class SumoRuntime:
           ``data/processed/sumo/leonia.routes_<source>.xml``).
 
         ``end_time_s`` overrides the ``<end>`` value in the config.
+        ``tripinfo_path`` enables SUMO's per-trip ``--tripinfo-output``
+        (parsed later by :mod:`leonia_traffic.sumo.trip_metrics`).
         ``extra_args`` are appended verbatim to the SUMO command line
         for power users.
 
@@ -235,6 +238,14 @@ class SumoRuntime:
         ]
         if end_time_s is not None:
             cmd += ["--end", str(end_time_s)]
+        if tripinfo_path is not None:
+            # SUMO writes the per-trip summary at simulation end; the
+            # ``write-unfinished`` flag also emits a row for vehicles
+            # still in the network so completion-rate stays meaningful.
+            cmd += [
+                "--tripinfo-output", str(tripinfo_path),
+                "--tripinfo-output.write-unfinished", "true",
+            ]
         if extra_args:
             cmd += list(extra_args)
 
@@ -292,11 +303,19 @@ class SumoRuntime:
         end_t = self.sim_time_s() + float(seconds)
         self.run_until(end_t)
 
-    def run_until(self, target_s: float) -> None:
+    def run_until(
+        self,
+        target_s: float,
+        *,
+        step_callback: Callable[[float], None] | None = None,
+    ) -> None:
         """Step the simulation until clock ≥ ``target_s``.
 
         Per-edge counters are sampled every ``sample_interval_s`` and
-        appended to the in-memory history.
+        appended to the in-memory history. ``step_callback``, when
+        supplied, is invoked with the current sim time after every
+        ``simulationStep()`` — the hook a live signal controller uses
+        to read queues and switch phases.
         """
         last_sample = self._next_sample_boundary(self.sim_time_s())
         while True:
@@ -317,6 +336,8 @@ class SumoRuntime:
                 self._backend.simulation.getArrivedNumber()
             )
             t_after = self.sim_time_s()
+            if step_callback is not None:
+                step_callback(t_after)
             if t_after >= last_sample:
                 self._record_sample(t_after)
                 last_sample = self._next_sample_boundary(t_after)
@@ -325,8 +346,16 @@ class SumoRuntime:
             if t_after <= t_now:
                 break
 
-    def run_to_end(self) -> None:
-        """Run until SUMO reports no expected vehicles remain."""
+    def run_to_end(
+        self,
+        *,
+        step_callback: Callable[[float], None] | None = None,
+    ) -> None:
+        """Run until SUMO reports no expected vehicles remain.
+
+        ``step_callback`` is invoked with the current sim time after
+        every step (used by the adaptive signal controller).
+        """
         while True:
             try:
                 self._backend.simulationStep()
@@ -334,6 +363,8 @@ class SumoRuntime:
                 break
             self._stats.n_steps += 1
             t_now = self.sim_time_s()
+            if step_callback is not None:
+                step_callback(t_now)
             if t_now % self._sample_interval_s < 1:
                 self._record_sample(t_now)
             self._stats.n_inserted += int(
@@ -605,6 +636,19 @@ class SumoRuntime:
     # ------------------------------------------------------------------
     # Properties
     # ------------------------------------------------------------------
+
+    def traffic_light_ids(self) -> list[str]:
+        """Every traffic-light (TLS) id netconvert produced for the net."""
+        try:
+            return list(self._backend.trafficlight.getIDList())
+        except Exception as exc:  # pragma: no cover - backend probe
+            logger.warning("trafficlight.getIDList failed: %s", exc)
+            return []
+
+    @property
+    def backend(self):
+        """The raw ``libsumo`` / ``traci`` module (for live controllers)."""
+        return self._backend
 
     @property
     def backend_name(self) -> str:

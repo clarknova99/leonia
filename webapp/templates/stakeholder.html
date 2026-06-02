@@ -176,6 +176,29 @@
           <div id="deck-map"></div>
         </div>
 
+        <!-- Before / after KPI panel — populated from the scenario's
+             compare_kpis.json (trip-level deltas vs the baseline). Hidden
+             until a scenario with comparison data is selected. -->
+        <section id="kpi-delta-panel" class="kpi-delta-panel" hidden
+                 aria-label="Before and after trip KPIs">
+          <h2 class="kpi-delta-title">Before / after — trip impact</h2>
+          <table id="kpi-delta" class="kpi-delta-table">
+            <thead>
+              <tr>
+                <th>Metric</th>
+                <th id="kpi-col-base">Baseline</th>
+                <th id="kpi-col-scenario">Scenario</th>
+                <th>Change</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+          <p class="kpi-delta-note">
+            Trip-level outcomes simulated across the day. Green is an
+            improvement, red a regression versus the unchanged network.
+          </p>
+        </section>
+
         <!-- Legend lives outside the iframe so it gets full width
              of the page rather than crowding the right pane. The
              colour stops match _ABSOLUTE_VPH_STOPS in
@@ -204,7 +227,10 @@
             <strong>Tip:</strong> hover a road for live vehicles/hour at
             the current time, or click to pin the readout. Use the
             play/scrub/speed controls on the map to step through the day;
-            the selected street is outlined in white.
+            the selected street is outlined in white. Toggle
+            <em>Impact vs baseline</em> on the map to glow the streets
+            whose traffic changed — orange where this scenario added
+            traffic, blue where it removed it.
           </p>
         </figure>
 

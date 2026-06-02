@@ -534,6 +534,7 @@ def _worker_run_baseline(
         net_path=net_path,
         seed=seed,
         sample_interval_s=sample_interval_s,
+        tripinfo_path=out_dir / "tripinfo.xml",
     )
     t0 = time.time()
     try:
@@ -611,6 +612,7 @@ def _worker_run_scenario(
         net_path=net_path,
         seed=seed,
         sample_interval_s=sample_interval_s,
+        tripinfo_path=out_dir / "tripinfo.xml",
     )
     applied_log: list[dict] = []
     t0 = time.time()
@@ -758,12 +760,20 @@ def _post_process_baseline(out_dir: Path, demand: str) -> None:
     """
     import pandas as pd
     from leonia_traffic.sumo.scoring import score_sumo_run, write_run_outputs
+    from leonia_traffic.sumo.trip_metrics import (
+        compute_trip_kpis,
+        parse_tripinfo,
+        write_trip_metrics,
+    )
 
     summary = pd.read_csv(out_dir / "edge_summary.csv")
     history = pd.read_csv(out_dir / "edge_history.csv")
     worker_stats = json.loads((out_dir / "worker_stats.json").read_text())
 
     sumo_score = score_sumo_run(summary, day_part="all_day")
+    trip_df = parse_tripinfo(out_dir / "tripinfo.xml")
+    trip_kpis = compute_trip_kpis(trip_df)
+    write_trip_metrics(out_dir, trip_df, trip_kpis)
     manifest = {
         "demand": demand,
         "seed": worker_stats.get("seed"),
@@ -771,6 +781,7 @@ def _post_process_baseline(out_dir: Path, demand: str) -> None:
         "scenario": None,
         "kind": "baseline",
         "worker": worker_stats.get("stats", {}),
+        "trip_kpis": trip_kpis.to_dict(),
     }
     write_run_outputs(
         out_dir,
@@ -942,6 +953,8 @@ _PERSIST_FILES = {
     "edge_summary.parquet",
     "edge_history.parquet",
     "spec.json",
+    "trip_metrics.json",
+    "compare_kpis.json",
 }
 
 
@@ -970,12 +983,20 @@ def _post_process_scenario(out_dir: Path) -> None:
     """Read worker scenario outputs, score, write manifest.json."""
     import pandas as pd
     from leonia_traffic.sumo.scoring import score_sumo_run, write_run_outputs
+    from leonia_traffic.sumo.trip_metrics import (
+        compute_trip_kpis,
+        parse_tripinfo,
+        write_trip_metrics,
+    )
 
     summary = pd.read_csv(out_dir / "edge_summary.csv")
     history = pd.read_csv(out_dir / "edge_history.csv")
     worker_stats = json.loads((out_dir / "worker_stats.json").read_text())
 
     sumo_score = score_sumo_run(summary, day_part="all_day")
+    trip_df = parse_tripinfo(out_dir / "tripinfo.xml")
+    trip_kpis = compute_trip_kpis(trip_df)
+    write_trip_metrics(out_dir, trip_df, trip_kpis)
     manifest = {
         "demand": worker_stats.get("demand"),
         "seed": worker_stats.get("seed"),
@@ -983,6 +1004,7 @@ def _post_process_scenario(out_dir: Path) -> None:
         "kind": "scenario",
         "scenario": worker_stats.get("scenario", {}),
         "worker": worker_stats.get("stats", {}),
+        "trip_kpis": trip_kpis.to_dict(),
     }
     write_run_outputs(
         out_dir,
@@ -1087,6 +1109,28 @@ def _build_visuals(
     else:
         flow_json = None
 
+    # --- compare_kpis.json: before/after trip KPIs vs the baseline -----
+    compare_kpis_json = run.run_dir / "compare_kpis.json"
+    if (run.run_dir / "trip_metrics.json").exists() and (
+        baseline_dir / "trip_metrics.json"
+    ).exists():
+        try:
+            from leonia_traffic.sumo.comparison import compare_runs
+
+            result = compare_runs(
+                baseline_dir, run.run_dir,
+                label_baseline=f"Baseline ({DEMAND_LABELS[run.demand]})",
+                label_scenario=f"{run.street.name} · {run.change_type}",
+            )
+            compare_kpis_json.write_text(
+                json.dumps(result.kpi_delta_payload(), indent=2, default=str)
+            )
+        except Exception as exc:
+            logger.warning("[%s] compare_kpis.json failed: %s", run.key, exc)
+            compare_kpis_json = None
+    else:
+        compare_kpis_json = None
+
     # --- legacy folium maps (opt-in; not used by the current UI) -------
     if not legacy_maps:
         animated_html = None
@@ -1179,6 +1223,9 @@ def _build_visuals(
         "flow_json": (
             f"{run.key}/flow.json" if flow_json else None
         ),
+        "compare_kpis": (
+            f"{run.key}/compare_kpis.json" if compare_kpis_json else None
+        ),
         "warnings": warnings,
         "ok": True,
     }
@@ -1210,6 +1257,10 @@ def _catalog_entry_from_disk(run: RunSpec, warnings: list[str]) -> dict:
         "flow_json": (
             f"{run.key}/flow.json"
             if (run.run_dir / "flow.json").exists() else None
+        ),
+        "compare_kpis": (
+            f"{run.key}/compare_kpis.json"
+            if (run.run_dir / "compare_kpis.json").exists() else None
         ),
         "warnings": warnings,
         "ok": True,
@@ -1399,6 +1450,10 @@ def _collect_all_runs_on_disk(
             "flow_json": (
                 f"{child.name}/flow.json"
                 if (child / "flow.json").exists() else None
+            ),
+            "compare_kpis": (
+                f"{child.name}/compare_kpis.json"
+                if (child / "compare_kpis.json").exists() else None
             ),
             "warnings": [],
             "ok": True,
