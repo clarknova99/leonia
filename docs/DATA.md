@@ -16,6 +16,99 @@ rebuild everything from scratch, see
 
 ---
 
+## Definitions
+
+A plain-language glossary of every acronym and domain term used across
+this documentation and the codebase. It assumes no prior knowledge of
+traffic engineering, the StreetLight data products, or the simulation
+stack. Skim the category that matches what you're reading.
+
+### Agencies, places & roads
+
+| Term | Meaning |
+| --- | --- |
+| **NJDOT** | New Jersey Department of Transportation — source of the crash records. |
+| **FHWA** | Federal Highway Administration — defines the national crash-severity (KABCO) and KSI conventions used here. |
+| **GWB** | George Washington Bridge — the Hudson River crossing immediately east of Leonia; the dominant traffic generator the study is about. |
+| **OSM** | OpenStreetMap — the open street-network database. Roads are identified by an OSM **way id**; the project joins most data to OSM ways. |
+| **OSMnx** | A Python library for downloading and analysing OSM street networks. |
+| **I-95** | Interstate 95 — the limited-access freeway / NJ Turnpike spur east of Leonia. Crashes "on" it are excluded from the borough crash map. |
+| **NJ Turnpike** | The New Jersey Turnpike (here, the I-95 extension toward the GWB). A state-system facility, not a Leonia local road. |
+| **NJ-93** | New Jersey Route 93 — the state-route designation for **Grand Avenue** through Leonia. Treated as a Leonia local road (the borough has policy levers on it) despite its state classification. |
+| **US 1/9/46** | Co-signed US Routes 1, 9 and 46 — the surface arterial feeding the GWB approach. Shown for context but not a Leonia local road. |
+
+### StreetLight & measured-traffic data
+
+| Term | Meaning |
+| --- | --- |
+| **StreetLight** (StL) | The mobility-data vendor whose probe/connected-vehicle exports provide all *measured* traffic volumes. "StL Volume" = StreetLight's estimated vehicle volume. |
+| **CVD** | Connected Vehicle Data — the GPS/telematics feed StreetLight derives volumes from (e.g. the metric `"All Vehicles CVD Plus"`). |
+| **ZA** | Zone Activity — a StreetLight product giving traffic volume on each defined "zone" (a short segment of a named road), by time of day and day of week. |
+| **OD** | Origin–Destination — trips counted between an origin zone and a destination zone, rather than volume on a single segment. |
+| **Bridge OD** | The StreetLight "Bridge-destination Zone OD" export: trips whose origin or destination is the GWB. Drives the simulation's through-traffic demand. |
+| **NP** (Network Performance) | A StreetLight product giving measured hourly volume for *every* selected OSM segment (broadest coverage, ~815 segments including residential blocks). Preferred source for the measured overlay. |
+| **StreetScanner** | A StreetLight product giving an annualised daily volume per zone (coarse time resolution, broad coverage). Used as a fallback level. |
+| **Visitor / Resident** | StreetLight's home-based segmentation. On a residential street a *Visitor* trip is the cut-through (pass-through) signal; a *Resident* lives on that street. |
+| **cut-through** | Through-traffic that uses a local residential street to bypass congestion on an arterial — the core phenomenon the study measures. |
+| **day type** | A day-of-week cohort code (e.g. 0 = All Days, 1–4 = Mon–Thu, 6/7 = Sun depending on the export). See the per-file caveats below. |
+| **day part** | A time-of-day window code (e.g. hourly `1`=12–1am … `24`=11pm–12am, or named windows like Peak AM). |
+| **vph / vpd** | Vehicles per hour / vehicles per day — the volume units throughout. |
+
+### Traffic simulation (SUMO)
+
+| Term | Meaning |
+| --- | --- |
+| **SUMO** | Simulation of Urban MObility — the open-source microscopic traffic simulator that routes individual vehicles through Leonia's network. |
+| **netconvert** | SUMO's tool for building a routable `.net.xml` network (here, from the OSM extract). |
+| **TraCI / libsumo** | SUMO's runtime control interfaces (Traffic Control Interface). The app drives a running simulation through one of these backends. |
+| **edge / junction / lane** | SUMO network elements: an **edge** is a one-way road segment (a street splits into `#0`, `#1`… edges), a **junction** is an intersection, a **lane** is one travel lane of an edge. |
+| **demand / flow** | The vehicles fed into the simulation. A `<flow>` injects vehicles between an origin and destination edge at a given vehicles-per-hour rate for a time window. |
+| **vtype** | Vehicle type (e.g. `passenger`) used by a flow. |
+| **tripinfo** | SUMO's per-trip output file (travel time, delay, distance) used to compute KPIs. |
+| **baseline / scenario** | The **baseline** is the unchanged network; a **scenario** applies one change (street closure, one-way, speed hump, signal retiming) so the before/after impact can be measured. |
+| **GEH** | The Geoffrey E. Havers statistic — an empirical formula comparing modelled vs. observed volumes on a link. **GEH < 5** is the standard "good match" threshold; the share of links passing it is the model's calibration score. |
+| **KPI** | Key Performance Indicator — a summary metric of a run (e.g. mean trip time, total delay, mean speed). |
+| **DSL** | Domain-Specific Language — the small scenario-definition format (`leonia_traffic/scenarios.py`) describing each network change. |
+| **UXsim** | A pure-Python traffic simulator used in an earlier version of this project. **Removed** in favour of SUMO; mentioned only in historical notes. |
+
+### Crash data
+
+| Term | Meaning |
+| --- | --- |
+| **KABCO** | The FHWA crash-severity scale: **K** = fatal, **A** = suspected serious injury, **B** = suspected minor injury, **C** = possible injury, **O** = no apparent injury (property-damage-only). |
+| **PDO** | Property-Damage-Only — a crash with no reported injuries (KABCO `O`). Shown on the map as "No injuries". |
+| **EPDO** | Equivalent Property-Damage-Only — a severity-weighted crash index (injuries/fatalities count for many PDO-equivalents), used to prioritise corridors. |
+| **KSI** | Killed or Seriously Injured — the count of K + A crashes (FHWA convention); the headline safety metric. |
+| **ped** | Pedestrian-involved (a crash flag). |
+| **road_system** | NJDOT's roadway-jurisdiction classification (Municipal / County / State Authority / Interstate) on each crash row. |
+
+### Geospatial & file formats
+
+| Term | Meaning |
+| --- | --- |
+| **CRS** | Coordinate Reference System — how lon/lat or x/y map to real-world positions. |
+| **EPSG** | The registry of CRS codes. **EPSG:4326** = WGS84 (degrees lon/lat), the CRS of every geospatial file in the lake. |
+| **WGS84** | World Geodetic System 1984 — the standard GPS latitude/longitude datum. |
+| **bbox** | Bounding box — a rectangular lon/lat extent used as a coarse spatial filter. |
+| **Parquet / GeoParquet** | Columnar binary table formats. GeoParquet adds a geometry column (points/lines/polygons). |
+| **CSV / JSON** | Comma-separated values (the raw exports) / JavaScript Object Notation (the web app's precomputed artefacts). |
+| **QGIS / DuckDB** | A desktop GIS app / an in-process analytics database — both can open the GeoParquet files directly, no Python needed. |
+| **UTC** | Coordinated Universal Time — the timezone of all build timestamps in `_manifest.json`. |
+
+### Web app & deployment
+
+| Term | Meaning |
+| --- | --- |
+| **API** | Application Programming Interface — the FastAPI endpoints the front-end calls (e.g. `/api/catalog.json`). |
+| **FastAPI / uvicorn** | The Python web framework / the server that runs it for the stakeholder web app. |
+| **deck.gl / MapLibre GL JS** | The WebGL layers library / the vector-basemap renderer that draw the maps in the browser. |
+| **LFS** | Git Large File Storage — stores the large `data/webapp/` serve set in Git as lightweight pointers (see `.gitattributes`). |
+| **CI** | Continuous Integration — the automated GitHub Actions build/test/deploy pipeline. |
+| **Docker / image / Kubernetes (k8s)** | The container tooling: the app is built into a Docker **image** (with `data/webapp/` baked in) and run on a Kubernetes cluster. |
+| **NAS** | Network-Attached Storage — a shared file mount. Previously used to supply webapp data at runtime; **retired** in favour of baking the data into the image. |
+
+---
+
 ## Quick start
 
 ```bash

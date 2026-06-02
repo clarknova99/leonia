@@ -1009,8 +1009,24 @@ def _filter_crash_rows_to_borough(
         #     (ignore road_system — OSM is authoritative)
         #   - if OSM name is unknown: drop iff road_system says
         #     state-system (no OSM signal to trust)
-        is_state = (has_osm_name & is_state_osm) | (
-            ~has_osm_name & is_state_njdot
+        # On-road text drop: NJDOT crashes whose *on-road* is itself a
+        # limited-access state facility (I-95 / NJ Turnpike / Interstate /
+        # express lanes). These are routinely mis-geocoded onto a parallel
+        # borough street, so the OSM-name signal alone keeps them (e.g. a
+        # "I-95; N.J. TURNPIKE" crash snapped to Broad/Grand Avenue). We key
+        # off crash_location only, so a local-street crash that merely
+        # *crosses* I-95 at the interchange is retained.
+        if "crash_location" in df.columns:
+            is_nonlocal_onroad = df["crash_location"].apply(
+                _is_nonlocal_crash_onroad
+            )
+        else:
+            is_nonlocal_onroad = pd.Series(False, index=df.index)
+
+        is_state = (
+            (has_osm_name & is_state_osm)
+            | (~has_osm_name & is_state_njdot)
+            | is_nonlocal_onroad
         )
         df = df[~is_state]
         if df.empty:
@@ -2794,6 +2810,31 @@ def _is_state_system_street(name: object) -> bool:
     import re as _re
     s = name.strip().lower()
     return any(_re.search(p, s) for p in _STATE_SYSTEM_NAME_PATTERNS)
+
+
+# NJDOT crash on-road (``crash_location``) free-text patterns for
+# limited-access state facilities that never run on a Leonia surface
+# street. Superset of the OSM-name patterns plus ``interstate`` (NJDOT
+# writes "INTERSTATE 95" where OSM uses "I-95"). Used to reject crashes
+# that NJDOT geocoded/snapped onto a parallel borough street (Broad /
+# Grand Avenue) even though the crash is actually on I-95 / the Turnpike.
+_CRASH_ONROAD_NONLOCAL_PATTERNS = _STATE_SYSTEM_NAME_PATTERNS + [
+    r"\binterstate\b",
+]
+
+
+def _is_nonlocal_crash_onroad(text: object) -> bool:
+    """True when a crash's on-road text names a non-Leonia state facility.
+
+    Keyed off the *on-road* only (``crash_location``). A crash whose
+    on-road is a local street but whose cross-street merely mentions I-95
+    is a genuine local crash at the interchange and is **not** flagged.
+    """
+    if not isinstance(text, str) or not text.strip():
+        return False
+    import re as _re
+    s = text.strip().lower()
+    return any(_re.search(p, s) for p in _CRASH_ONROAD_NONLOCAL_PATTERNS)
 
 
 # OSM ``way`` records are split at intersections, so a single street
