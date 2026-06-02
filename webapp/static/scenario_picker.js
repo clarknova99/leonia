@@ -203,6 +203,7 @@
       const seq = ++requestSeq;
       ctl.setHighlight([]);
       clearKpi();
+      if (els.change) els.change.disabled = false;
       const demandVal = els.demand.value;
       const base = (catalog.baselines || {})[demandVal];
       if (!base || !base.flow_json) {
@@ -227,6 +228,49 @@
       }
       return;
     }
+
+    // Operational (network-wide) scenario selected — keyed by demand
+    // only; the Change dropdown does not apply.
+    if (els.street.value.startsWith("op:")) {
+      const opKind = els.street.value.slice(3);
+      const seq = ++requestSeq;
+      ctl.setHighlight([]);
+      if (els.change) els.change.disabled = true;
+      const op = (catalog.operational || {})[opKind];
+      const demandVal = els.demand.value;
+      const opEntry =
+        op && op.by_demand ? op.by_demand[demandVal] : null;
+      if (!opEntry || !opEntry.flow_json) {
+        setStatus(
+          `No precomputed ${op ? op.label : opKind} run for ` +
+            `${optionText(els.demand)}.`,
+          "warn",
+        );
+        ctl.clear();
+        clearKpi();
+        return;
+      }
+      setStatus(`${op.label} — ${opEntry.demand_label} — loading flow…`);
+      try {
+        const data = await loadFlow(
+          opEntry.flow_json, `__op__${opKind}__${demandVal}`, seq,
+        );
+        if (data === null) return; // superseded
+        ctl.update(data);
+        loadKpiDelta(opEntry, seq);
+        setStatus(
+          `${op.label} — ${opEntry.demand_label}. Toggle ` +
+            `"Impact vs baseline" to see where signals shifted traffic.`,
+        );
+      } catch (err) {
+        if (seq !== requestSeq) return;
+        setStatus(`Could not load ${op.label} flow: ${err.message}`, "error");
+        ctl.clear();
+        clearKpi();
+      }
+      return;
+    }
+    if (els.change) els.change.disabled = false;
 
     const key = buildKey();
     const entry = catalog.scenarios[key];
@@ -301,6 +345,26 @@
     placeholder.textContent = "Select a street…";
     placeholder.selected = true;
     els.street.appendChild(placeholder);
+
+    // Operational (network-wide) scenarios — citywide adaptive signals,
+    // etc. These aren't tied to a single street, so they live in their
+    // own optgroup at the top and ignore the Change dropdown.
+    const operational = catalog.operational || {};
+    const opEntries = Object.entries(operational).filter(
+      ([, v]) => v && v.by_demand && Object.keys(v.by_demand).length,
+    );
+    if (opEntries.length) {
+      const group = document.createElement("optgroup");
+      group.label = "Operational (whole town)";
+      opEntries.forEach(([opKind, v]) => {
+        const opt = document.createElement("option");
+        opt.value = `op:${opKind}`;
+        opt.textContent = v.label || opKind;
+        group.appendChild(opt);
+      });
+      els.street.appendChild(group);
+    }
+
     streets.forEach((s) => {
       const opt = document.createElement("option");
       opt.value = s.slug;

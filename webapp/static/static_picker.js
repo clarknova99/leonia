@@ -26,7 +26,70 @@ window.LeoniaTabs = window.LeoniaTabs || {
     status: document.getElementById("static-status"),
     map: document.getElementById("static-map"),
     panel: document.querySelector('.tab-panel[data-panel="static"]'),
+    topPanel: document.getElementById("static-top-panel"),
+    topTitle: document.getElementById("static-top-title"),
+    topMetric: document.getElementById("static-top-metric"),
+    topBody: document.getElementById("static-top-body"),
   };
+
+  // Last-loaded payloads, kept so the top-roads table can be recomputed
+  // when only the day-part / year filter changes (the map renderer is
+  // updated in place without a refetch in those cases).
+  let lastTraffic = null;
+  let lastCrash = null;
+  // Hour currently shown by the renderer during "Hourly (24 hrs)" playback;
+  // the renderer pushes updates here via its onHourChange callback so the
+  // top-roads table can re-rank for the active hour.
+  let currentHour = 0;
+
+  const ESCAPES = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  };
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, (c) => ESCAPES[c]);
+  }
+
+  // Street-suffix abbreviations → full words, so crash-location spellings
+  // like "BROAD AVE" and "Broad Avenue" collapse onto one road row.
+  const SUFFIX = {
+    AVE: "Avenue", AV: "Avenue", ST: "Street", RD: "Road", DR: "Drive",
+    PL: "Place", LN: "Lane", BLVD: "Boulevard", CT: "Court",
+    TER: "Terrace", TERR: "Terrace", HWY: "Highway", PKWY: "Parkway",
+    CIR: "Circle", SQ: "Square", PLZ: "Plaza",
+  };
+
+  function titleCase(s) {
+    return s.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
+  }
+
+  // Roads that carry different OSM names along one physical corridor and
+  // should collapse to a single row. Keyed by UPPERCASE display name →
+  // canonical display name. Fort Lee Road becomes "Main Street" once it
+  // crosses into Fort Lee, but it's the same road through Leonia.
+  const ROAD_ALIASES = {
+    "MAIN STREET": "Fort Lee Road",
+  };
+
+  function aliasRoad(name) {
+    return ROAD_ALIASES[String(name).toUpperCase()] || name;
+  }
+
+  // Normalise a crash label / road string to a display road name. Crash
+  // labels are "<on-road> × <cross-street>" or "<on-road> / <cross>"; we
+  // keep the on-road only so a road groups to one row.
+  function roadDisplay(raw) {
+    if (!raw) return "Unknown";
+    let s = String(raw).split(/[\u00d7/]/)[0].trim().replace(/\s+/g, " ");
+    if (!s || s === "(unknown)") return "Unknown";
+    const parts = s.split(" ");
+    const lastKey = parts[parts.length - 1].toUpperCase().replace(/\.$/, "");
+    if (SUFFIX[lastKey]) parts[parts.length - 1] = SUFFIX[lastKey];
+    return titleCase(parts.join(" "));
+  }
 
   function setStatus(text, variant) {
     if (!els.status) return;
@@ -81,6 +144,18 @@ window.LeoniaTabs = window.LeoniaTabs || {
       return null;
     }
     ctl = window.LeoniaStaticMap.create(els.map);
+    // Re-rank the top-roads table for each hour as the player advances.
+    if (ctl.onHourChange) {
+      ctl.onHourChange((h) => {
+        currentHour = h;
+        if (
+          els.maptype && els.maptype.value === "traffic" &&
+          els.daypart && els.daypart.value === "hourly"
+        ) {
+          renderTopRoads();
+        }
+      });
+    }
     return ctl;
   }
 
@@ -98,6 +173,14 @@ window.LeoniaTabs = window.LeoniaTabs || {
     let hr = h % 12;
     if (hr === 0) hr = 12;
     return hr + ampm;
+  }
+
+  // Long clock label ("12 AM" … "11 PM") for the hourly-playback table title.
+  function fmtClock(h) {
+    const hr = ((h % 24) + 24) % 24;
+    const ampm = hr < 12 ? "AM" : "PM";
+    const display = hr % 12 === 0 ? 12 : hr % 12;
+    return `${display} ${ampm}`;
   }
 
   function fmtWindow(win) {
@@ -140,6 +223,8 @@ window.LeoniaTabs = window.LeoniaTabs || {
         opt.textContent = withWin(earlyBase, pw && pw.off_peak_early);
       } else if (opt.value === "off_peak_late") {
         opt.textContent = withWin(lateBase, pw && pw.off_peak_late);
+      } else if (opt.value === "overnight") {
+        opt.textContent = withWin("Off-peak overnight", pw && pw.overnight);
       }
     }
   }
@@ -178,8 +263,116 @@ window.LeoniaTabs = window.LeoniaTabs || {
       peak_pm: "Peak PM",
       off_peak_early: "off-peak early",
       off_peak_late: "off-peak late",
+      overnight: "off-peak overnight",
+      hourly: "hourly playback",
     };
     return labels[part] || "all day";
+  }
+
+  // --- top-10 roads table ----------------------------------------------
+  function hideTopRoads() {
+    if (els.topBody) els.topBody.innerHTML = "";
+    if (els.topPanel) els.topPanel.hidden = true;
+  }
+
+  // Busiest roads for the selected window. Edges are per-segment, so we
+  // roll segments up by street name and take the busiest segment's vph as
+  // the road's value (its peak point). Restricted to Leonia-local roads:
+  // the builder flags each edge `in_leonia` (strictly in-borough + a
+  // local-road name), so the GWB approach corridor (turnpike, US-1-9-46,
+  // Bergen Boulevard, ramps…) the map shows for context is excluded here.
+  function topTrafficRowsBy(getVal) {
+    if (!lastTraffic || !Array.isArray(lastTraffic.edges)) return [];
+    const edges = lastTraffic.edges;
+    const hasFlag = edges.some((e) => "in_leonia" in e);
+    const byName = new Map();
+    for (const e of edges) {
+      if (hasFlag && !e.in_leonia) continue;
+      const name = aliasRoad(e.name || e.id);
+      const v = getVal(e) || 0;
+      if (v > (byName.get(name) || 0)) byName.set(name, v);
+    }
+    return Array.from(byName, ([name, value]) => ({ name, value }))
+      .filter((r) => r.value > 0)
+      .sort((a, b) => b.value - a.value)
+      .slice(0, 10);
+  }
+
+  function topTrafficRows(part) {
+    return topTrafficRowsBy((e) => (e.vals && e.vals[part]) || 0);
+  }
+
+  // Same ranking but for one hour of the measured 24h profile (the
+  // "Hourly (24 hrs)" day-part), so the table tracks the player.
+  function topTrafficRowsHourly(h) {
+    return topTrafficRowsBy((e) => (e.hourly && e.hourly[h]) || 0);
+  }
+
+  // Roads with the most crashes for the selected year filter. Crash points
+  // carry an optional `road`; otherwise the on-road is parsed from `label`.
+  function topCrashRows(yr) {
+    if (!lastCrash || !Array.isArray(lastCrash.points)) return [];
+    const y = yr === "all" || yr == null ? null : +yr;
+    const byRoad = new Map();
+    for (const p of lastCrash.points) {
+      if (y !== null && p.year !== y) continue;
+      const disp = aliasRoad(roadDisplay(p.road || p.label));
+      const key = disp.toUpperCase();
+      const cur = byRoad.get(key) || { name: disp, value: 0 };
+      cur.value += 1;
+      byRoad.set(key, cur);
+    }
+    return Array.from(byRoad.values())
+      .sort((a, b) => b.value - a.value)
+      .slice(0, 10);
+  }
+
+  function renderTopRoads() {
+    if (!els.topPanel || !els.topBody) return;
+    const mapType = els.maptype ? els.maptype.value : "traffic";
+    let rows;
+    let title;
+    let metric;
+    let fmt;
+    if (mapType === "traffic") {
+      const dt = els.daytype ? els.daytype.value : "weekday";
+      const part = els.daypart ? els.daypart.value : "all_day";
+      if (part === "hourly") {
+        rows = topTrafficRowsHourly(currentHour);
+        title =
+          `Top 10 busiest roads \u2014 ${dayTypeLabel(dt)}, ${fmtClock(currentHour)}`;
+        metric = "vph";
+      } else {
+        rows = topTrafficRows(part);
+        title =
+          `Top 10 busiest roads \u2014 ${dayTypeLabel(dt)}, ${partLabel(part)}`;
+        metric = "Avg vph";
+      }
+      fmt = (v) => Math.round(v).toLocaleString();
+    } else {
+      const yr = els.year ? els.year.value : "all";
+      rows = topCrashRows(yr);
+      title =
+        "Top 10 roads by crashes \u2014 " +
+        (yr === "all" ? "all years" : yr);
+      metric = "Crashes";
+      fmt = String;
+    }
+    if (!rows.length) {
+      hideTopRoads();
+      return;
+    }
+    if (els.topTitle) els.topTitle.textContent = title;
+    if (els.topMetric) els.topMetric.textContent = metric;
+    els.topBody.innerHTML = rows
+      .map(
+        (r, i) =>
+          `<tr><td class="rank-col">${i + 1}</td>` +
+          `<td class="road-col">${escapeHtml(r.name)}</td>` +
+          `<td class="num-col">${fmt(r.value)}</td></tr>`,
+      )
+      .join("");
+    els.topPanel.hidden = false;
   }
 
   async function apply() {
@@ -190,6 +383,7 @@ window.LeoniaTabs = window.LeoniaTabs || {
     }
     const mapType = els.maptype ? els.maptype.value : "traffic";
     toggleControls(mapType);
+    hideTopRoads();
     const mySeq = ++seq;
 
     if (mapType === "traffic") {
@@ -214,8 +408,15 @@ window.LeoniaTabs = window.LeoniaTabs || {
       }
       if (mySeq !== seq) return;
       renderer.showTraffic(data, part);
+      lastTraffic = data;
+      if (part === "hourly" && renderer.currentHour) {
+        currentHour = renderer.currentHour();
+      }
+      renderTopRoads();
       setStatus(
-        `Measured traffic — ${dayTypeLabel(dt)}, ${partLabel(part)} (avg vph).`,
+        part === "hourly"
+          ? `Measured traffic — ${dayTypeLabel(dt)}, hourly playback (vph by hour).`
+          : `Measured traffic — ${dayTypeLabel(dt)}, ${partLabel(part)} (avg vph).`,
       );
     } else {
       const path = staticCatalog && staticCatalog.crash;
@@ -237,6 +438,8 @@ window.LeoniaTabs = window.LeoniaTabs || {
       if (mySeq !== seq) return;
       const yr = els.year ? els.year.value : "all";
       renderer.showCrash(data, yr);
+      lastCrash = data;
+      renderTopRoads();
       setStatus(
         `NJDOT crashes — ${yr === "all" ? "all years" : yr}.`,
       );
@@ -258,9 +461,16 @@ window.LeoniaTabs = window.LeoniaTabs || {
       els.daypart.addEventListener("change", () => {
         if (!ctl) return apply();
         ctl.setValueKey(els.daypart.value);
+        if (els.daypart.value === "hourly" && ctl.currentHour) {
+          currentHour = ctl.currentHour();
+        }
+        renderTopRoads();
         setStatus(
-          `Measured traffic — ${dayTypeLabel(els.daytype.value)}, ` +
-            `${partLabel(els.daypart.value)} (avg vph).`,
+          els.daypart.value === "hourly"
+            ? `Measured traffic — ${dayTypeLabel(els.daytype.value)}, ` +
+                "hourly playback (vph by hour)."
+            : `Measured traffic — ${dayTypeLabel(els.daytype.value)}, ` +
+                `${partLabel(els.daypart.value)} (avg vph).`,
         );
       });
     }
@@ -268,6 +478,7 @@ window.LeoniaTabs = window.LeoniaTabs || {
       els.year.addEventListener("change", () => {
         if (!ctl) return apply();
         ctl.setYear(els.year.value);
+        renderTopRoads();
         setStatus(
           `NJDOT crashes — ${els.year.value === "all" ? "all years" : els.year.value}.`,
         );

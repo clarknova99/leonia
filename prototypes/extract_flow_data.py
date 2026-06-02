@@ -28,9 +28,9 @@ from leonia_traffic.sumo.visualizations import build_flow_payload
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_RUN = (
     REPO_ROOT
-    / "data/processed/sumo/runs/20260522T041939Z_baseline/edge_history.parquet"
+    / "data/sumo/runs/20260522T041939Z_baseline/edge_history.parquet"
 )
-DEFAULT_NET = REPO_ROOT / "data/processed/sumo/leonia.net.xml"
+DEFAULT_NET = REPO_ROOT / "data/sumo/base/leonia.net.xml"
 OUT_JS = Path(__file__).resolve().parent / "leonia_flow_data.js"
 
 

@@ -6,32 +6,33 @@
 #   * the FastAPI service (webapp/app)
 #   * the leonia_traffic library (so leonia_traffic.config still
 #     resolves cleanly, even though no SUMO is invoked at runtime)
-#   * the precomputed scenario cache under
-#     /app/data/processed/sumo/runs_precache/
+#   * the published webapp serve set under /app/data/webapp/
+#     (catalog.json + per-scenario flow.json + _static/ + _overlays/),
+#     tracked in Git LFS and baked straight into the image
 #   * a thin Jinja2 + uvicorn web layer
 #
 # What it does NOT bundle:
 #   * SUMO (netconvert / sumo / sumo-gui) — the precache is built
 #     out-of-band before the image is built. See webapp/README.md.
-#   * The full data/ tree — only the artefacts the webapp actually
-#     reads at request time.
+#   * The heavy SUMO build tree (data/sumo/precache_build, ~17 GB) or any
+#     raw/staged data — only the slim data/webapp/ serve set is copied in.
 #
 # Build targets:
-#   * `base`    — code-only image. No data baked in; the precache is
-#                 expected to be mounted at runtime (k8s volume / -v).
-#                 This is what CI builds and what the Talos deploy runs.
-#   * `bundled` — extends `base` by baking the local data tree (precache
-#                 + borough polygon) for a self-contained local run.
-#                 This is the DEFAULT target (last stage) so the local
-#                 build command below keeps working unchanged.
+#   * `base`     — code-only image. No data baked in (data mounted at
+#                  runtime via LEONIA_DATA_DIR). Kept for local dev/iter.
+#   * `bundled`  — extends `base` by baking data/webapp/ (+ borough
+#                  polygon) for a self-contained image. This is the DEFAULT
+#                  target and what CI publishes — every image is complete.
 #
-# Build (self-contained, bakes local precache — DEFAULT target):
+# Build (self-contained, bakes data/webapp — DEFAULT target):
 #   docker build -t leonia-webapp -f webapp/Dockerfile .
+#   (CI checks out with Git LFS so data/webapp holds real files, not
+#    LFS pointer stubs — otherwise the served set would be empty.)
 #
-# Build (code-only, data mounted at runtime — CI / k8s):
+# Build (code-only, data mounted at runtime — local dev):
 #   docker build -t leonia-webapp --target base -f webapp/Dockerfile .
 #
-# Run (in-image precache, `bundled`):
+# Run (baked data, `bundled`):
 #   docker run --rm -p 8000:8000 leonia-webapp
 #
 # Run (mounted data dir, dev/iter or `base`):
@@ -94,16 +95,16 @@ CMD ["uvicorn", "webapp.app.main:app", \
      "--proxy-headers"]
 
 # ---------------------------------------------------------------------------
-# `bundled` (default) — bakes the local data tree for a self-contained image.
-#
-# These paths live under data/ which is .gitignored, so this stage only
-# builds when the data tree is present in the build context. CI builds the
-# `base` target instead (--target base) and mounts the precache at runtime.
+# `bundled` (default) — bakes the published serve set for a self-contained
+# image. data/webapp/ is Git-LFS tracked and the borough polygon is a small
+# committed file, so both are present in any LFS-aware checkout (CI must use
+# `lfs: true` or it would bake pointer stubs instead of real data).
 # ---------------------------------------------------------------------------
 FROM base AS bundled
 
 # Network polygon — leonia_traffic.config.load_leonia_polygon reads it.
 COPY data/network/leonia_borough.geojson /app/data/network/leonia_borough.geojson
 
-# Precomputed scenario cache. This is the big payload.
-COPY data/processed/sumo/runs_precache/ /app/data/processed/sumo/runs_precache/
+# Published webapp serve set (the image payload). webapp/app/config.py
+# resolves WEBAPP_PUBLISH_DIR to /app/data/webapp via LEONIA_DATA_DIR.
+COPY data/webapp/ /app/data/webapp/

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Leonia traffic — scenario explorer</title>
+  <title>Leonia Traffic Explorer</title>
   <link rel="stylesheet" href="/static/styles.css" />
   <!-- MapLibre basemap (open-source, no token) + deck.gl (WebGL).
        Loaded synchronously so the deck renderer and picker (deferred)
@@ -14,15 +14,8 @@
 </head>
 <body>
   <header class="page-header">
-    <h1>Leonia traffic — map explorer</h1>
-    <p class="lede">
-      Two views of Leonia's streets. <strong>Static Maps</strong> show
-      average measured conditions for the day — traffic volumes by day
-      type and time window, or NJDOT crash locations by year.
-      <strong>Simulation</strong> animates a precomputed SUMO model of a
-      street change across a 24-hour day. All maps render on the GPU with
-      deck.gl over a token-free MapLibre basemap.
-    </p>
+    <h1>Leonia Traffic Explorer</h1>
+
   </header>
 
   <main>
@@ -37,8 +30,11 @@
       <div class="tabs" role="tablist" aria-label="Map type">
         <button class="tab is-active" role="tab" type="button"
                 data-tab="static" aria-selected="true">Static Maps</button>
+        <!-- Simulation tab hidden until the simulation view is ready for
+             users. Re-enable by restoring this button.
         <button class="tab" role="tab" type="button"
                 data-tab="simulation" aria-selected="false">Simulation</button>
+        -->
       </div>
 
       <section class="tab-panel static-panel is-active" data-panel="static"
@@ -47,8 +43,8 @@
           <label class="picker-field">
             <span class="picker-label">Map type</span>
             <select id="static-maptype" aria-label="Map type">
-              <option value="crash" selected>Crash</option>
-              <option value="traffic">Traffic</option>
+              <option value="crash">Crash</option>
+              <option value="traffic" selected>Traffic</option>
             </select>
           </label>
 
@@ -63,11 +59,13 @@
           <label class="picker-field" data-when="traffic" hidden>
             <span class="picker-label">Day part</span>
             <select id="static-daypart" aria-label="Day part">
+              <option value="hourly" selected>Hourly (24 hrs)</option>
               <option value="all_day">All day</option>
               <option value="peak_am">Peak AM</option>
               <option value="peak_pm">Peak PM</option>
               <option value="off_peak_early">Off-peak early</option>
               <option value="off_peak_late">Off-peak late</option>
+              <option value="overnight">Off-peak overnight</option>
             </select>
           </label>
 
@@ -101,8 +99,11 @@
           </div>
           <p class="legend-note">
             Average vehicles/hour over the selected window, derived from
-            StreetLight measured volumes. Colour and width scale to the
-            busiest roads in this view.
+            StreetLight measured volumes. Leonia local roads and the
+            surrounding highways (turnpike, US&nbsp;1/9/46, GWB approach)
+            use <strong>separate</strong> colour/width scales, so a volume
+            that maxes out a residential street isn't painted the same red
+            as a genuinely busy highway.
             <span class="legend-network-swatch"></span>
             <span class="legend-network-label">network (no data)</span>
           </p>
@@ -116,7 +117,7 @@
             <span><i class="crash-dot crash-a"></i> Serious injury</span>
             <span><i class="crash-dot crash-b"></i> Minor injury</span>
             <span><i class="crash-dot crash-c"></i> Possible injury</span>
-            <span><i class="crash-dot crash-o"></i> Property damage</span>
+            <span><i class="crash-dot crash-o"></i> No injuries</span>
           </div>
           <p class="legend-note">
             Geocoded crashes within the borough (state-system roads
@@ -124,6 +125,21 @@
             the Year filter to focus a single year.
           </p>
         </figure>
+
+        <section id="static-top-panel" class="top-roads-panel" hidden
+                 aria-live="polite" aria-label="Top roads">
+          <h2 id="static-top-title" class="top-roads-title">Top roads</h2>
+          <table class="top-roads-table">
+            <thead>
+              <tr>
+                <th class="rank-col" scope="col">#</th>
+                <th scope="col">Road</th>
+                <th id="static-top-metric" class="num-col" scope="col">Value</th>
+              </tr>
+            </thead>
+            <tbody id="static-top-body"></tbody>
+          </table>
+        </section>
 
         <details class="metadata">
           <summary>About this view</summary>

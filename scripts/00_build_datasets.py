@@ -35,6 +35,10 @@ Outputs (paths relative to repo root):
             za_tourist_summary.parquet,
             za_line_shapes.parquet,
             za_polygon_shapes.parquet             (ZA on Leonia streets)
+        za_volume_history.parquet,
+            za_trips_history.parquet,
+            za_line_shapes_history.parquet,
+            za_polygon_shapes_history.parquet     (ZA historical baseline 2038018)
         _manifest.json
     data/processed/derived/
         cutthrough_index.parquet
@@ -445,6 +449,56 @@ def build_za_streets(skip_files: set[str] | None = None) -> dict[str, int]:
     return counts
 
 
+def build_za_history(skip_files: set[str] | None = None) -> dict[str, int]:
+    """Historical ZA baseline on Leonia tertiary streets (analysis 2038018).
+
+    A single multi-year aggregate covering
+    ``Jan 01, 2022 - May 31, 2023; Jan 01, 2024 - Apr 30, 2026`` for all 375
+    OSM tertiary segments. Unlike the recent-year ``build_za_streets`` export
+    it has **no Visitor/Resident split and no Home/Work folder**, so only the
+    main volume, per-trip distributions, and the two shapefiles are emitted.
+    Kept separate from the ``za_*`` tables so the Visitor-filtered analyses
+    stay comparable.
+    """
+    _section("ZA — historical baseline (2038018)")
+    skip_files = skip_files or set()
+    folder = za.ZA_STREETS_HISTORY_DIR
+    if za.discover_za_streets(folder) is None:
+        _skip("za_*_history", f"{folder} not found")
+        return {}
+
+    counts: dict[str, int] = {}
+    src = [folder]
+
+    def _emit(df, name: str) -> None:
+        if name in skip_files:
+            _skip(name, "user requested skip")
+            return
+        if df is None or df.empty:
+            _skip(name, "empty in raw export")
+            return
+        write_dataframe(df, folder=CANONICAL_DIR, name=name, sources=src)
+        _ok(name, len(df))
+        counts[name] = len(df)
+
+    def _emit_geo(gdf, name: str) -> None:
+        if name in skip_files:
+            _skip(name, "user requested skip")
+            return
+        if gdf is None or gdf.empty:
+            _skip(name, "empty in raw export")
+            return
+        write_geodataframe(gdf, folder=CANONICAL_DIR, name=name, sources=src)
+        _ok(name, len(gdf))
+        counts[name] = len(gdf)
+
+    _emit(za.load_za_main(folder),              CanonicalFiles.za_volume_history)
+    _emit(za.load_za_trip(folder),              CanonicalFiles.za_trips_history)
+    _emit_geo(za.load_za_line_shapes(folder),   CanonicalFiles.za_line_shapes_history)
+    _emit_geo(za.load_za_polygon_shapes(folder), CanonicalFiles.za_polygon_shapes_history)
+    return counts
+
+
 # ---------------------------------------------------------------------------
 # Derived analytics builders
 # ---------------------------------------------------------------------------
@@ -603,6 +657,7 @@ KNOWN_PRODUCTS = {
     "network_performance": build_network_performance,
     "cutthrough_omd": build_cutthrough_omd,
     "za": build_za_streets,
+    "za_history": build_za_history,
 }
 
 

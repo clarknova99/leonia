@@ -66,12 +66,24 @@
     B: { color: [239, 108, 0], radius: 5 },
     C: { color: [245, 124, 0], radius: 4.5 },
     I: { color: [239, 108, 0], radius: 5 },
-    O: { color: [97, 97, 97], radius: 3.5 },
-    P: { color: [97, 97, 97], radius: 3.5 },
+    // No-injury (property-damage-only): a muted steel blue at reduced
+    // opacity. Plain grey was getting lost against the dark basemap, but
+    // bright cyan overpowered the injury colours — this reads as present
+    // without competing with them.
+    O: { color: [108, 148, 178], radius: 3.5, alpha: 150 },
+    P: { color: [108, 148, 178], radius: 3.5, alpha: 150 },
   };
 
   function severityStyle(sev) {
     return SEVERITY[(sev || "O").toUpperCase()] || SEVERITY.O;
+  }
+
+  // Hour-of-day (0..23) → "12 AM", "1 AM", … "12 PM", … "11 PM".
+  function fmtClock(h) {
+    const hr = ((h % 24) + 24) % 24;
+    const ampm = hr < 12 ? "AM" : "PM";
+    const display = hr % 12 === 0 ? 12 : hr % 12;
+    return `${display} ${ampm}`;
   }
 
   const THEMES = [
@@ -105,6 +117,18 @@
       (t) => `<option value="${t.id}">${t.label}</option>`,
     ).join("");
     panel.innerHTML = [
+      // Hourly-playback transport, shown only for the "Hourly (24 hrs)"
+      // day-part. Uses the same classes as the simulation map's in-panel
+      // controls so it inherits that styling.
+      '<div class="deck-player" hidden>',
+      '<div class="deck-clock"><span class="deck-time">12 AM</span>',
+      '<small class="deck-player-hint">measured vph by hour</small></div>',
+      '<div class="deck-row">',
+      '<button type="button" class="deck-play">&#9658; Play</button>',
+      '<input type="range" class="deck-scrub" min="0" max="23" step="1" ' +
+        'value="0" aria-label="Hour of day" />',
+      "</div>",
+      "</div>",
       '<div class="deck-row deck-row-theme">',
       '<span class="deck-theme-label">Basemap</span>',
       `<select class="deck-theme">${themeOpts}</select>`,
@@ -115,11 +139,16 @@
     const tip = document.createElement("div");
     tip.className = "deck-tip";
     container.appendChild(tip);
+
     return {
       panel,
       tip,
-      stat: panel.querySelector(".deck-stat"),
+      stat: panel.querySelector(".deck-static-readout .deck-stat"),
       theme: panel.querySelector(".deck-theme"),
+      player: panel.querySelector(".deck-player"),
+      play: panel.querySelector(".deck-play"),
+      scrub: panel.querySelector(".deck-scrub"),
+      clock: panel.querySelector(".deck-time"),
     };
   }
 
@@ -153,16 +182,42 @@
 
     let mode = "traffic"; // 'traffic' | 'crash'
     let data = null;
-    let vmax = 600;
+    let vmax = 600; // colour scale for Leonia local roads
+    let vmaxHighway = 600; // separate scale for highways / GWB approach
+    let vmaxHourly = 600; // local-road scale for the hourly animation
+    let vmaxHighwayHourly = 600; // highway scale for the hourly animation
     let valueKey = "all_day";
     let crashYear = "all";
     let hover = null; // { html, x, y }
     let pinned = null;
     let centred = false;
 
+    // Hourly-playback ("Hourly (24 hrs)" day-part) state.
+    let hourIndex = 0;
+    let playing = false;
+    let timer = null;
+    let onHourCb = null;
+    const HOUR_MS = 700; // dwell per hour during playback
+
     // --- helpers ---------------------------------------------------------
+    function isHourly() {
+      return valueKey === "hourly";
+    }
+
     function trafficValue(e) {
+      if (isHourly()) return (e.hourly && e.hourly[hourIndex]) || 0;
       return (e.vals && e.vals[valueKey]) || 0;
+    }
+
+    // Highways and Leonia local roads use separate colour/width scales so
+    // a volume that maxes out a local street isn't painted the same red as
+    // a genuinely jammed highway. `in_leonia` is set per edge by the
+    // builder; absent (older data) it falls back to the local scale. The
+    // hourly animation uses its own (higher) peak-hour scales.
+    function edgeVmax(e) {
+      const local = isHourly() ? vmaxHourly : vmax;
+      const highway = isHourly() ? vmaxHighwayHourly : vmaxHighway;
+      return e.in_leonia === false ? highway : local;
     }
 
     function visibleCrashPoints() {
@@ -195,15 +250,19 @@
         peak_pm: "Peak PM",
         off_peak_early: "Off-peak early",
         off_peak_late: "Off-peak late",
+        overnight: "Off-peak overnight",
       };
+      const label = isHourly() ? fmtClock(hourIndex) : w[valueKey] || valueKey;
       return (
         '<div class="deck-tip-name">' +
         (e.name || e.id) +
         "</div>" +
         '<div class="deck-tip-vph"><b>' +
         trafficValue(e) +
-        "</b> avg vph &middot; " +
-        (w[valueKey] || valueKey) +
+        "</b> " +
+        (isHourly() ? "vph" : "avg vph") +
+        " &middot; " +
+        label +
         "</div>"
       );
     }
@@ -241,8 +300,8 @@
         id: "traffic",
         data: data.edges,
         getPath: (e) => e.coords,
-        getColor: (e) => rampColor(trafficValue(e), vmax),
-        getWidth: (e) => 1.5 + 5 * norm(trafficValue(e), vmax),
+        getColor: (e) => rampColor(trafficValue(e), edgeVmax(e)),
+        getWidth: (e) => 1.5 + 5 * norm(trafficValue(e), edgeVmax(e)),
         widthUnits: "pixels",
         widthMinPixels: 1.2,
         capRounded: true,
@@ -262,7 +321,10 @@
             : null;
           renderTip();
         },
-        updateTriggers: { getColor: valueKey, getWidth: valueKey },
+        updateTriggers: {
+          getColor: [valueKey, hourIndex],
+          getWidth: [valueKey, hourIndex],
+        },
       });
     }
 
@@ -273,8 +335,9 @@
         data: pts,
         getPosition: (p) => [p.lon, p.lat],
         getFillColor: (p) => {
-          const c = severityStyle(p.severity).color;
-          return [c[0], c[1], c[2], 220];
+          const s = severityStyle(p.severity);
+          const a = s.alpha == null ? 220 : s.alpha;
+          return [s.color[0], s.color[1], s.color[2], a];
         },
         getLineColor: [10, 15, 26, 200],
         lineWidthMinPixels: 0.5,
@@ -367,6 +430,59 @@
       });
     }
 
+    // --- hourly playback -------------------------------------------------
+    function setHour(h) {
+      hourIndex = ((h % 24) + 24) % 24;
+      if (ui.scrub) ui.scrub.value = String(hourIndex);
+      if (ui.clock) ui.clock.textContent = fmtClock(hourIndex);
+      if (onHourCb) onHourCb(hourIndex);
+      draw();
+    }
+
+    function pausePlayback() {
+      playing = false;
+      if (timer) {
+        clearInterval(timer);
+        timer = null;
+      }
+      if (ui.play) ui.play.innerHTML = "&#9658; Play";
+    }
+
+    function startPlayback() {
+      if (playing) return;
+      playing = true;
+      if (ui.play) ui.play.innerHTML = "&#10073;&#10073; Pause";
+      timer = setInterval(() => setHour(hourIndex + 1), HOUR_MS);
+    }
+
+    // Show/hide the transport bar to match the current day-part. The hourly
+    // view (re)starts at midnight and waits — playback only begins when the
+    // user hits Play. Called whenever the value key or data changes.
+    function applyValueMode() {
+      if (mode === "traffic" && isHourly()) {
+        if (ui.player) ui.player.hidden = false;
+        hourIndex = 0;
+        pausePlayback();
+        setHour(hourIndex);
+      } else {
+        pausePlayback();
+        if (ui.player) ui.player.hidden = true;
+      }
+    }
+
+    if (ui.play) {
+      ui.play.addEventListener("click", () => {
+        if (playing) pausePlayback();
+        else startPlayback();
+      });
+    }
+    if (ui.scrub) {
+      ui.scrub.addEventListener("input", () => {
+        pausePlayback();
+        setHour(+ui.scrub.value);
+      });
+    }
+
     // --- public API ------------------------------------------------------
     function _afterDataSet() {
       hover = null;
@@ -386,8 +502,13 @@
       mode = "traffic";
       data = next;
       valueKey = key || "all_day";
-      vmax = (next && next.meta && next.meta.vmax_vph) || 600;
+      const meta = (next && next.meta) || {};
+      vmax = meta.vmax_vph || 600;
+      vmaxHighway = meta.vmax_highway_vph || vmax;
+      vmaxHourly = meta.vmax_vph_hourly || vmax;
+      vmaxHighwayHourly = meta.vmax_highway_vph_hourly || vmaxHourly;
       _afterDataSet();
+      applyValueMode();
     }
 
     function setValueKey(key) {
@@ -396,14 +517,17 @@
       hover = null;
       pinned = null;
       ui.tip.style.display = "none";
+      applyValueMode();
+      if (!isHourly()) draw();
       refreshHud();
-      draw();
     }
 
     function showCrash(next, year) {
       mode = "crash";
       data = next;
       crashYear = year == null ? "all" : year;
+      pausePlayback();
+      if (ui.player) ui.player.hidden = true;
       _afterDataSet();
     }
 
@@ -419,9 +543,21 @@
 
     function clear() {
       data = null;
+      pausePlayback();
+      if (ui.player) ui.player.hidden = true;
       overlay.setProps({ layers: [] });
       if (ui.stat) ui.stat.textContent = "";
       ui.tip.style.display = "none";
+    }
+
+    // Register a callback fired on every hour change during playback (the
+    // picker uses it to re-rank the top-roads table for the current hour).
+    function onHourChange(cb) {
+      onHourCb = typeof cb === "function" ? cb : null;
+    }
+
+    function currentHour() {
+      return hourIndex;
     }
 
     function resize() {
@@ -433,6 +569,7 @@
     }
 
     function destroy() {
+      pausePlayback();
       try {
         map.remove();
       } catch (_e) {
@@ -445,6 +582,8 @@
       setValueKey,
       showCrash,
       setYear,
+      onHourChange,
+      currentHour,
       clear,
       resize,
       destroy,

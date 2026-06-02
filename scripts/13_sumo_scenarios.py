@@ -100,7 +100,7 @@ def _scenario_specs() -> dict[str, dict]:
 
 
 def _build_scenario(spec: dict):
-    from leonia_traffic.simulation.scenarios import (
+    from leonia_traffic.scenarios import (
         Closure, OneWayConversion, SpeedHumpCalming,
     )
 
@@ -430,11 +430,9 @@ def main(argv: list[str] | None = None) -> int:
                 return 2
         specs = {k: specs[k] for k in args.scenarios}
 
+    from leonia_traffic.config import SUMO_RUNS_DIR
     ts = time.strftime("%Y%m%dT%H%M%SZ", time.gmtime())
-    base_dir = (
-        REPO_ROOT / "data" / "processed" / "sumo" / "runs"
-        / f"{ts}_baseline"
-    ).resolve()
+    base_dir = (SUMO_RUNS_DIR / f"{ts}_baseline").resolve()
     base_dir.mkdir(parents=True, exist_ok=True)
 
     print("[parent] === baseline ===")
@@ -464,10 +462,7 @@ def main(argv: list[str] | None = None) -> int:
         spec_path = base_dir.parent / f"{ts}_{name}_spec.json"
         spec_path.write_text(json.dumps(spec_with_name, indent=2))
 
-        scen_dir = (
-            REPO_ROOT / "data" / "processed" / "sumo" / "runs"
-            / f"{ts}_{name}"
-        ).resolve()
+        scen_dir = (SUMO_RUNS_DIR / f"{ts}_{name}").resolve()
         scen_dir.mkdir(parents=True, exist_ok=True)
 
         print(f"[parent] === {name} ===")

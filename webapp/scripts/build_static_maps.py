@@ -49,7 +49,7 @@ if str(REPO_ROOT) not in sys.path:
 import numpy as np
 import pandas as pd
 
-from leonia_traffic.config import DATA_PROCESSED_DIR
+from leonia_traffic.config import SUMO_BASE_DIR, SUMO_PRECACHE_DIR
 from leonia_traffic.sumo.net_lookup import (
     load_sumo_edge_geometries,
     load_sumo_edge_junctions,
@@ -57,6 +57,7 @@ from leonia_traffic.sumo.net_lookup import (
 )
 from leonia_traffic.sumo.visualizations import (
     _filter_crash_rows_to_borough,
+    _is_state_system_street,
     _round_coords,
     load_crash_points_if_available,
     load_crash_segments_if_available,
@@ -69,9 +70,9 @@ logger = logging.getLogger(__name__)
 # Paths
 # ---------------------------------------------------------------------------
 
-SUMO_DIR = DATA_PROCESSED_DIR / "sumo"
+SUMO_DIR = SUMO_BASE_DIR
 NET_PATH = SUMO_DIR / "leonia.net.xml"
-PRECACHE_DIR = SUMO_DIR / "runs_precache"
+PRECACHE_DIR = SUMO_PRECACHE_DIR
 OVERLAY_DIR = PRECACHE_DIR / "_overlays"
 STATIC_DIR = PRECACHE_DIR / "_static"
 
@@ -93,12 +94,14 @@ PEAK_WINDOWS: dict[str, dict[str, list[int]]] = {
         "peak_pm": [15, 18],
         "off_peak_early": [10, 15],  # midday lull between the commute peaks
         "off_peak_late": [19, 23],   # evening, after the PM peak fades
+        "overnight": [0, 6],         # 12am–6am quiet overnight window
     },
     "sunday": {
         "peak_am": [10, 13],
         "peak_pm": [13, 16],
         "off_peak_early": [6, 10],   # early morning before the midday plateau
         "off_peak_late": [16, 21],   # late afternoon into evening
+        "overnight": [0, 6],         # 12am–6am quiet overnight window
     },
 }
 
@@ -140,12 +143,78 @@ APPROACH_REGION_BUFFER_M = 60.0
 # ---------------------------------------------------------------------------
 
 
+# Street names that are part of the GWB approach corridor / limited-access
+# facilities, NOT Leonia local roads. The static traffic map still draws
+# them for context, but the "top roads" table is Leonia-only.
+# ``_is_state_system_street`` already flags the turnpike / I-95 / express
+# lanes / motorway-link / GWB names; this set adds the surface approach
+# corridor and the OSM highway-type placeholders that the borough's 50 m
+# border buffer grazes (e.g. US-1-9-46 and Bergen Boulevard clipping the
+# southern tip). Matched case-insensitively. NJ-93 (= Grand Avenue) and
+# Broad Avenue / Fort Lee Road are intentionally NOT here — their
+# in-borough segments are exactly the Leonia main roads to keep.
+_NON_LOCAL_TABLE_NAMES = {
+    "us 1;us 9;us 46", "us 1;us 9", "us 9;us 1",
+    "bergen boulevard", "mackay highway", "bruce reynolds boulevard",
+    "bridge plaza north", "south bridge plaza",
+    "george washington bridge plaza", "fletcher avenue",
+    "motorway", "motorway_link", "trunk", "trunk_link",
+    "primary", "primary_link", "secondary", "secondary_link",
+    "tertiary", "tertiary_link", "unclassified", "residential",
+}
+
+
+def _is_leonia_local_road(name: object) -> bool:
+    """True for a real Leonia local-road name (for the top-roads table).
+
+    Excludes state-system facilities (via ``_is_state_system_street``),
+    the GWB approach corridor (``_NON_LOCAL_TABLE_NAMES``), and the OSM
+    highway-type placeholders / edge-id fallbacks that have no street name.
+    """
+    if not isinstance(name, str) or not name.strip():
+        return False
+    if _is_state_system_street(name):
+        return False
+    return name.strip().lower() not in _NON_LOCAL_TABLE_NAMES
+
+
 def _window_mean(hourly: list[float], lo: int, hi: int) -> float:
     """Mean vehicles/hour across the half-open hour window ``[lo, hi)``."""
     vals = [hourly[h] for h in range(lo, hi) if 0 <= h < len(hourly)]
     if not vals:
         return 0.0
     return float(sum(vals) / len(vals))
+
+
+def _hourly_24(hourly: list[float]) -> list[int]:
+    """Coerce a measured profile to a fixed 24-slot integer vph array.
+
+    The "Hourly (24 hrs)" day-part animates these directly, one frame per
+    hour from midnight to midnight, so they must be exactly 24 long.
+    """
+    out = [int(round(float(hourly[h]))) if h < len(hourly) else 0
+           for h in range(24)]
+    return out
+
+
+def _vals_to_hourly(vals: dict, windows: dict) -> list[int]:
+    """Reconstruct a 24-slot hourly profile from window means.
+
+    Used for the gap-filled collinear segments (which only carry window
+    means, not a measured curve) so they still pulse in step with their
+    parent street during the hourly playback instead of sitting static.
+    Each named window paints its hours; hours no window covers fall back
+    to the all-day average.
+    """
+    base = int(vals.get("all_day", 0))
+    hourly = [base] * 24
+    for wkey, (lo, hi) in windows.items():
+        v = vals.get(wkey)
+        if v is None:
+            continue
+        for h in range(max(0, int(lo)), min(24, int(hi))):
+            hourly[h] = int(v)
+    return hourly
 
 
 def snapped_coords_by_edge(geo: pd.DataFrame) -> dict[str, list[list[float]]]:
@@ -414,6 +483,7 @@ def build_traffic_static(
     vmax_ids: set[str] | None = None,
     name_of: dict[str, str] | None = None,
     edge_junctions: dict[str, tuple[str, str]] | None = None,
+    leonia_ids: set[str] | None = None,
 ) -> dict:
     """Build the static traffic payload for one day type.
 
@@ -433,7 +503,19 @@ def build_traffic_static(
     windows = PEAK_WINDOWS[demand]
 
     edges_out: list[dict] = []
-    all_values: list[float] = []
+    # Two separate colour-scale pools: Leonia local roads vs. the
+    # surrounding highways / GWB approach. A volume that saturates a local
+    # street (≈800 vph) is light traffic on the turnpike, so colouring both
+    # off one vmax paints every highway red. Each class gets its own vmax
+    # so the green→red gradient is meaningful within its own road class.
+    local_values: list[float] = []
+    highway_values: list[float] = []
+    # Separate pools for the hourly-playback colour scale: a single peak
+    # hour runs higher than the 4-hour Peak-AM/PM window means, so reusing
+    # the static vmax would clip every busy hour to red. These hold each
+    # edge's peak single-hour vph instead.
+    local_hourly_peaks: list[float] = []
+    highway_hourly_peaks: list[float] = []
     covered: set[str] = set()
     for eid, rec in by_edge.items():
         if eid not in geo.index:
@@ -455,26 +537,51 @@ def build_traffic_static(
         for wkey, (lo, hi) in windows.items():
             vals[wkey] = int(round(_window_mean(hourly, lo, hi)))
         covered.add(eid)
-        # Scale colours off Leonia's own streets so the much higher-volume
-        # GWB approach saturates at max-red instead of washing out the
-        # in-town gradient. Falls back to all edges when no subset given.
-        # Only the busy windows feed vmax (see VMAX_WINDOWS).
-        if vmax_ids is None or str(eid) in vmax_ids:
-            all_values.append(all_day)
-            all_values.extend(float(vals[w]) for w in VMAX_WINDOWS if w in vals)
+        nm = rec.get("street") or str(eid)
+        # Leonia-local flag: strictly in-borough AND a local-road name
+        # (drives the Leonia-only top-roads table AND which colour scale
+        # the edge uses; the map draws all edges either way).
+        is_leonia = (
+            (leonia_ids is None or str(eid) in leonia_ids)
+            and _is_leonia_local_road(nm)
+        )
+        # Only the busy windows feed each vmax (see VMAX_WINDOWS).
+        pool = local_values if is_leonia else highway_values
+        pool.append(all_day)
+        pool.extend(float(vals[w]) for w in VMAX_WINDOWS if w in vals)
+        hourly_int = _hourly_24(hourly)
+        peak_pool = local_hourly_peaks if is_leonia else highway_hourly_peaks
+        peak_pool.append(float(max(hourly_int)) if hourly_int else 0.0)
         coords = (
             coords_by_edge.get(str(eid)) if coords_by_edge is not None else None
         ) or _round_coords(list(geom.coords))
         edges_out.append({
             "id": str(eid),
-            "name": rec.get("street") or str(eid),
+            "name": nm,
             "coords": coords,
             "vals": vals,
+            "hourly": hourly_int,
+            "in_leonia": is_leonia,
         })
 
-    positive = [v for v in all_values if v > 0]
-    vmax = (
-        max(50.0, round(float(np.quantile(positive, 0.95)))) if positive else 50.0
+    def _q95(values: list[float]) -> float:
+        pos = [v for v in values if v > 0]
+        if not pos:
+            return 50.0
+        return max(50.0, round(float(np.quantile(pos, 0.95))))
+
+    vmax = _q95(local_values)
+    # Highways scale to their own 95th percentile, floored at the local
+    # vmax so a quiet-data day never makes them scale lower than streets.
+    vmax_highway = max(vmax, _q95(highway_values)) if highway_values else vmax
+
+    # Hourly-playback scales: 95th percentile of per-edge peak-hour vph
+    # (floored at the static vmax so the animation never reads cooler than
+    # the matching static window).
+    vmax_hourly = max(vmax, _q95(local_hourly_peaks))
+    vmax_highway_hourly = (
+        max(vmax_highway, _q95(highway_hourly_peaks))
+        if highway_hourly_peaks else vmax_hourly
     )
 
     # Fill collinear gaps: unnamed mid-street segments OSM never tagged
@@ -493,11 +600,17 @@ def build_traffic_static(
         )
         for eid, payload in filled.items():
             covered.add(eid)
+            nm = payload.get("name") or str(eid)
             edges_out.append({
                 "id": str(eid),
-                "name": payload.get("name") or str(eid),
+                "name": nm,
                 "coords": coords_by_edge[eid],
                 "vals": dict(payload["vals"]),
+                "hourly": _vals_to_hourly(payload["vals"], windows),
+                "in_leonia": (
+                    (leonia_ids is None or str(eid) in leonia_ids)
+                    and _is_leonia_local_road(nm)
+                ),
             })
         if filled:
             logger.info("%s: filled %d unnamed gap segments.", demand, len(filled))
@@ -531,6 +644,9 @@ def build_traffic_static(
             "demand": demand,
             "metric": "avg_vph",
             "vmax_vph": int(vmax),
+            "vmax_highway_vph": int(vmax_highway),
+            "vmax_vph_hourly": int(vmax_hourly),
+            "vmax_highway_vph_hourly": int(vmax_highway_hourly),
             "center": center,
             "zoom": ZOOM,
             "n_edges": len(edges_out),
@@ -582,6 +698,34 @@ def build_crash_static(
         logger.warning("All crashes filtered out of borough; skipping.")
         return None
 
+    # Canonical road name per crash from the OSM-snapped way. NJDOT's
+    # on-road text is noisy (state-route numbers, county codes, compound
+    # "A / B" labels, case drift), which fragments one physical street
+    # into several rows. The OSM ``street_name`` for the geocoded way
+    # collapses them onto a single road so the webapp's top-roads table
+    # groups cleanly; rows without an OSM snap fall back to ``None`` and
+    # the front-end parses the on-road from the label instead.
+    df = df.copy()
+    way_to_name: dict = {}
+    if (
+        segments is not None and not segments.empty
+        and "osm_way_id" in segments.columns
+        and "street_name" in segments.columns
+    ):
+        way_to_name = (
+            segments[["osm_way_id", "street_name"]]
+            .dropna(subset=["osm_way_id"])
+            .drop_duplicates("osm_way_id")
+            .set_index("osm_way_id")["street_name"]
+            .to_dict()
+        )
+    if way_to_name and "geocoded_osm_way_id" in df.columns:
+        df["_road"] = pd.to_numeric(
+            df["geocoded_osm_way_id"], errors="coerce",
+        ).map(way_to_name)
+    else:
+        df["_road"] = None
+
     points: list[dict] = []
     years: set[int] = set()
     for _, r in df.iterrows():
@@ -609,6 +753,8 @@ def build_crash_static(
             epdo = float(epdo) if pd.notna(epdo) else None
         except (TypeError, ValueError):
             epdo = None
+        road = r.get("_road")
+        road = road.strip() if isinstance(road, str) and road.strip() else None
         points.append({
             "lat": round(float(r["lat"]), 6),
             "lon": round(float(r["lon"]), 6),
@@ -621,6 +767,7 @@ def build_crash_static(
             "epdo": epdo,
             "ped": bool(r.get("ped_involved", False)),
             "label": label,
+            "road": road,
             "date": date_str,
         })
 
@@ -752,6 +899,7 @@ def build_static_maps(out_dir: Path = STATIC_DIR) -> dict[str, Path]:
             payload = build_traffic_static(
                 demand, geo, include, coords_by_edge, vmax_ids=borough_only,
                 name_of=name_of, edge_junctions=edge_junctions,
+                leonia_ids=borough_only,
             )
         except FileNotFoundError as exc:
             logger.warning("traffic %s: %s", demand, exc)

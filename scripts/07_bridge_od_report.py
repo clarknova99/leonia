@@ -56,7 +56,12 @@ from leonia_traffic.analysis.recommendations import (
     generate_recommendations,
     recommendations_to_markdown,
 )
-from leonia_traffic.config import REPORTS_DIR, REPORTS_FIG_DIR
+from leonia_traffic.config import (
+    DATA_NETWORK_DIR,
+    DATA_STAGE2_DIR,
+    REPORTS_DIR,
+    REPORTS_FIG_DIR,
+)
 from leonia_traffic.data.bridge_od_loader import (
     DAY_PART_CODES,
     load_bridge_attributes,
@@ -551,7 +556,7 @@ def main() -> None:
     reliability = cg.reliability_breakdown(cdf)
     overrides = cg.link_speed_overrides(
         cdf,
-        cache_path=REPO_ROOT / "data" / "network" / "speed_overrides_weekday_peak_am.parquet",
+        cache_path=DATA_NETWORK_DIR / "speed_overrides_weekday_peak_am.parquet",
     )
 
     summary = annotate_in_leonia(summary, congestion_zones)
@@ -614,7 +619,7 @@ def main() -> None:
     # Load the Pass-C per-residential-street index if it's been built;
     # otherwise the residential rules are silently skipped.
     per_street_df = None
-    per_street_path = REPO_ROOT / "data" / "processed" / "leonia_streets_cutthrough_index.parquet"
+    per_street_path = DATA_STAGE2_DIR / "leonia_streets_cutthrough_index.parquet"
     if per_street_path.exists():
         try:
             per_street_df = pd.read_parquet(per_street_path)
@@ -628,7 +633,7 @@ def main() -> None:
     # Load Pass-D derived tables (trend + OMD attribution) if present.
     street_trend_df = None
     cutthrough_attribution_df = None
-    derived_dir = REPO_ROOT / "data" / "processed" / "derived"
+    derived_dir = DATA_STAGE2_DIR
     trend_path = derived_dir / "street_trend.parquet"
     if trend_path.exists():
         try:

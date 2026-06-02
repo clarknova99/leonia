@@ -390,11 +390,9 @@ def main(argv: list[str] | None = None) -> int:
     if args.out:
         run_dir = Path(args.out).resolve()
     else:
+        from leonia_traffic.config import SUMO_RUNS_DIR
         ts = time.strftime("%Y%m%dT%H%M%SZ", time.gmtime())
-        run_dir = (
-            REPO_ROOT / "data" / "processed" / "sumo" / "runs"
-            / f"{ts}_{args.demand}"
-        ).resolve()
+        run_dir = (SUMO_RUNS_DIR / f"{ts}_{args.demand}").resolve()
     run_dir.mkdir(parents=True, exist_ok=True)
 
     rc = _spawn_worker(args, run_dir)

@@ -1,14 +1,28 @@
 # Leonia stakeholder webapp
 
 Interactive scenario explorer for traffic impact studies on Leonia local
-streets. The user picks a street, a change to apply (close, speed-hump,
-or convert to one-way), and a demand cohort (average weekday or average
-Sunday); the page swaps to a precomputed SUMO simulation comparing the
-baseline vs. the chosen scenario.
+streets. The user picks a street, a change to apply (close or speed-hump),
+and a demand cohort (average weekday or average Sunday); the page swaps to
+a precomputed SUMO simulation comparing the baseline vs. the chosen
+scenario.
 
 The webapp itself is **read-only**: every scenario is computed offline by
 `build_precache.py` and the FastAPI service simply maps dropdown
-selections to the cached HTML artefact.
+selections to the cached JSON/HTML artefact.
+
+## Data layout: build tree vs. published serve set
+
+- **Build tree** — `data/sumo/precache_build/` (~17 GB, git-ignored). The
+  full per-scenario SUMO output incl. the heavy `edge_history.parquet` /
+  `edge_summary.parquet` and the netconvert `_nets/` scratch.
+- **Published serve set** — `data/webapp/` (~0.4 GB). The slim subset the
+  webapp actually serves (`catalog.json` + per-scenario `flow.json` /
+  small JSON / HTML + `_static/` + `_overlays/`). Tracked via **Git LFS**
+  and **baked into the container image** (no runtime volume mount).
+
+`build_precache.py` writes the build tree, then publishes the slim subset
+into `data/webapp/`. Re-publish without rebuilding via
+`make publish-webapp-data` (= `build_precache.py --publish-only`).
 
 ## Layout
 
@@ -24,7 +38,7 @@ webapp/
 │   ├── deckgl_flow.js       reusable deck.gl/MapLibre flow renderer
 │   └── scenario_picker.js   client-side catalog -> flow.json -> deck.gl
 ├── scripts/
-│   └── build_precache.py    540-run offline scenario builder
+│   └── build_precache.py    offline scenario builder + serve-set publisher
 ├── Dockerfile
 ├── requirements.txt
 └── README.md
@@ -33,18 +47,20 @@ webapp/
 ## How it works
 
 1. **Precache build** (offline, ~2 h with `--parallel 8`)
-   `webapp/scripts/build_precache.py` enumerates the 90 streets in
-   `data/processed/leonia_streets_cutthrough_index.parquet`, crosses
-   them with three change types and two demand cohorts (= 540 runs),
-   and dispatches a SUMO worker subprocess per run. Each run writes:
+   `webapp/scripts/build_precache.py` enumerates the streets in
+   `data/stage-2/leonia_streets_cutthrough_index.parquet`, crosses
+   them with the change types (`closure`, `speed_hump`) and two demand
+   cohorts, and dispatches a SUMO worker subprocess per run. Each run
+   writes:
    - `edge_history.parquet` / `edge_summary.parquet`
    - `flow.json` — compact per-link, per-15-min vph dataset the
      stakeholder page renders with deck.gl (the primary map artefact)
    - `animated.html` / `animated_dual.html` / `compare.html` — legacy
      folium maps, kept as fallbacks
    - `manifest.json`
-   to `data/processed/sumo/runs_precache/<scenario_key>/`. A top-level
-   `catalog.json` is rebuilt from disk on every invocation.
+   to `data/sumo/precache_build/<scenario_key>/`. A top-level
+   `catalog.json` is rebuilt from disk on every invocation. The slim
+   serve set is then published to `data/webapp/`.
 
    > **Note:** `flow.json` was added after the original precache. To
    > backfill it for every scenario, re-run the full build with
@@ -57,8 +73,8 @@ webapp/
    - `GET /` → stakeholder page (dropdowns + deck.gl map)
    - `GET /api/catalog.json` → raw catalog (for the JS to populate
      dropdowns and resolve the cache key)
-   - `GET /precache/{path}` → static-serves files under
-     `runs_precache/`
+   - `GET /precache/{path}` → static-serves files under the published
+     serve set (`data/webapp/`)
    - `GET /healthz` → catalog readiness probe
 
    No SUMO is invoked at request time.
@@ -87,7 +103,7 @@ venv/bin/python webapp/scripts/build_precache.py \
     --demands bridge_od_weekday_24h \
     --parallel 1
 
-# Full 540-run build (~2 hours wallclock with parallel 8)
+# Full build (~2 hours wallclock with parallel 8)
 venv/bin/python webapp/scripts/build_precache.py --parallel 8
 ```
 
@@ -124,61 +140,68 @@ curl -sS http://127.0.0.1:8000/healthz | jq
 
 ## Building the Docker image
 
-The Dockerfile bakes the precache into the image so a `docker run`
-without volume mounts is self-contained. SUMO is *not* installed in
-the image because all SUMO work happens during `build_precache.py`,
-out-of-band from the image build.
+The Dockerfile `COPY`s the published serve set (`data/webapp/`) into the
+image, so a `docker run` without volume mounts is self-contained. SUMO is
+*not* installed in the image because all SUMO work happens during
+`build_precache.py`, out-of-band from the image build.
 
 ```bash
-# Build the precache first (out-of-band)
+# Build + publish the serve set first (out-of-band)
 venv/bin/python webapp/scripts/build_precache.py --parallel 8
 
-# Then build the image
+# Then build the image (default `bundled` target bakes data/webapp/)
 docker build -t leonia-webapp -f webapp/Dockerfile .
 
-# Run with the baked-in precache
+# Run with the baked-in serve set
 docker run --rm -p 8000:8000 leonia-webapp
 # -> http://127.0.0.1:8000
 ```
 
-### Mounting the precache instead of baking it
+> **Git LFS.** `data/webapp/` is tracked with Git LFS. Any host that
+> builds the image must have `git-lfs` installed and the real files
+> checked out (`git lfs pull`); otherwise the `COPY` bakes pointer stubs
+> and the webapp serves nothing. CI checks out with `lfs: true` for this
+> reason. See the repo `README.md` for the Git LFS setup/quota notes.
 
-For dev iteration, skip the COPY of `runs_precache/` and mount the
-host's data dir at runtime via `LEONIA_DATA_DIR`:
+### Mounting the serve set instead of baking it
+
+For dev iteration you can skip the baked data and point the container at
+a host directory via `LEONIA_PRECACHE_DIR` (or re-root everything with
+`LEONIA_DATA_DIR`):
 
 ```bash
 docker run --rm -p 8000:8000 \
-    -e LEONIA_DATA_DIR=/data \
-    -v $(pwd)/data:/data \
+    -e LEONIA_PRECACHE_DIR=/served \
+    -v $(pwd)/data/webapp:/served \
     leonia-webapp
 ```
 
-`leonia_traffic.config` honors `LEONIA_DATA_DIR` and re-roots all
-data paths under it (4-line patch in `leonia_traffic/config.py`).
+`webapp/app/config.py` honors `LEONIA_PRECACHE_DIR` and
+`leonia_traffic.config` honors `LEONIA_DATA_DIR`.
 
 ### Image size budget
 
-Approximate split for the default build (with 540 scenarios cached):
+Approximate split for the default `bundled` build:
 
 | layer                       | size   |
 | --------------------------- | ------ |
 | python:3.13-slim base       | ~140 MB |
 | pip deps (fastapi + pandas) | ~250 MB |
 | leonia_traffic + webapp     | ~5 MB |
-| precache (`runs_precache/`) | ~10 GB |
+| serve set (`data/webapp/`)  | ~0.4 GB |
 
-The precache is the dominant cost. If you're shipping over the
-network, consider hosting it as a separate volume / S3 mount and
-running with `LEONIA_DATA_DIR=/mnt/precache`.
+The serve set is the dominant data cost; the heavy build tree
+(`data/sumo/precache_build/`, ~17 GB) is **not** shipped.
 
 ## Operating notes
 
 - **Catalog is cached in memory** after the first request. Restart the
   process to pick up a freshly-rebuilt catalog (or call
   `reset_catalog_cache()` in code).
-- **Precache `_nets/` subdir** holds the per-street one-way
-  netconvert rebuilds. It's a build-time artefact and can be deleted
-  to reclaim disk if you don't need to re-run any one-way scenarios.
+- **Build-tree `_nets/` subdir** (under `data/sumo/precache_build/`)
+  holds the per-street netconvert rebuilds. It's a build-time artefact,
+  excluded from the published serve set, and can be deleted to reclaim
+  disk if you don't need to re-run any scenarios.
 - **Tests**: the webapp itself doesn't have a dedicated test suite;
   routes are thin enough that the local smoke (`uvicorn` + `curl`) is
   the recommended verification. The precache builder reuses the

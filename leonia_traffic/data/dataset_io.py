@@ -34,15 +34,17 @@ from typing import Any
 
 import pandas as pd
 
-from leonia_traffic.config import DATA_PROCESSED_DIR
+from leonia_traffic.config import DATA_STAGE1_DIR, DATA_STAGE2_DIR
 
 # ---------------------------------------------------------------------------
 # Paths
 # ---------------------------------------------------------------------------
+# stage-1 = canonical parquet built directly from the raw StreetLight /
+# NJDOT exports; stage-2 = analytics derived from stage-1.
 
-CANONICAL_DIR = DATA_PROCESSED_DIR / "streetlight"
-DERIVED_DIR = DATA_PROCESSED_DIR / "derived"
-CRASHES_DIR = DATA_PROCESSED_DIR / "crashes"
+CANONICAL_DIR = DATA_STAGE1_DIR / "streetlight"
+DERIVED_DIR = DATA_STAGE2_DIR
+CRASHES_DIR = DATA_STAGE1_DIR / "crash"
 
 CANONICAL_DIR.mkdir(parents=True, exist_ok=True)
 DERIVED_DIR.mkdir(parents=True, exist_ok=True)
@@ -260,6 +262,14 @@ class CanonicalFiles:
     za_tourist_summary = "za_tourist_summary.parquet"
     za_line_shapes = "za_line_shapes.parquet"
     za_polygon_shapes = "za_polygon_shapes.parquet"
+
+    # Historical ZA baseline (analysis 2038018): single multi-year aggregate
+    # Jan 2022 - May 2023 + Jan 2024 - Apr 2026, all-trips (no Visitor split).
+    # Complements the recent-year za_* tables above with a long-run baseline.
+    za_volume_history = "za_volume_history.parquet"
+    za_trips_history = "za_trips_history.parquet"
+    za_line_shapes_history = "za_line_shapes_history.parquet"
+    za_polygon_shapes_history = "za_polygon_shapes_history.parquet"
 
 
 class DerivedFiles:

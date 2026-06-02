@@ -31,7 +31,7 @@ import geopandas as gpd
 import numpy as np
 import pandas as pd
 
-from leonia_traffic.config import DATA_PROCESSED_DIR
+from leonia_traffic.config import SUMO_BASE_DIR
 from leonia_traffic.data.dataset_io import (
     CANONICAL_DIR,
     CRASHES_DIR,
@@ -45,7 +45,7 @@ from leonia_traffic.sumo.net_lookup import load_sumo_edge_geometries
 logger = logging.getLogger(__name__)
 
 
-SUMO_DIR = DATA_PROCESSED_DIR / "sumo"
+SUMO_DIR = SUMO_BASE_DIR
 DEFAULT_NET_PATH = SUMO_DIR / "leonia.net.xml"
 
 

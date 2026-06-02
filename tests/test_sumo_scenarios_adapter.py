@@ -5,7 +5,7 @@ from __future__ import annotations
 import pandas as pd
 import pytest
 
-from leonia_traffic.simulation.scenarios import (
+from leonia_traffic.scenarios import (
     Closure,
     LaneReduction,
     OneWayConversion,

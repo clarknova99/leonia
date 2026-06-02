@@ -31,6 +31,9 @@ jobs:
         uses: actions/checkout@v6
         with:
           fetch-depth: 0  # Ensure a full clone to avoid shallow clone issues
+          lfs: true       # CRITICAL: pull the real data/webapp serve set, not
+                          # the LFS pointer stubs — otherwise the bundled image
+                          # bakes tiny pointer files and the webapp serves nothing.
 
       # QEMU enables building the linux/arm64 variant on the amd64 runner.
       - name: Set up QEMU
@@ -60,9 +63,11 @@ jobs:
           echo "image_tag=${IMAGE_TAG}" >> $GITHUB_OUTPUT
           echo "Computed tag: ${IMAGE_TAG}"
 
-      # The webapp image is built code-only (--target base): the precomputed
-      # scenario cache lives under the .gitignored data/ tree and is mounted at
-      # runtime (k8s volume), so it is not baked into the published image.
+      # The webapp image is built data-bundled (--target bundled): the
+      # published serve set (data/webapp/) is Git-LFS tracked and baked into
+      # the image, so every published image is self-contained (no runtime
+      # data mount). The `lfs: true` checkout above is what makes the real
+      # files (not pointer stubs) available to the build.
       - name: Build and push Main
         if: github.ref_name == 'main'
         id: build_main
@@ -70,7 +75,7 @@ jobs:
         with:
           context: .
           file: ./webapp/Dockerfile
-          target: base
+          target: bundled
           cache-from: type=gha
           cache-to: type=gha,mode=max
           push: true
@@ -84,7 +89,7 @@ jobs:
         with:
           context: .
           file: ./webapp/Dockerfile
-          target: base
+          target: bundled
           cache-from: type=gha
           cache-to: type=gha,mode=max
           push: true
@@ -98,7 +103,7 @@ jobs:
         with:
           context: .
           file: ./webapp/Dockerfile
-          target: base
+          target: bundled
           cache-from: type=gha
           cache-to: type=gha,mode=max
           push: true

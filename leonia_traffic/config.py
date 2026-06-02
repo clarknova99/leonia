@@ -20,15 +20,37 @@ from shapely.geometry import Polygon, box
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
-STREETLIGHT_DIR = REPO_ROOT / "streetlight"
 DATA_DIR = Path(os.environ.get("LEONIA_DATA_DIR", REPO_ROOT / "data"))
+
+# Raw inputs (StreetLight exports, NJDOT crash sources). Upstream source
+# data, not regenerable from this repo.
 DATA_RAW_DIR = DATA_DIR / "raw"
-DATA_PROCESSED_DIR = DATA_DIR / "processed"
+STREETLIGHT_DIR = DATA_RAW_DIR / "streetlight"
+
+# Staged processed lake. stage-1 = canonical parquet built directly from
+# raw; stage-2 = analytics derived from stage-1.
+DATA_STAGE1_DIR = DATA_DIR / "stage-1"
+DATA_STAGE2_DIR = DATA_DIR / "stage-2"
+
+# OSM/sim network cache + hand-maintained overrides + borough boundary.
 DATA_NETWORK_DIR = DATA_DIR / "network"
+
+# SUMO: base sim inputs, analyst run outputs, and heavy precache build
+# scratch (the slim served set is published to WEBAPP_PUBLISH_DIR).
+DATA_SUMO_DIR = DATA_DIR / "sumo"
+SUMO_BASE_DIR = DATA_SUMO_DIR / "base"
+SUMO_RUNS_DIR = DATA_SUMO_DIR / "runs"
+SUMO_PRECACHE_DIR = DATA_SUMO_DIR / "precache_build"
+
+# Single published webapp serve set: catalog.json + per-scenario flow.json
+# + _static/ + _overlays/. Git-LFS tracked and baked into the container
+# image (no NAS mount).
+WEBAPP_PUBLISH_DIR = DATA_DIR / "webapp"
+
 REPORTS_DIR = REPO_ROOT / "reports"
 REPORTS_FIG_DIR = REPORTS_DIR / "figures"
 
-for _p in (DATA_PROCESSED_DIR, DATA_NETWORK_DIR, REPORTS_FIG_DIR):
+for _p in (DATA_STAGE1_DIR, DATA_STAGE2_DIR, DATA_NETWORK_DIR, REPORTS_FIG_DIR):
     _p.mkdir(parents=True, exist_ok=True)
 
 
@@ -191,17 +213,3 @@ STREETLIGHT_FOLDER_TO_LABEL = {
     "weekdays": STREETLIGHT_LABELS.weekdays,
     "weekend": STREETLIGHT_LABELS.weekend,
 }
-
-
-@dataclass(frozen=True)
-class SimulationDefaults:
-    """Default UXsim simulation parameters."""
-
-    deltan: int = 5              # platoon size
-    tmax_seconds: int = 4 * 3600 # 4-hour simulation horizon by default
-    default_jam_density: float = 0.2
-    coef_degree_to_meter: float = 111_000.0
-    random_seed: int = 0
-
-
-SIM_DEFAULTS = SimulationDefaults()

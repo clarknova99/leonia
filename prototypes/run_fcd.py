@@ -31,7 +31,7 @@ from pathlib import Path
 from sumolib import checkBinary
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-SUMO_DIR = REPO_ROOT / "data/processed/sumo"
+SUMO_DIR = REPO_ROOT / "data/sumo/base"
 NET = SUMO_DIR / "leonia.net.xml"
 OUT_JS = Path(__file__).resolve().parent / "leonia_fcd_data.js"
 

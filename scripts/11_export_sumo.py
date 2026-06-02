@@ -70,7 +70,7 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from leonia_traffic.config import (  # noqa: E402
-    DATA_PROCESSED_DIR,
+    SUMO_BASE_DIR,
     LEONIA_BBOX_WGS84,
     load_leonia_polygon,
 )
@@ -86,7 +86,7 @@ from leonia_traffic.sumo.net_lookup import (  # noqa: E402
     spatial_resolve_zones as _spatial_resolve_zones,
 )
 
-SUMO_DIR = DATA_PROCESSED_DIR / "sumo"
+SUMO_DIR = SUMO_BASE_DIR
 
 # Output filenames
 OSM_NAME = "leonia.osm.xml"

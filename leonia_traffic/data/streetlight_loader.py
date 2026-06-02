@@ -33,7 +33,7 @@ import geopandas as gpd
 import pandas as pd
 
 from leonia_traffic.config import (
-    DATA_PROCESSED_DIR,
+    DATA_STAGE1_DIR,
     STREETLIGHT_DIR,
     STREETLIGHT_FOLDER_TO_LABEL,
     STUDY_AREA_CITIES,
@@ -374,7 +374,7 @@ def pivot_by_source(
 # ---------------------------------------------------------------------------
 
 
-_CACHE_PATH = DATA_PROCESSED_DIR / "streetlight_segments.parquet"
+_CACHE_PATH = DATA_STAGE1_DIR / "streetlight_segments.parquet"
 
 
 def load_cached(

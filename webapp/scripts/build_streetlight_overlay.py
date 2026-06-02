@@ -102,7 +102,7 @@ if str(REPO_ROOT) not in sys.path:
 
 import pandas as pd
 
-from leonia_traffic.config import DATA_PROCESSED_DIR, STREETLIGHT_DIR
+from leonia_traffic.config import SUMO_BASE_DIR, SUMO_PRECACHE_DIR, STREETLIGHT_DIR
 from leonia_traffic.data.network_performance_loader import (
     load_network_performance_cached,
     load_network_performance_shapes_cached,
@@ -123,10 +123,10 @@ logger = logging.getLogger(__name__)
 # Output paths
 # ---------------------------------------------------------------------------
 
-PRECACHE_DIR = DATA_PROCESSED_DIR / "sumo" / "runs_precache"
+PRECACHE_DIR = SUMO_PRECACHE_DIR
 OVERLAY_DIR = PRECACHE_DIR / "_overlays"
-META_CSV = DATA_PROCESSED_DIR / "sumo" / "leonia.edgedata.meta.csv"
-NET_PATH = DATA_PROCESSED_DIR / "sumo" / "leonia.net.xml"
+META_CSV = SUMO_BASE_DIR / "leonia.edgedata.meta.csv"
+NET_PATH = SUMO_BASE_DIR / "leonia.net.xml"
 STREETSCANNER_CSV = (
     STREETLIGHT_DIR
     / "26600_20260514_212812_streetscanner_speed_volume.csv"

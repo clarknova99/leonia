@@ -1,16 +1,13 @@
 """SUMO-side adapter for the declarative scenario DSL.
 
-The :mod:`leonia_traffic.simulation.scenarios` module defines a small
+The :mod:`leonia_traffic.scenarios` module defines a small, engine-neutral
 DSL — :class:`Closure`, :class:`OneWayConversion`,
-:class:`SpeedHumpCalming`, :class:`LaneReduction` — that the UXsim
-pipeline applies *before* loading the network. SUMO is different: the
-network is fixed at ``netconvert`` time, so we apply scenarios *during*
-the simulation through libsumo's edge controls.
+:class:`SpeedHumpCalming`, :class:`LaneReduction`. SUMO fixes the network
+at ``netconvert`` time, so we apply each scenario *during* the simulation
+through libsumo's edge controls.
 
-This adapter takes the same ``Scenario`` instances the UXsim pipeline
-uses and translates each into one or more :class:`SumoRuntime` calls
-so callers can write a single scenario list and run it through either
-simulator.
+This adapter takes those ``Scenario`` instances and translates each into
+one or more :class:`SumoRuntime` calls.
 
 Limitations
 -----------
@@ -27,7 +24,7 @@ import logging
 from dataclasses import dataclass
 from typing import Iterable
 
-from leonia_traffic.simulation.scenarios import (
+from leonia_traffic.scenarios import (
     Closure,
     LaneReduction,
     OneWayConversion,

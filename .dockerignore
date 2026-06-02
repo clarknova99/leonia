@@ -33,20 +33,15 @@ notebooks/
 scripts/
 tests/
 
-# Heavy raw data — only the runs_precache + the borough geojson are
-# COPY'd in. Everything else under data/ is excluded.
+# Heavy data — only the published serve set (data/webapp/) and the small
+# borough polygon are COPY'd into the image. Exclude everything else under
+# data/ (raw inputs, the staged parquet lake, the ~17 GB SUMO build tree).
 data/raw/
-data/streetlight/
-data/processed/sumo/runs/
-data/processed/sumo/runs_*/
-data/processed/sumo/runs_precache/_nets/
-data/processed/sumo/leonia.osm.xml
-data/processed/sumo/leonia.net.xml
-data/processed/sumo/leonia.poly.xml
-data/processed/sumo/*.csv
-data/processed/sumo/*.parquet
-data/processed/*.parquet
-streetlight/
+data/stage-1/
+data/stage-2/
+data/sumo/
+data/network/*
+!data/network/leonia_borough.geojson
 
 # Build artefacts
 dist/

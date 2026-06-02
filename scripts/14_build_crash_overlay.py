@@ -59,7 +59,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from leonia_traffic.config import DATA_PROCESSED_DIR  # noqa: E402
+from leonia_traffic.config import DATA_RAW_DIR, SUMO_BASE_DIR  # noqa: E402
 from leonia_traffic.data.dataset_io import (  # noqa: E402
     CRASHES_DIR,
     CrashFiles,
@@ -81,9 +81,9 @@ from leonia_traffic.sumo.net_lookup import (  # noqa: E402
 logger = logging.getLogger("build_crash_overlay")
 
 
-RAW_ROOT = REPO_ROOT / "data" / "raw" / "njdot_crashes"
-DASHBOARD_DIR = REPO_ROOT / "data" / "raw" / "njdot_dashboard"
-SUMO_DIR = DATA_PROCESSED_DIR / "sumo"
+RAW_ROOT = DATA_RAW_DIR / "njdot_crashes"
+DASHBOARD_DIR = DATA_RAW_DIR / "njdot_dashboard"
+SUMO_DIR = SUMO_BASE_DIR
 NET_PATH = SUMO_DIR / "leonia.net.xml"
 META_PATH = SUMO_DIR / "leonia.edgedata.meta.csv"
 

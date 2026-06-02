@@ -33,7 +33,7 @@ from leonia_traffic.sumo.net_lookup import (
 )
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-SUMO_DIR = REPO_ROOT / "data/processed/sumo"
+SUMO_DIR = REPO_ROOT / "data/sumo/base"
 NET = SUMO_DIR / "leonia.net.xml"
 META = SUMO_DIR / "leonia.edgedata.meta.csv"
 OUT_JS = Path(__file__).resolve().parent / "leonia_flow_data.js"

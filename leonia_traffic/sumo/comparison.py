@@ -2,7 +2,7 @@
 
 Diffs a *baseline* run directory against a *scenario* run directory
 (both produced by ``scripts/12_sumo_baseline.py``,
-``scripts/14_sumo_signal_control.py``, or the webapp precache builder)
+``scripts/16_sumo_signal_control.py``, or the webapp precache builder)
 and produces:
 
 * a KPI delta table (trip-level: completion, travel time, delay,

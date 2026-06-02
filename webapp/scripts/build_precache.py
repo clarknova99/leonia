@@ -109,14 +109,24 @@ if str(REPO_ROOT) not in sys.path:
 # Imports below are all inside-leonia and may transitively load
 # parquets — that's fine, this script is the *parent* and never
 # imports libsumo (workers do).
-from leonia_traffic.config import DATA_PROCESSED_DIR  # noqa: E402
+from leonia_traffic.config import (  # noqa: E402
+    DATA_STAGE2_DIR,
+    SUMO_BASE_DIR,
+    SUMO_PRECACHE_DIR,
+    WEBAPP_PUBLISH_DIR,
+)
 
-SUMO_DIR = DATA_PROCESSED_DIR / "sumo"
-PRECACHE_DIR = SUMO_DIR / "runs_precache"
+SUMO_DIR = SUMO_BASE_DIR
+# Heavy build tree: full per-scenario outputs incl. edge_history.parquet /
+# edge_summary.parquet (kept for animation re-renders) and the netconvert
+# _nets/ scratch. The slim served subset is published from here into
+# WEBAPP_PUBLISH_DIR by ``publish_webapp_data`` (see scripts/sync_webapp_data
+# replacement / Makefile build-webapp-data).
+PRECACHE_DIR = SUMO_PRECACHE_DIR
 DEFAULT_NET_PATH = SUMO_DIR / "leonia.net.xml"
 DEFAULT_OSM_PATH = SUMO_DIR / "leonia.osm.xml"
 CUTTHROUGH_INDEX_PATH = (
-    DATA_PROCESSED_DIR / "leonia_streets_cutthrough_index.parquet"
+    DATA_STAGE2_DIR / "leonia_streets_cutthrough_index.parquet"
 )
 
 logger = logging.getLogger("precache")
@@ -155,6 +165,17 @@ def _scenario_key(street_slug: str, change_type: str, demand: str) -> str:
 
 def _baseline_key(demand: str) -> str:
     return f"baseline__{DEMAND_LABELS[demand]}"
+
+
+# Operational (network-wide) scenarios that aren't tied to a single
+# street — currently just the citywide adaptive-signals controller.
+OPERATIONAL_KINDS = {
+    "adaptive_signals": "Citywide: adaptive signals",
+}
+
+
+def _operational_key(op_kind: str, demand: str) -> str:
+    return f"operational__{op_kind}__{DEMAND_LABELS[demand]}"
 
 
 # ---------------------------------------------------------------------------
@@ -577,7 +598,7 @@ def _worker_run_scenario(
     libsumo permanently breaks pyarrow's read path inside its own
     process.
     """
-    from leonia_traffic.simulation.scenarios import (
+    from leonia_traffic.scenarios import (
         Closure, SpeedHumpCalming,
     )
     from leonia_traffic.sumo import DemandSource, SumoRuntime
@@ -657,6 +678,70 @@ def _worker_run_scenario(
     return stats
 
 
+def _worker_run_operational(
+    *,
+    op_kind: str,
+    demand: str,
+    out_dir: Path,
+    net_path: Path,
+    seed: int,
+    sample_interval_s: int,
+) -> dict:
+    """Worker entry point: run a network-wide operational scenario.
+
+    Currently only ``adaptive_signals`` — drives every signalised
+    intersection with the max-pressure controller for the whole run.
+    """
+    from leonia_traffic.sumo import DemandSource, SumoRuntime
+    from leonia_traffic.sumo.signal_control import (
+        AdaptivePressureController,
+        AdaptiveSignalConfig,
+    )
+
+    out_dir.mkdir(parents=True, exist_ok=True)
+    rt = SumoRuntime.start(
+        demand=DemandSource(demand),
+        net_path=net_path,
+        seed=seed,
+        sample_interval_s=sample_interval_s,
+        tripinfo_path=out_dir / "tripinfo.xml",
+    )
+
+    if op_kind == "adaptive_signals":
+        controller = AdaptivePressureController(
+            rt.backend, rt.traffic_light_ids(), AdaptiveSignalConfig(),
+        )
+        step_cb = controller.step
+    else:
+        rt.close()
+        raise ValueError(f"Unknown operational kind: {op_kind}")
+
+    t0 = time.time()
+    try:
+        rt.run_to_end(step_callback=step_cb)
+        history = rt.edge_history()
+        summary = rt.edge_summary()
+        stats = rt.stats()
+    finally:
+        rt.close()
+    stats["worker_wallclock_s"] = time.time() - t0
+
+    history.to_csv(out_dir / "edge_history.csv", index=False)
+    summary.to_csv(out_dir / "edge_summary.csv", index=False)
+    (out_dir / "worker_stats.json").write_text(
+        json.dumps({
+            "kind": "operational",
+            "op_kind": op_kind,
+            "demand": demand,
+            "seed": seed,
+            "sample_interval_s": sample_interval_s,
+            "signal_control": controller.diagnostics(),
+            "stats": stats,
+        }, indent=2, default=str)
+    )
+    return stats
+
+
 # ---------------------------------------------------------------------------
 # Worker process entry point — dispatched via ``--worker``
 # ---------------------------------------------------------------------------
@@ -666,17 +751,21 @@ def _worker_main(argv: list[str]) -> int:
     """Subprocess entry: run a single simulation and exit.
 
     The parent invokes us as ``python build_precache.py --worker
-    --kind {baseline,scenario} --out … --net …``. We never read the
-    parent's process state — everything we need is in argv.
+    --kind {baseline,scenario,operational} --out … --net …``. We never
+    read the parent's process state — everything we need is in argv.
     """
     p = argparse.ArgumentParser()
-    p.add_argument("--kind", choices=["baseline", "scenario"], required=True)
+    p.add_argument(
+        "--kind", choices=["baseline", "scenario", "operational"],
+        required=True,
+    )
     p.add_argument("--out", required=True)
     p.add_argument("--net", required=True)
     p.add_argument("--seed", type=int, default=42)
     p.add_argument("--sample-interval", type=int, default=60)
     p.add_argument("--demand", default=None)
     p.add_argument("--spec", default=None)
+    p.add_argument("--op-kind", default=None)
     args = p.parse_args(argv)
 
     out_dir = Path(args.out)
@@ -687,6 +776,19 @@ def _worker_main(argv: list[str]) -> int:
             print("--demand required for baseline", file=sys.stderr)
             return 2
         stats = _worker_run_baseline(
+            demand=args.demand,
+            out_dir=out_dir,
+            net_path=net_path,
+            seed=args.seed,
+            sample_interval_s=args.sample_interval,
+        )
+    elif args.kind == "operational":
+        if not args.demand or not args.op_kind:
+            print("--demand and --op-kind required for operational",
+                  file=sys.stderr)
+            return 2
+        stats = _worker_run_operational(
+            op_kind=args.op_kind,
             demand=args.demand,
             out_dir=out_dir,
             net_path=net_path,
@@ -814,6 +916,156 @@ def _post_process_baseline(out_dir: Path, demand: str) -> None:
         logger.warning("baseline %s flow.json failed: %s", demand, exc)
 
 
+def _maybe_build_operational(
+    *,
+    op_kind: str,
+    demand: str,
+    seed: int,
+    sample_interval_s: int,
+    force: bool,
+) -> dict | None:
+    """Run a network-wide operational scenario once. Idempotent.
+
+    Returns a catalog entry dict (or ``None`` on failure). Requires the
+    matching per-demand baseline to already exist (for the impact-glow
+    flow.json and the before/after KPI delta).
+    """
+    out_dir = PRECACHE_DIR / _operational_key(op_kind, demand)
+    manifest = out_dir / "manifest.json"
+    if manifest.exists() and not force:
+        logger.info("operational %s/%s: skip (already built)", op_kind, demand)
+        return _operational_catalog_entry(op_kind, demand)
+
+    logger.info("operational %s/%s: building...", op_kind, demand)
+    cmd = [
+        sys.executable, str(Path(__file__).resolve()),
+        "--worker", "--kind", "operational",
+        "--op-kind", op_kind,
+        "--out", str(out_dir),
+        "--net", str(DEFAULT_NET_PATH),
+        "--seed", str(seed),
+        "--sample-interval", str(sample_interval_s),
+        "--demand", demand,
+    ]
+    rc, log = _spawn_worker(cmd)
+    if rc != 0:
+        logger.error("operational %s/%s FAILED (exit %d):\n%s",
+                     op_kind, demand, rc, log[-500:])
+        return None
+    try:
+        _post_process_operational(out_dir, demand, op_kind)
+        _build_operational_visuals(out_dir, demand, op_kind)
+    except Exception as exc:
+        logger.error("operational %s/%s post-process failed: %s",
+                     op_kind, demand, exc)
+        return None
+    _trim_run_artefacts(out_dir)
+    return _operational_catalog_entry(op_kind, demand)
+
+
+def _post_process_operational(out_dir: Path, demand: str, op_kind: str) -> None:
+    """Read operational worker outputs, score, write manifest.json."""
+    import pandas as pd
+    from leonia_traffic.sumo.scoring import score_sumo_run, write_run_outputs
+    from leonia_traffic.sumo.trip_metrics import (
+        compute_trip_kpis,
+        parse_tripinfo,
+        write_trip_metrics,
+    )
+
+    summary = pd.read_csv(out_dir / "edge_summary.csv")
+    history = pd.read_csv(out_dir / "edge_history.csv")
+    worker_stats = json.loads((out_dir / "worker_stats.json").read_text())
+
+    sumo_score = score_sumo_run(summary, day_part="all_day")
+    trip_df = parse_tripinfo(out_dir / "tripinfo.xml")
+    trip_kpis = compute_trip_kpis(trip_df)
+    write_trip_metrics(out_dir, trip_df, trip_kpis)
+    manifest = {
+        "demand": demand,
+        "seed": worker_stats.get("seed"),
+        "sample_interval_s": worker_stats.get("sample_interval_s"),
+        "kind": "operational",
+        "op_kind": op_kind,
+        "signal_control": worker_stats.get("signal_control", {}),
+        "worker": worker_stats.get("stats", {}),
+        "trip_kpis": trip_kpis.to_dict(),
+    }
+    write_run_outputs(
+        out_dir,
+        edge_history=history,
+        edge_summary=summary,
+        scoring_df=sumo_score.scoring_df,
+        score=sumo_score.score,
+        manifest=manifest,
+    )
+
+
+def _build_operational_visuals(out_dir: Path, demand: str, op_kind: str) -> None:
+    """Emit flow.json (baseline embedded) + compare_kpis.json."""
+    import pandas as pd
+    from leonia_traffic.sumo.visualizations import write_flow_json
+
+    baseline_dir = PRECACHE_DIR / _baseline_key(demand)
+    history_pq = pd.read_parquet(out_dir / "edge_history.parquet")
+    baseline_history = None
+    bh = baseline_dir / "edge_history.parquet"
+    if bh.exists():
+        try:
+            baseline_history = _load_baseline_history_cached(bh)
+        except Exception as exc:
+            logger.warning("operational baseline history read failed: %s", exc)
+    try:
+        write_flow_json(
+            history_pq, DEFAULT_NET_PATH, out_dir / "flow.json",
+            sample_interval_s=60,
+            title=f"{OPERATIONAL_KINDS.get(op_kind, op_kind)} · "
+                  f"{DEMAND_LABELS[demand]}",
+            baseline_history=baseline_history,
+        )
+    except Exception as exc:
+        logger.warning("operational flow.json failed: %s", exc)
+
+    if (out_dir / "trip_metrics.json").exists() and (
+        baseline_dir / "trip_metrics.json"
+    ).exists():
+        try:
+            from leonia_traffic.sumo.comparison import compare_runs
+
+            result = compare_runs(
+                baseline_dir, out_dir,
+                label_baseline=f"Baseline ({DEMAND_LABELS[demand]})",
+                label_scenario=OPERATIONAL_KINDS.get(op_kind, op_kind),
+            )
+            (out_dir / "compare_kpis.json").write_text(
+                json.dumps(result.kpi_delta_payload(), indent=2, default=str)
+            )
+        except Exception as exc:
+            logger.warning("operational compare_kpis.json failed: %s", exc)
+
+
+def _operational_catalog_entry(op_kind: str, demand: str) -> dict | None:
+    """Catalog entry for one operational run, or None if not on disk."""
+    key = _operational_key(op_kind, demand)
+    run_dir = PRECACHE_DIR / key
+    if not (run_dir / "manifest.json").exists():
+        return None
+    return {
+        "key": key,
+        "op_kind": op_kind,
+        "label": OPERATIONAL_KINDS.get(op_kind, op_kind),
+        "demand": demand,
+        "demand_label": DEMAND_LABELS[demand],
+        "flow_json": (
+            f"{key}/flow.json" if (run_dir / "flow.json").exists() else None
+        ),
+        "compare_kpis": (
+            f"{key}/compare_kpis.json"
+            if (run_dir / "compare_kpis.json").exists() else None
+        ),
+    }
+
+
 def _build_scenario_net(
     run: RunSpec,
     netconvert_binary: str | None,
@@ -835,7 +1087,7 @@ def _build_scenario_net(
     if netconvert_binary is None:
         return DEFAULT_NET_PATH, "netconvert binary not found; oneway not enforceable"
 
-    scenario_net_dir = PRECACHE_DIR / "_nets" / run.street.slug
+    scenario_net_dir = SUMO_PRECACHE_DIR / "_nets" / run.street.slug
     scenario_net = scenario_net_dir / f"{run.street.slug}.net.xml"
     scenario_osm = scenario_net_dir / f"{run.street.slug}.osm.xml"
 
@@ -1323,6 +1575,21 @@ def _write_catalog(
             }
             for d in demands
         },
+        # Operational (network-wide) scenarios, keyed by op_kind then
+        # demand. Reflects whatever is on disk so a partial build still
+        # produces a valid (possibly sparser) catalog block.
+        "operational": {
+            op_kind: {
+                "label": label,
+                "by_demand": {
+                    d: entry
+                    for d in demands
+                    if (entry := _operational_catalog_entry(op_kind, d))
+                    is not None
+                },
+            }
+            for op_kind, label in OPERATIONAL_KINDS.items()
+        },
     }
     # Static-map artefacts (Static Maps tab). Built separately by
     # webapp/scripts/build_static_maps.py; reflect whatever is on disk.
@@ -1387,6 +1654,8 @@ def _collect_all_runs_on_disk(
         if not child.is_dir() or child.name.startswith("_"):
             continue
         if child.name.startswith("baseline__"):
+            continue
+        if child.name.startswith("operational__"):
             continue
         manifest = child / "manifest.json"
         if not manifest.exists():
@@ -1488,6 +1757,88 @@ def _build_baseline_visuals(demand: str) -> None:
 # ---------------------------------------------------------------------------
 
 
+# ---------------------------------------------------------------------------
+# Publish: copy the slim served subset out of the heavy build tree
+# ---------------------------------------------------------------------------
+
+# Patterns excluded when publishing the build tree to data/webapp. These are
+# heavy build inputs the webapp never serves (edge_history/edge_summary
+# parquet + the worker CSVs) and the netconvert scratch dir.
+_PUBLISH_EXCLUDES = (
+    "*edge_history*",
+    "*edge_summary*",
+    "_nets/",
+    "*.csv",
+    "worker_stats.json",
+    ".DS_Store",
+)
+
+
+def publish_webapp_data(
+    src: Path = PRECACHE_DIR, dst: Path = WEBAPP_PUBLISH_DIR,
+) -> Path:
+    """Mirror the slim served subset from the build tree into ``data/webapp``.
+
+    ``data/webapp`` is the single published serve set — git-LFS tracked and
+    baked into the container image. It holds ``catalog.json`` + each
+    scenario's ``flow.json`` / ``*.html`` / small JSON + ``_static/`` +
+    ``_overlays/``. The multi-GB ``edge_*`` parquet build inputs and the
+    netconvert ``_nets/`` scratch are excluded and stay only in
+    ``data/sumo/precache_build``.
+    """
+    import shutil
+    import subprocess
+
+    if not src.exists():
+        raise FileNotFoundError(
+            f"build tree not found at {src}; run the precache build first."
+        )
+    dst.mkdir(parents=True, exist_ok=True)
+
+    rsync = shutil.which("rsync")
+    if rsync:
+        cmd = [rsync, "-a", "--delete"]
+        cmd += [f"--exclude={pat}" for pat in _PUBLISH_EXCLUDES]
+        cmd += [f"{src}/", f"{dst}/"]
+        subprocess.run(cmd, check=True)
+    else:
+        _publish_copy_fallback(src, dst)
+    logger.info("Published webapp serve set -> %s", dst)
+    return dst
+
+
+def _publish_copy_fallback(src: Path, dst: Path) -> None:
+    """Pure-Python publish for hosts without rsync (mirror with delete)."""
+    import fnmatch
+    import shutil
+
+    def _excluded(rel: Path) -> bool:
+        name = rel.name
+        if any(part == "_nets" for part in rel.parts):
+            return True
+        return any(
+            fnmatch.fnmatch(name, pat)
+            for pat in _PUBLISH_EXCLUDES
+            if not pat.endswith("/")
+        )
+
+    kept: set[Path] = set()
+    for path in src.rglob("*"):
+        rel = path.relative_to(src)
+        if path.is_dir():
+            continue
+        if _excluded(rel):
+            continue
+        target = dst / rel
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(path, target)
+        kept.add(rel)
+
+    for path in list(dst.rglob("*")):
+        if path.is_file() and path.relative_to(dst) not in kept:
+            path.unlink()
+
+
 def _parse(argv: list[str]) -> argparse.Namespace:
     p = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     p.add_argument(
@@ -1526,6 +1877,22 @@ def _parse(argv: list[str]) -> argparse.Namespace:
              "uses flow.json, so these are skipped by default for a "
              "faster build.",
     )
+    p.add_argument(
+        "--skip-operational", action="store_true",
+        help="Skip the network-wide operational runs (citywide adaptive "
+             "signals). They are built once per demand by default.",
+    )
+    p.add_argument(
+        "--no-publish", action="store_true",
+        help="Skip publishing the slim served subset to data/webapp. By "
+             "default the build tree is published there after each build.",
+    )
+    p.add_argument(
+        "--publish-only", action="store_true",
+        help="Do not build anything; just publish the current build tree's "
+             "slim served subset to data/webapp and exit. Run after the "
+             "overlay/static builders so their output is included.",
+    )
     p.add_argument("--worker", action="store_true",
                    help=argparse.SUPPRESS)
     return p.parse_args(argv)
@@ -1545,6 +1912,10 @@ def main(argv: list[str] | None = None) -> int:
         format="%(asctime)s %(levelname)s %(message)s",
     )
     args = _parse(argv)
+
+    if args.publish_only:
+        publish_webapp_data()
+        return 0
 
     PRECACHE_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -1575,7 +1946,7 @@ def main(argv: list[str] | None = None) -> int:
     )
 
     # 2. Build per-demand baselines (sequentially — they're prerequisites
-    #    for the dual-compare maps).
+    #    for the dual-compare maps and the operational runs below).
     for demand in args.demands:
         _maybe_build_baseline(
             demand=demand, seed=args.seed,
@@ -1583,6 +1954,18 @@ def main(argv: list[str] | None = None) -> int:
             force=args.force,
         )
         _build_baseline_visuals(demand)
+
+    # 2b. Build network-wide operational scenarios (citywide adaptive
+    #     signals) per demand. These depend on the baseline above for
+    #     the impact glow + before/after KPIs.
+    if not args.skip_operational:
+        for demand in args.demands:
+            for op_kind in OPERATIONAL_KINDS:
+                _maybe_build_operational(
+                    op_kind=op_kind, demand=demand, seed=args.seed,
+                    sample_interval_s=args.sample_interval,
+                    force=args.force,
+                )
 
     # 3. Enumerate scenario runs and execute via process pool.
     runs = _enumerate_runs(streets, args.change_types, args.demands)
@@ -1659,6 +2042,10 @@ def main(argv: list[str] | None = None) -> int:
         len(entries), n_ok_now, n_fail_now, elapsed,
         n_total_catalog, catalog_path,
     )
+
+    # 5. Publish the slim served subset to data/webapp (the image payload).
+    if not args.no_publish:
+        publish_webapp_data()
     return 0
 
 

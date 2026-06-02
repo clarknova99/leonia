@@ -1,7 +1,7 @@
 """GEH scoring of a SUMO run against StreetLight Street Scanner.
 
-Mirrors :mod:`leonia_traffic.simulation.calibration` so a SUMO run
-can use the same downstream reporting helpers as the UXsim pipeline.
+Uses the engine-neutral GEH primitives in
+:mod:`leonia_traffic.analysis.scoring`.
 
 The SUMO runtime hands us:
 
@@ -32,7 +32,7 @@ from leonia_traffic.data.dataset_io import (
     CANONICAL_DIR,
     CanonicalFiles,
 )
-from leonia_traffic.simulation.calibration import (
+from leonia_traffic.analysis.scoring import (
     CalibrationScore,
     geh_array,
 )

@@ -69,7 +69,7 @@ from xml.sax.saxutils import escape
 import geopandas as gpd
 import pandas as pd
 
-from leonia_traffic.config import DATA_PROCESSED_DIR
+from leonia_traffic.config import SUMO_BASE_DIR
 from leonia_traffic.data.dataset_io import (
     CANONICAL_DIR,
     DERIVED_DIR,
@@ -85,7 +85,7 @@ from leonia_traffic.sumo.net_lookup import (
 logger = logging.getLogger(__name__)
 
 
-SUMO_DIR = DATA_PROCESSED_DIR / "sumo"
+SUMO_DIR = SUMO_BASE_DIR
 DEFAULT_NET_PATH = SUMO_DIR / "leonia.net.xml"
 
 

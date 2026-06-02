@@ -1,9 +1,12 @@
 # Leonia data dictionary
 
-This document is the single reference for every processed dataset
-under `data/processed/`. It describes the canonical Parquet files
-produced from raw StreetLight exports, the derived analytics tables
-built on top of them, and how to load each one.
+This document is the single reference for every processed dataset in
+the staged data lake. It describes the canonical Parquet files
+(`data/stage-1/`) produced from the raw StreetLight/NJDOT exports, the
+derived analytics tables built on top of them (`data/stage-2/`), and how
+to load each one. Raw inputs live under `data/raw/` (StreetLight exports
+in `data/raw/streetlight/`); paths are single-sourced in
+`leonia_traffic/config.py` and `leonia_traffic/data/dataset_io.py`.
 
 If you only want to **use** the data, start with
 [Quick start](#quick-start). If you want to know what a specific
@@ -16,18 +19,18 @@ rebuild everything from scratch, see
 ## Quick start
 
 ```bash
-# One-time: build the canonical data lake from raw streetlight/ exports
+# One-time: build the canonical data lake from raw data/raw/streetlight/ exports
 venv/bin/python scripts/00_build_datasets.py
 ```
 
 ```python
 # Read a canonical tabular dataset (pandas)
 import pandas as pd
-za = pd.read_parquet("data/processed/streetlight/za_volume.parquet")
+za = pd.read_parquet("data/stage-1/streetlight/za_volume.parquet")
 
 # Read a GeoParquet (geopandas)
 import geopandas as gpd
-lines = gpd.read_parquet("data/processed/streetlight/za_line_shapes.parquet")
+lines = gpd.read_parquet("data/stage-1/streetlight/za_line_shapes.parquet")
 # CRS is EPSG:4326 (WGS84 lon/lat) for every geospatial file in the lake.
 
 # Or use the convenience helpers, which fall back to raw CSV if the
@@ -44,8 +47,8 @@ without any Python.
 ## Directory layout
 
 ```
-data/processed/
-├── streetlight/              # canonical, raw-aligned tables (one per StreetLight CSV family)
+data/stage-1/                # canonical, raw-aligned tables
+├── streetlight/              # one parquet per StreetLight CSV family
 │   ├── _manifest.json        # build metadata for every file in this folder
 │   ├── streetscanner_segments.parquet
 │   ├── bridge_od.parquet
@@ -62,16 +65,27 @@ data/processed/
 │   ├── za_work_block_groups.parquet
 │   ├── za_tourist_summary.parquet
 │   ├── za_line_shapes.parquet      (GeoParquet)
-│   └── za_polygon_shapes.parquet   (GeoParquet)
-└── derived/                  # downstream analytics tables
-    ├── _manifest.json
-    ├── cutthrough_index.parquet
-    ├── hourly_profiles.parquet
-    ├── peak_intensity_am.parquet
-    └── peak_intensity_pm.parquet
+│   ├── za_polygon_shapes.parquet   (GeoParquet)
+│   ├── za_volume_history.parquet   (2022→2026 baseline, all-trips)
+│   ├── za_trips_history.parquet
+│   ├── za_line_shapes_history.parquet     (GeoParquet)
+│   └── za_polygon_shapes_history.parquet  (GeoParquet)
+└── crash/                    # NJDOT crash overlay (geocoded to OSM ways)
+    └── _manifest.json + crash parquet (see Crash overlay section)
+
+data/stage-2/                 # downstream analytics tables
+├── _manifest.json
+├── cutthrough_index.parquet
+├── leonia_streets_cutthrough_index.parquet  (per-street ranking, from 09)
+├── hourly_profiles.parquet
+├── peak_intensity_am.parquet
+├── peak_intensity_pm.parquet
+├── street_trend.parquet
+├── cutthrough_attribution.parquet
+└── od_bypass_pairs.parquet
 ```
 
-`_manifest.json` records, for each file: row count, column count, file size, build timestamp (UTC), source paths consumed, and whether the file is a GeoParquet. Read it programmatically with `json.load(open("data/processed/streetlight/_manifest.json"))`.
+`_manifest.json` records, for each file: row count, column count, file size, build timestamp (UTC), source paths consumed, and whether the file is a GeoParquet. Read it programmatically with `json.load(open("data/stage-1/streetlight/_manifest.json"))`.
 
 ---
 
@@ -96,13 +110,13 @@ These columns appear with the same meaning in many tables — they're listed onc
 
 ---
 
-## Canonical datasets — `data/processed/streetlight/`
+## Canonical datasets — `data/stage-1/streetlight/`
 
 ### `streetscanner_segments.parquet` (GeoParquet)
 
-**Source:** `streetlight/` root + `streetlight/weekdays/` + `streetlight/weekend/` (StreetLight Street Scanner exports).
+**Source:** `data/raw/streetlight/` root + `data/raw/streetlight/weekdays/` + `data/raw/streetlight/weekend/` (StreetLight Street Scanner exports).
 **Grain:** one row per (zone × source × day_type × day_part). Zones are short subsegments of named OSM ways; a single street name can have many split rows.
-**Used by:** `scripts/02_build_network.py`, `scripts/03_calibrate.py`, all Pass-B simulation scoring.
+**Used by:** `scripts/11_export_sumo.py`, `leonia_traffic.sumo` (SUMO demand + GEH scoring).
 
 | Column | Type | Notes |
 |---|---|---|
@@ -130,11 +144,11 @@ These columns appear with the same meaning in many tables — they're listed onc
 
 ### `bridge_od.parquet`
 
-**Source:** `streetlight/2036064_Destinations/*_od_all.csv` (StreetLight Destinations analysis 2036064, Apr 2025 – Mar 2026, 24-hour day parts).
+**Source:** `data/raw/streetlight/2036064_Destinations/*_od_all.csv` (StreetLight Destinations analysis 2036064, Apr 2025 – Mar 2026, 24-hour day parts).
 **Grain:** one row per (origin × destination × day_type × day_part). With 24 hourly day-parts × 8 day-types × ~26 origin/destination pairs that's ~4,900 rows.
-**Used by:** `scripts/05_bridge_od_report.py`, `scripts/07_bridge_od_report.py`, `leonia_traffic.sumo.demand_builder`.
+**Used by:** `scripts/07_bridge_od_report.py`, `leonia_traffic.sumo.demand_builder`.
 
-> **Schema note:** This dataset replaces the legacy `streetlight/bridge_destination/` export (analysis 2034043) which used 5 fixed windows (Early AM / Peak AM / Mid-Day / Peak PM / Late PM). The new export uses **24 hourly windows** (`day_part_code` 1–24, each covering hour `[code-1, code)`), plus code 0 = All-Day total. See `BRIDGE_OD_WINDOWS` (24 entries) and `BRIDGE_OD_HOUR_RANGES` (named ranges like `PeakAM = [7, 8, 9, 10]`) in `leonia_traffic.sumo.demand_builder` for the canonical mapping.
+> **Schema note:** This dataset replaces the legacy `data/raw/streetlight/bridge_destination/` export (analysis 2034043) which used 5 fixed windows (Early AM / Peak AM / Mid-Day / Peak PM / Late PM). The new export uses **24 hourly windows** (`day_part_code` 1–24, each covering hour `[code-1, code)`), plus code 0 = All-Day total. See `BRIDGE_OD_WINDOWS` (24 entries) and `BRIDGE_OD_HOUR_RANGES` (named ranges like `PeakAM = [7, 8, 9, 10]`) in `leonia_traffic.sumo.demand_builder` for the canonical mapping.
 
 | Column | Type | Notes |
 |---|---|---|
@@ -154,7 +168,7 @@ These columns appear with the same meaning in many tables — they're listed onc
 
 ### `bridge_od_zones.parquet` (GeoParquet)
 
-**Source:** `streetlight/2036064_Destinations/Shapefile/*_origin_zones.zip` + `*_destination_zones.zip` merged.
+**Source:** `data/raw/streetlight/2036064_Destinations/Shapefile/*_origin_zones.zip` + `*_destination_zones.zip` merged.
 **Grain:** one row per zone (14 total: 7 origin + 7 destination, both shapefiles include all 7 zones).
 
 | Column | Type | Notes |
@@ -172,7 +186,7 @@ These columns appear with the same meaning in many tables — they're listed onc
 
 ### `bridge_attributes.parquet`
 
-**Source:** Six attribute CSVs under `streetlight/2036064_Destinations/` (`*_traveler_*` + `*_od_trip_all.csv`) joined onto the OD key.
+**Source:** Six attribute CSVs under `data/raw/streetlight/2036064_Destinations/` (`*_traveler_*` + `*_od_trip_all.csv`) joined onto the OD key.
 **Grain:** one row per (origin × destination × day_type × day_part). Same key as `bridge_od.parquet`.
 **Used by:** `scripts/07_bridge_od_report.py` for equity / household / income narratives.
 
@@ -195,9 +209,9 @@ All `*::*` columns are float64 in [0, 1], representing the **share** of trips in
 
 ### `congestion_links.parquet`
 
-**Source:** `streetlight/congestion/*_link_metrics_all.csv` (StreetLight Congestion Trends).
+**Source:** `data/raw/streetlight/congestion/*_link_metrics_all.csv` (StreetLight Congestion Trends).
 **Grain:** one row per (link × day_type × day_part). `zone_name` here is `"<osm_road_type> / <osm_way_id>"` because the Congestion product names zones by class, not by street name.
-**Used by:** `scripts/05_congestion_report.py`, `scripts/06_scenarios.py` (calibration target).
+**Used by:** `scripts/07_bridge_od_report.py` (speed-override cache + congestion hotspots).
 
 | Column | Type | Notes |
 |---|---|---|
@@ -225,7 +239,7 @@ All `*::*` columns are float64 in [0, 1], representing the **share** of trips in
 
 ### `congestion_zones.parquet` (GeoParquet)
 
-**Source:** `streetlight/congestion/Shapefile/*_congestion_zones.zip`.
+**Source:** `data/raw/streetlight/congestion/Shapefile/*_congestion_zones.zip`.
 **Grain:** one row per zone (136 zones — primarily classes/segments inside Leonia's study area).
 
 | Column | Type | Notes |
@@ -239,7 +253,7 @@ All `*::*` columns are float64 in [0, 1], representing the **share** of trips in
 
 ### Network Performance — `network_performance_*.parquet`
 
-**Source:** `streetlight/2038116_leonia_network/` (StreetLight Network Performance, analysis 2038116).
+**Source:** `data/raw/streetlight/2038116_leonia_network/` (StreetLight Network Performance, analysis 2038116).
 **Why it exists:** the broadest segment-level product in the lake. Unlike Congestion Trends (arterials only) it covers **every selected OSM segment** — arterials, the GWB approach, *and* residential blocks — at **hourly** day-parts and **per-day-of-week** day types, so it supplies peak-hour volumes for calibration and a residential speed/volume layer.
 **Zone-name format:** the 3-part OSM Derivative form `"<name> / <osm way id> / <split #>"` (e.g. `"1st Street / 1007650684 / 1"`). The loader parses the **middle** number as `osm_way_id` and the trailing number as `split_num` — do **not** reuse the 2-part `parse_bridge_zone_name` here.
 
@@ -297,7 +311,7 @@ The Zone Activity export covers **OSM tertiary segments inside Leonia** with bot
 
 #### `za_volume.parquet` — main volume table
 
-**Source:** `streetlight/2034227_leonia_streets/*_za_all.csv`.
+**Source:** `data/raw/streetlight/2034227_leonia_streets/*_za_all.csv`.
 **Grain:** one row per (zone × day_type × day_part × filter).
 **Used by:** `scripts/09_leonia_streets_report.py` and the derived cut-through index.
 
@@ -317,7 +331,7 @@ The Zone Activity export covers **OSM tertiary segments inside Leonia** with bot
 
 #### `za_trips.parquet` — trip-attribute distributions
 
-**Source:** `streetlight/2034227_leonia_streets/*_zone_trip_all.csv`.
+**Source:** `data/raw/streetlight/2034227_leonia_streets/*_zone_trip_all.csv`.
 **Grain:** same as `za_volume.parquet` (it's an extended sibling).
 
 In addition to all columns above, this table includes:
@@ -332,7 +346,7 @@ Each `*_bin` value is a share in [0, 1]; the bins for a given metric (e.g. all `
 
 #### `za_home_distance.parquet`
 
-**Source:** `streetlight/2034227_leonia_streets/Home Work/*_home_distance_all.csv`.
+**Source:** `data/raw/streetlight/2034227_leonia_streets/Home Work/*_home_distance_all.csv`.
 **Grain:** one row per (zone × day_type × day_part × filter). Filter is overwhelmingly `Visitors` here (Residents always live within 0-1 mi of their own street, by definition).
 **Used by:** `non_local_home_share()` in `cutthrough_streets.py`.
 
@@ -341,7 +355,7 @@ Adds bin columns (each is a share):
 
 #### `za_home_zips_top.parquet`
 
-**Source:** `streetlight/2034227_leonia_streets/Home Work/*_home_zip_codes_top_all.csv`.
+**Source:** `data/raw/streetlight/2034227_leonia_streets/Home Work/*_home_zip_codes_top_all.csv`.
 **Grain:** **Multi-row** per zone — one row for each of the top home ZIP codes contributing to that zone's traffic, pre-ranked by StreetLight.
 **Used by:** `visitor_demographics.origin_municipality_breakdown()`.
 
@@ -353,7 +367,7 @@ Adds bin columns (each is a share):
 
 #### `za_home_state.parquet`
 
-**Source:** `streetlight/2034227_leonia_streets/Home Work/*_home_state_all.csv`.
+**Source:** `data/raw/streetlight/2034227_leonia_streets/Home Work/*_home_state_all.csv`.
 **Grain:** one row per (zone × day_type × day_part × filter × state). For a typical Leonia residential street, ~90% of Visitor home rows are New Jersey, ~7% New York.
 
 | Column | Type | Notes |
@@ -363,7 +377,7 @@ Adds bin columns (each is a share):
 
 #### `za_work_distance.parquet`
 
-**Source:** `streetlight/2034227_leonia_streets/Home Work/*_work_distance_all.csv`.
+**Source:** `data/raw/streetlight/2034227_leonia_streets/Home Work/*_work_distance_all.csv`.
 **Grain:** same as `za_home_distance.parquet`. Filter here is `Residents` only (StreetLight only publishes a workplace distance for resident drivers).
 
 Adds: `Percent Work less than 1 mi`, `Percent Work 1 to 3 mi`, …, `Percent Work more than 100 mi`.
@@ -372,7 +386,7 @@ Adds: `Percent Work less than 1 mi`, `Percent Work 1 to 3 mi`, …, `Percent Wor
 
 #### `za_work_block_groups.parquet` ⚠ large
 
-**Source:** `streetlight/2034227_leonia_streets/Home Work/*_work_block_groups_all.csv` (~2.86M rows, ~140 MB raw CSV, **13 MB** as Parquet).
+**Source:** `data/raw/streetlight/2034227_leonia_streets/Home Work/*_work_block_groups_all.csv` (~2.86M rows, ~140 MB raw CSV, **13 MB** as Parquet).
 **Grain:** one row per (zone × day_type × day_part × Census block group). Filter is `Residents` only.
 **Used by:** `visitor_demographics.work_destination_breakdown()` (workplace-county aggregation, used as a destination proxy in the Pass-C report).
 
@@ -389,7 +403,7 @@ Sub-rows for a given (zone × day_type × day_part) sum to ~1.0 across all block
 
 #### `za_tourist_summary.parquet`
 
-**Source:** `streetlight/2034227_leonia_streets/Home Work/*_tourist_summary_all.csv`.
+**Source:** `data/raw/streetlight/2034227_leonia_streets/Home Work/*_tourist_summary_all.csv`.
 **Grain:** one row per (zone × day_type × day_part × filter × home-area type).
 
 | Column | Type | Notes |
@@ -402,7 +416,7 @@ Sub-rows for a given (zone × day_type × day_part) sum to ~1.0 across all block
 
 #### `za_line_shapes.parquet` (GeoParquet)
 
-**Source:** `streetlight/2034227_leonia_streets/Shapefile/*_zone_activity_line.zip`.
+**Source:** `data/raw/streetlight/2034227_leonia_streets/Shapefile/*_zone_activity_line.zip`.
 **Grain:** one row per zone (375).
 
 | Column | Type | Notes |
@@ -418,14 +432,26 @@ Sub-rows for a given (zone × day_type × day_part) sum to ~1.0 across all block
 
 #### `za_polygon_shapes.parquet` (GeoParquet)
 
-**Source:** `streetlight/2034227_leonia_streets/Shapefile/*_zone_activity_polygon.zip`.
+**Source:** `data/raw/streetlight/2034227_leonia_streets/Shapefile/*_zone_activity_polygon.zip`.
 **Grain:** one row per zone (375).
 
 Same columns as the line shape file, minus the gate metadata, with `Polygon` geometry instead of `LineString`. Use the polygon shapes for mapping/colouring; use the line shapes for routing/spatial joins to the OSM network.
 
+#### `za_volume_history.parquet` / `za_trips_history.parquet` / `za_line_shapes_history.parquet` / `za_polygon_shapes_history.parquet`
+
+**Source:** `data/raw/streetlight/2038018_leonia_streets_new/` (analysis 2038018, created May 2026). Same OSM Tertiary zone library as the `za_*` tables above, identical column schema and parsing (built by `build_za_history` in `scripts/00_build_datasets.py`; read with `za_streets_loader.load_za_main_history_cached()` / `load_za_trip_history_cached()`).
+
+**What's different — this is a long-run baseline, not a replacement for `za_volume.parquet`:**
+
+- **Window:** a *single* multi-year aggregate covering `Jan 01, 2022 – May 31, 2023; Jan 01, 2024 – Apr 30, 2026`. The recent-year `za_volume.parquet` covers only `Apr 2025 – Mar 2026`. This extends the granular 375-segment pass-through measurement ~3 years further back.
+- **Deliberately excludes `Jun 01 2023 – Dec 31 2023`** (a StreetLight-side sample gap) — that 7-month window is *not* blended into the aggregate and is not recoverable from this export.
+- **No Visitor/Resident split and no `Home Work/` folder.** The `filter` column is absent (all-trips only), so it has no `za_home_*` / `za_work_*` / `za_tourist_summary` siblings and **cannot** drive home-location / cut-through attribution. Use the recent-year `za_*` tables for that.
+- **Coverage:** all **375** segments appear (vs 337 in the Visitor-filtered recent export — the missing 38 were sample-suppressed by the Visitor sub-filter). Full 7 day-types × 25 day-parts grid, plus the same trip-attribute bins (`tt_min_*`, `len_mi_*`, `spd_mph_*`, `circuity_*`).
+- The raw folder also ships `*_zone_prediction_interval.csv` (volume confidence bounds) and `*_zone_traveler_trip_purpose_all.csv` (HBW/HBO/NHB split) — additional dimensions not yet wired into the canonical lake.
+
 ### `streetscanner_trend.parquet`
 
-**Source:** `streetlight/streetscanner_trend/26658_*.csv` (StreetLight "Trend" export, monthly volume Jan 2023 → present).
+**Source:** `data/raw/streetlight/streetscanner_trend/26658_*.csv` (StreetLight "Trend" export, monthly volume Jan 2023 → present).
 **Grain:** one row per `(zone_name, year_month)` — long format. The wide `Change` column from the raw CSV is dropped (recoverable from `last_value` / `baseline_12mo_avg`).
 **Used by:** `street_trend.parquet` derivation, accelerating-cut-through recommendation rule.
 
@@ -450,7 +476,7 @@ Same columns as the line shape file, minus the gate metadata, with `Polygon` geo
 
 ### `cutthrough_omd.parquet`
 
-**Source:** `streetlight/2034993_cut_through/` — StreetLight O-D + Middle-Filter Analysis. This is the canonical confirmed-cut-through dataset: every row is a `(origin, middle, destination)` triple with the measured volume.
+**Source:** `data/raw/streetlight/2034993_cut_through/` — StreetLight O-D + Middle-Filter Analysis. This is the canonical confirmed-cut-through dataset: every row is a `(origin, middle, destination)` triple with the measured volume.
 **Grain:** one row per `(origin × middle × destination × day_type × day_part)`. 67,635 rows in the current export.
 **Used by:** `cutthrough_attribution.parquet`, `od_bypass_pairs.parquet`, `omd_confirmed_cutthrough` recommendation rule.
 
@@ -501,7 +527,7 @@ Lists zone id, label, role, and parsed osm_way_id where applicable. Acts as the 
 
 ---
 
-## Derived datasets — `data/processed/derived/`
+## Derived datasets — `data/stage-2/`
 
 These are recomputed from canonical data by `scripts/00_build_datasets.py --skip-derived` (skip flag) or simply by running the orchestrator with no flags.
 
@@ -612,7 +638,7 @@ Reduces the OMD triple-product table along the **middle-street** axis: for every
 
 ---
 
-## Crash overlay datasets — `data/processed/crashes/`
+## Crash overlay datasets — `data/stage-1/crash/`
 
 These files come from the **NJDOT Crash Data Dashboard**
 (Numetric / AASHTOWare Safety) and are joined to the OSM ways
@@ -846,7 +872,7 @@ The orchestrator uses an **explicit** product list — adding a new product requ
 ## Exporting to Eclipse SUMO
 
 The canonical lake + the derived layer can be exported to a
-**self-contained SUMO project** under `data/processed/sumo/` with:
+**self-contained SUMO project** under `data/sumo/base/` with:
 
 ```bash
 venv/bin/python scripts/11_export_sumo.py
@@ -876,9 +902,8 @@ finish the conversion later.
 > today. The export script handles this with a spatial fallback: any
 > Bridge OD zone whose id isn't found in the fresh OSM extract is
 > matched to the nearest SUMO edge (within 300 m) by its zone
-> geometry. The same trick is used in `calibration_match.py` for the
-> UXsim simulation. Result: all 7 Bridge OD zones resolve to SUMO
-> edges and all 49 flows route successfully.
+> geometry. Result: all 7 Bridge OD zones resolve to SUMO edges and all
+> 49 flows route successfully.
 
 ## Running SUMO simulations with libsumo
 
@@ -891,11 +916,11 @@ entry points consume the canonical lake directly:
 venv/bin/python scripts/12_sumo_baseline.py --demand peak_am_slice
 venv/bin/python scripts/12_sumo_baseline.py --demand bridge_od_full
 
-# Pass-B/C scenarios mirrored through SUMO + dual-compare maps.
+# Mitigation scenarios mirrored through SUMO + dual-compare maps.
 venv/bin/python scripts/13_sumo_scenarios.py
 ```
 
-Outputs land under `data/processed/sumo/runs/<timestamp>_<label>/`:
+Outputs land under `data/sumo/runs/<timestamp>_<label>/`:
 
 | File | What it is |
 |---|---|
@@ -984,15 +1009,17 @@ fidelity — for analytical use of raw ZA Visitor counts, call
 > `ZA_WEEKDAY_DAY_TYPE_CODES = (1,2,3,4)` and
 > `ZA_SUNDAY_DAY_TYPE_CODE = 6` for ZA.
 
-## Webapp precache datasets — `data/processed/sumo/runs_precache/`
+## Webapp datasets — build tree (`data/sumo/precache_build/`) + serve set (`data/webapp/`)
 
 The stakeholder web app (`webapp/`) is **read-only**: every map is a
 precomputed JSON artefact served by FastAPI and rendered with deck.gl.
 Nothing here is computed at request time. Three offline builders
-populate this tree:
+populate the **build tree** under `data/sumo/precache_build/`; the slim
+served subset is then published to `data/webapp/` (the single git-LFS-
+tracked, image-baked serve set):
 
 ```
-runs_precache/
+data/sumo/precache_build/         # heavy build tree (~17 GB, git-ignored)
 ├── catalog.json                  # index of everything below (rebuilt on every build)
 ├── <scenario_key>/               # one per (street × change × demand), e.g.
 │   │                             #   willow_tree_road__speed_hump__weekday
@@ -1017,11 +1044,15 @@ Built by, respectively:
 - `webapp/scripts/build_streetlight_overlay.py` → `_overlays/`
 - `webapp/scripts/build_static_maps.py` → `_static/`
 
-The deployable subset (`catalog.json` + every `flow.json` + `_static/`
-+ `_overlays/`, minus the heavy `edge_history.parquet` build inputs) is
-staged under `data/webapp/` and copied to the container's mounted
-volume at deploy time. See [`webapp/README.md`](../webapp/README.md) for
-the build/serve workflow.
+`build_precache.py` publishes the served subset (`catalog.json` + every
+`flow.json` + small JSON/HTML + `_static/` + `_overlays/`, minus the
+heavy `edge_history.parquet` / `edge_summary.parquet` build inputs and
+the `_nets/` scratch) into `data/webapp/`. That directory is tracked via
+**Git LFS** and **baked into the container image** (no runtime mount).
+Re-publish at any time with `make publish-webapp-data` (or
+`build_precache.py --publish-only`). See
+[`webapp/README.md`](../webapp/README.md) for the build/serve/deploy
+workflow.
 
 ### `catalog.json`
 
@@ -1108,7 +1139,7 @@ scripts/run_notebooks.sh         # both
 
 The traffic-assignment engine the sandbox is built on:
 
-- Reuses the same `(nodes, links)` tuple `build_or_load_network()` already produces for UXsim — the network is bit-identical.
+- Reuses the same SUMO network (`data/sumo/base/leonia.net.xml`) every other consumer reads — the network is bit-identical across builders.
 - Public API in `leonia_traffic/assignment/__init__.py`:
   - `build_assignment_graph(nodes, links)` — NetworkX DiGraph.
   - `bridge_od_to_demand(bridge_od_df, zones_gdf, G, day_type_code, day_part_code)` — Bridge-OD → `{(o_node, d_node): vph}`.

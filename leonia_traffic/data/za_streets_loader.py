@@ -50,6 +50,15 @@ logger = logging.getLogger(__name__)
 
 ZA_STREETS_DIR = STREETLIGHT_DIR / "2034227_leonia_streets"
 
+# Historical backfill export (analysis 2038018, created May 2026). Same OSM
+# tertiary zone library, but a single multi-year aggregate covering
+# ``Jan 01, 2022 - May 31, 2023; Jan 01, 2024 - Apr 30, 2026`` and *without*
+# the Visitor/Resident (Home & Work) split. It exists to give the 375
+# residential segments a long-run baseline that the recent-year 2034227
+# export (Apr 2025 - Mar 2026, Visitor-filtered) cannot. Treated as a
+# complementary ``*_history`` dataset, not a replacement.
+ZA_STREETS_HISTORY_DIR = STREETLIGHT_DIR / "2038018_leonia_streets_new"
+
 
 @dataclass(frozen=True)
 class ZAStreetsPaths:
@@ -520,14 +529,49 @@ def load_za_line_shapes_cached(folder: Path = ZA_STREETS_DIR) -> gpd.GeoDataFram
     return cached if cached is not None else load_za_line_shapes(folder)
 
 
+# ---------------------------------------------------------------------------
+# Historical baseline (2038018) cache loaders
+# ---------------------------------------------------------------------------
+# The historical export reuses the exact same parsing as the recent-year
+# export — the loaders above are already folder-parametrized — so these
+# canonical-first helpers just point the fallback at ``ZA_STREETS_HISTORY_DIR``
+# and read the ``*_history`` parquets when the lake has been built.
+
+
+def load_za_main_history_cached(
+    folder: Path = ZA_STREETS_HISTORY_DIR,
+) -> pd.DataFrame:
+    """Canonical-first loader for the historical ZA volume baseline."""
+    cached = _try_canonical("za_volume_history.parquet")
+    return cached if cached is not None else load_za_main(folder)
+
+
+def load_za_trip_history_cached(
+    folder: Path = ZA_STREETS_HISTORY_DIR,
+) -> pd.DataFrame:
+    cached = _try_canonical("za_trips_history.parquet")
+    return cached if cached is not None else load_za_trip(folder)
+
+
+def load_za_line_shapes_history_cached(
+    folder: Path = ZA_STREETS_HISTORY_DIR,
+) -> gpd.GeoDataFrame:
+    cached = _try_canonical("za_line_shapes_history.parquet")
+    return cached if cached is not None else load_za_line_shapes(folder)
+
+
 __all__ = [
     "ZA_STREETS_DIR",
+    "ZA_STREETS_HISTORY_DIR",
     "ZAStreetsPaths",
     "discover_za_streets",
     "load_za_main",
     "load_za_main_cached",
+    "load_za_main_history_cached",
     "load_za_trip",
     "load_za_trip_cached",
+    "load_za_trip_history_cached",
+    "load_za_line_shapes_history_cached",
     "load_za_home_distance",
     "load_za_home_distance_cached",
     "load_za_home_zips_top",

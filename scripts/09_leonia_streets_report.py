@@ -38,14 +38,15 @@ import pandas as pd
 from leonia_traffic.analysis import cutthrough_streets as cs
 from leonia_traffic.analysis import visitor_demographics as vd
 from leonia_traffic.analysis.jurisdiction import filter_segments_to_leonia
-from leonia_traffic.config import REPORTS_DIR, REPORTS_FIG_DIR
+from leonia_traffic.config import DATA_STAGE2_DIR, REPORTS_DIR, REPORTS_FIG_DIR
 from leonia_traffic.data import za_streets_loader as zl
+from leonia_traffic.data.dataset_io import DERIVED_DIR, DerivedFiles
 from leonia_traffic.viz.maps import volume_map
 
 REPORTS_MAPS_DIR = REPORTS_DIR / "maps"
 REPORTS_MAPS_DIR.mkdir(parents=True, exist_ok=True)
 REPORTS_FIG_DIR.mkdir(parents=True, exist_ok=True)
-PROCESSED_DIR = REPO_ROOT / "data" / "processed"
+PROCESSED_DIR = DATA_STAGE2_DIR
 PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
 
 
@@ -794,38 +795,58 @@ def main() -> None:
         f"  Non-residential OSM tags dropped: ~{pre_drop - len(imbalance)} rows."
     )
 
-    index_df = cs.composite_cutthrough_index(
-        imbalance_df=imbalance,
-        weekday_volume_df=weekday_vol,
-        long_trip_df=long_trip,
-        speeding_df=speeding,
-        home_dist_df=home_share,
-    )
+    # Cut-through ranking: reuse the jurisdiction-filtered, ranked composite
+    # index that scripts/00_build_datasets.build_derived already writes
+    # (DerivedFiles.cutthrough_index) rather than recomputing it here. Fall
+    # back to an in-line recompute if the derived lake has not been built yet
+    # so this report still runs standalone.
+    derived_index_path = DERIVED_DIR / DerivedFiles.cutthrough_index
+    if derived_index_path.exists():
+        index_df_leonia = pd.read_parquet(derived_index_path)
+        print(
+            f"  Loaded cut-through index from {derived_index_path.name} "
+            f"({len(index_df_leonia)} in-borough segments)."
+        )
+    else:
+        index_df = cs.composite_cutthrough_index(
+            imbalance_df=imbalance,
+            weekday_volume_df=weekday_vol,
+            long_trip_df=long_trip,
+            speeding_df=speeding,
+            home_dist_df=home_share,
+        )
+        # Spatial filter: only segments whose geometry actually sits inside
+        # the Leonia borough polygon. The earlier name-based drop already
+        # removed state-road tags; the polygon filter catches any
+        # tertiary-named segment that lies outside the borough.
+        index_df_leonia = filter_segments_to_leonia(
+            index_df.rename(columns={"street_name": "osm_name"}),
+            line_gdf.rename(columns={"name": "zone_name"}),
+        ).rename(columns={"osm_name": "street_name"})
+        index_df_leonia = index_df_leonia.sort_values(
+            "cutthrough_index", ascending=False
+        ).reset_index(drop=True)
+        index_df_leonia["rank"] = index_df_leonia.index + 1
+        print(
+            f"  Jurisdiction filter: {len(index_df)}\u2192{len(index_df_leonia)} "
+            "in-borough municipal residential segments."
+        )
 
+    # Report-only augmentation: peak-AM volume + Leonia-ZIP origin shares.
+    # (build_derived's table is the ranking; these columns are for the
+    # report tables/figures only.)
     if not peak_am.empty:
-        index_df = index_df.merge(peak_am, on=list(cs.KEY_COLUMNS), how="left")
+        index_df_leonia = index_df_leonia.merge(
+            peak_am, on=list(cs.KEY_COLUMNS), how="left",
+        )
     if not leonia_zip_share.empty:
-        index_df = index_df.merge(leonia_zip_share, on=list(cs.KEY_COLUMNS), how="left")
-
-    # Spatial filter: only segments whose geometry actually sits inside
-    # the Leonia borough polygon. The earlier name-based drop already
-    # removed state-road tags; the polygon filter catches any
-    # tertiary-named segment that lies outside the borough.
-    index_df_leonia = filter_segments_to_leonia(
-        index_df.rename(columns={"street_name": "osm_name"}),
-        line_gdf.rename(columns={"name": "zone_name"}),
-    ).rename(columns={"osm_name": "street_name"})
-
-    # Re-rank now that the filter has stripped out-of-scope rows.
+        index_df_leonia = index_df_leonia.merge(
+            leonia_zip_share, on=list(cs.KEY_COLUMNS), how="left",
+        )
     index_df_leonia = index_df_leonia.sort_values(
         "cutthrough_index", ascending=False
     ).reset_index(drop=True)
     index_df_leonia["rank"] = index_df_leonia.index + 1
-
-    print(
-        f"  Jurisdiction filter: {len(index_df)}\u2192{len(index_df_leonia)} "
-        "in-borough municipal residential segments."
-    )
 
     # Restrict the peak-hour dataframes to in-borough OSM ways so the
     # peak-hour section reflects the same jurisdictional scope as the
